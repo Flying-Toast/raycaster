@@ -3,7 +3,9 @@ use std::io::{BufRead, BufReader};
 use std::fs::File;
 use std::collections::HashMap;
 
-use crate::vector::{Vector};
+use crate::server::{
+    vector::Vector,
+};
 
 
 #[derive(Debug, Clone)]

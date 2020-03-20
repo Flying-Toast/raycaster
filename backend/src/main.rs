@@ -1,5 +1,7 @@
-use backend::map::Map;
-use backend::vector::{Vector};
+use backend::server::{
+    map::Map,
+    vector::Vector,
+};
 
 fn main() {
     let m = Map::from_file("../maps/simple_test.map").expect("Invalid map");
