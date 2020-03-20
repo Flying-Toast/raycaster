@@ -35,4 +35,12 @@ impl Vector {
             y: a.y * b.y,
         }
     }
+
+    /// Creates a vector that is perpendicular to this one.
+    pub fn perp(&self) -> Self {
+        Self {
+            x: -self.y,
+            y: self.x,
+        }
+    }
 }
