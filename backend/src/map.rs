@@ -3,6 +3,9 @@ use std::io::{BufRead, BufReader};
 use std::fs::File;
 use std::collections::HashMap;
 
+use crate::vector::{Vector};
+
+
 #[derive(Debug, Clone)]
 pub enum TileType {
     Air,
@@ -23,17 +26,26 @@ impl TileType {
 #[derive(Debug)]
 pub struct Tile {
     tile_type: TileType,
+    location: Vector,
 }
 
 impl Tile {
-    pub fn new(tile_type: TileType) -> Self {
+    pub fn new(tile_type: TileType, x: u32, y: u32) -> Self {
         Self {
             tile_type,
+            location: Vector {
+                x: x as f64,
+                y: y as f64,
+            }
         }
     }
 
     pub fn tile_type(&self) -> &TileType {
         &self.tile_type
+    }
+
+    pub fn location(&self) -> &Vector {
+        &self.location
     }
 }
 
@@ -65,14 +77,16 @@ impl Map {
         }
 
         let mut tiles = Vec::new();
-        for l in lines {
-            let line = l?;
+        for (y, line) in lines.enumerate() {
+            let line = line?;
             let mut row = Vec::new();
             let chars = line.chars();
-            for c in chars {
+            for (x, ch) in chars.enumerate() {
                 row.push(
                     Tile::new(
-                        tiletype_map.get(&c).ok_or("Invalid map")?.clone()
+                        tiletype_map.get(&ch).ok_or("Invalid map")?.clone(),
+                        x as u32,
+                        y as u32
                     )
                 );
             }
@@ -84,5 +98,10 @@ impl Map {
             height,
             tiles,
         })
+    }
+
+    /// Returns the tile that the given vector is in.
+    pub fn get_tile(&self, v: Vector) -> Option<&Tile> {
+        self.tiles.get(v.y as usize)?.get(v.x as usize)
     }
 }
