@@ -12,11 +12,13 @@ impl Vector {
         }
     }
 
+    /// Adds `v` to this vector, modifying it in-place.
     pub fn plus(&mut self, v: &Self) {
         self.x += v.x;
         self.y += v.y;
     }
 
+    /// Adds the two vectors, returning the result as a new vector.
     pub fn add(a: &Self, b: &Self) -> Self {
         Self {
             x: a.x + b.x,
@@ -24,11 +26,13 @@ impl Vector {
         }
     }
 
+    /// Multiplies this vector by `v`, modifying it in-place.
     pub fn times(&mut self, v: &Self) {
         self.x *= v.x;
         self.y *= v.y;
     }
 
+    /// Multiplies the two vectors, returning the result as a new vector.
     pub fn mult(a: &Self, b: &Self) -> Self {
         Self {
             x: a.x * b.x,
