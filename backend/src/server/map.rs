@@ -2,10 +2,7 @@ use std::error::Error;
 use std::io::{BufRead, BufReader};
 use std::fs::File;
 use std::collections::HashMap;
-
-use crate::server::{
-    vector::Vector,
-};
+use crate::server::vector::Vector;
 
 
 #[derive(Debug, Clone)]
@@ -15,7 +12,7 @@ pub enum TileType {
 }
 
 impl TileType {
-    pub fn from_str(string: &str) -> Result<Self, String> {
+    fn from_str(string: &str) -> Result<Self, String> {
         use TileType::*;
         match string {
             "air" => Ok(Air),
@@ -32,7 +29,7 @@ pub struct Tile {
 }
 
 impl Tile {
-    pub fn new(tile_type: TileType, x: u32, y: u32) -> Self {
+    fn new(tile_type: TileType, x: u32, y: u32) -> Self {
         Self {
             tile_type,
             location: Vector {
