@@ -1,5 +1,5 @@
 use std::sync::mpsc;
-use ws::{Handler, Message, Handshake, CloseCode};
+use ws::{Handler, Message, Handshake, CloseCode, listen};
 
 
 const SEND_FAIL_MSG: &str = "Failed to send a message to the server thread";
@@ -78,4 +78,16 @@ impl Handler for NetConnection {
     fn on_close(&mut self, _: CloseCode, _: &str) {
         self.shun();
     }
+}
+
+/// Runs the websocket network in this thread.
+/// `server_tx` is the transmitting end of a channel for sending `NetMessage`s to the server thread.
+pub fn start_network(host: &str, server_tx: mpsc::Sender<NetMessage>) -> Result<(), String> {
+    listen(host, |sender| {
+        NetConnection {
+            out: sender,
+            server: server_tx.clone(),
+            shunned: false,
+        }
+    }).or(Err("Failed to start the websocket listener".to_string()))
 }
