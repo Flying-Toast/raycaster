@@ -18,11 +18,11 @@ impl Vector {
         self.y += v.y;
     }
 
-    /// Adds the two vectors, returning the result as a new vector.
-    pub fn add(a: &Self, b: &Self) -> Self {
+    /// Adds `v` to this vector, returning the result as a new vector.
+    pub fn add(&self, v: &Self) -> Self {
         Self {
-            x: a.x + b.x,
-            y: a.y + b.y,
+            x: self.x + v.x,
+            y: self.y + v.y,
         }
     }
 
@@ -32,11 +32,11 @@ impl Vector {
         self.y *= v.y;
     }
 
-    /// Multiplies the two vectors, returning the result as a new vector.
-    pub fn mult(a: &Self, b: &Self) -> Self {
+    /// Multiplies this vector by `v`, returning the result as a new vector.
+    pub fn mult(&self, v: &Self) -> Self {
         Self {
-            x: a.x * b.x,
-            y: a.y * b.y,
+            x: self.x * v.x,
+            y: self.y * v.y,
         }
     }
 
