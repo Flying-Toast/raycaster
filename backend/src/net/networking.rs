@@ -37,7 +37,7 @@ struct NetConnection {
 impl NetConnection {
     fn shun(&mut self, close: bool) {
         if close {
-            let _ = self.out.close(CloseCode::Policy);
+            let _ = self.out.close(CloseCode::Normal);
         }
 
         if !self.shunned {
