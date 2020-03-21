@@ -1,12 +1,9 @@
-use backend::server::{
-    map::Map,
-    vector::Vector,
-};
+use std::sync::mpsc::channel;
+use backend::net::networking::start_network;
+
 
 fn main() {
-    let m = Map::from_file("../maps/simple_test.map").expect("Invalid map");
-    let a = m.get_tile(Vector::new(5.0, 0.0));
-    let b = m.get_tile(Vector::new(3.0, 9.0));
-    println!("{:#?}", a);
-    println!("{:#?}", b);
+    let (tx, rx) = channel();
+
+    start_network("0.0.0.0:8000", tx).expect("Failed to start network");
 }
