@@ -5,3 +5,4 @@ authors = ["Flying-Toast"]
 edition = "2018"
 
 [dependencies]
+ws = "0.9.1"
