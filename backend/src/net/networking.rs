@@ -37,9 +37,12 @@ struct NetConnection {
 }
 
 impl NetConnection {
-    /// Ignores all future messages from the websocket and attempts to close the connection.
-    fn shun(&mut self) {
-        let _ = self.out.close(CloseCode::Policy);
+    /// Ignores all future messages from the websocket.
+    /// If `close` is true, it also attempts to close the connection.
+    fn shun(&mut self, close: bool) {
+        if close {
+            let _ = self.out.close(CloseCode::Policy);
+        }
         self.shunned = true;
         self.server.send(NetMessage::Disconnect(self.out.connection_id()))
             .expect(SEND_FAIL_MSG);
@@ -69,14 +72,14 @@ impl Handler for NetConnection {
                 message
             )).expect(SEND_FAIL_MSG);
         } else { //the client sent a binary message
-            self.shun();
+            self.shun(true);
         }
 
         Ok(())
     }
 
     fn on_close(&mut self, _: CloseCode, _: &str) {
-        self.shun();
+        self.shun(false);
     }
 }
 
