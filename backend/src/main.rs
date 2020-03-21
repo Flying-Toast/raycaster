@@ -1,6 +1,6 @@
 use std::sync::mpsc::channel;
 use backend::net::networking::start_network;
-use backend::server::start::run_game;
+use backend::game::start::run_game;
 
 
 fn main() {

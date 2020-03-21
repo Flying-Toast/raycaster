@@ -2,7 +2,7 @@ use std::sync::mpsc;
 use ws::{Handler, Message, Handshake, CloseCode, listen};
 
 
-/// Information that gets sent to the server thread.
+/// Information that gets sent to the game thread.
 pub enum NetMessage {
     /// Signifies that a new websocket connection has been made.
     /// The first field is an id that uniquely identifies this websocket.
@@ -29,8 +29,8 @@ impl Responder {
 
 struct NetConnection {
     out: ws::Sender,
-    /// For sending messages to the server thread.
-    server: mpsc::Sender<NetMessage>,
+    /// For sending messages to the game thread.
+    game: mpsc::Sender<NetMessage>,
     shunned: bool,
 }
 
@@ -41,7 +41,7 @@ impl NetConnection {
         }
 
         if !self.shunned {
-            let _ = self.server.send(NetMessage::Disconnect(self.out.connection_id()));
+            let _ = self.game.send(NetMessage::Disconnect(self.out.connection_id()));
         }
 
         self.shunned = true;
@@ -50,7 +50,7 @@ impl NetConnection {
 
 impl Handler for NetConnection {
     fn on_open(&mut self, _: Handshake) -> ws::Result<()> {
-        let res = self.server.send(NetMessage::Connection(
+        let res = self.game.send(NetMessage::Connection(
             self.out.connection_id(),
             Responder {
                 sender: self.out.clone()
@@ -58,7 +58,7 @@ impl Handler for NetConnection {
         ));
 
         if let Err(_) = res {
-            eprintln!("Shunning websocket connection due to closed server");
+            eprintln!("Closing websocket connection due to closed game thread");
             self.shun(true);
         }
 
@@ -71,13 +71,13 @@ impl Handler for NetConnection {
         }
 
         if let Message::Text(message) = msg {
-            let res = self.server.send(NetMessage::Message(
+            let res = self.game.send(NetMessage::Message(
                 self.out.connection_id(),
                 message
             ));
 
             if let Err(_) = res {
-                eprintln!("Shunning websocket connection due to closed server");
+                eprintln!("Closing websocket connection due to closed game thread");
                 self.shun(true);
             }
         } else { //the client sent a binary message
@@ -92,14 +92,14 @@ impl Handler for NetConnection {
     }
 }
 
-/// Runs the websocket network in this thread.
-/// `server_tx` is the transmitting end of a channel for sending `NetMessage`s to the server thread.
-pub fn start_network(host: &str, server_tx: mpsc::Sender<NetMessage>) -> Result<(), String> {
+/// Runs the websocket server in this thread.
+/// `game_tx` is the transmitting end of a channel for sending `NetMessage`s to the game thread.
+pub fn start_network(host: &str, game_tx: mpsc::Sender<NetMessage>) -> Result<(), String> {
     listen(host, |sender| {
         NetConnection {
             out: sender,
-            server: server_tx.clone(),
+            game: game_tx.clone(),
             shunned: false,
         }
-    }).or(Err("Failed to start the websocket listener".to_string()))
+    }).or(Err("Failed to start websocket server".to_string()))
 }

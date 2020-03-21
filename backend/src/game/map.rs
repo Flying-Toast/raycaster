@@ -2,7 +2,7 @@ use std::error::Error;
 use std::io::{BufRead, BufReader};
 use std::fs::File;
 use std::collections::HashMap;
-use crate::server::vector::Vector;
+use crate::game::vector::Vector;
 
 
 #[derive(Debug, Clone)]

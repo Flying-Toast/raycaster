@@ -1,6 +1,6 @@
 use std::sync::mpsc::Receiver;
 use crate::net::networking::NetMessage;
-use crate::server::map::Map;
+use crate::game::map::Map;
 
 
 pub struct Game {
