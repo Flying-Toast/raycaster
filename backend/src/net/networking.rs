@@ -2,8 +2,6 @@ use std::sync::mpsc;
 use ws::{Handler, Message, Handshake, CloseCode, listen};
 
 
-const SEND_FAIL_MSG: &str = "Failed to send a message to the server thread";
-
 /// Information that gets sent to the server thread.
 pub enum NetMessage {
     /// Signifies that a new websocket connection has been made.
@@ -43,8 +41,7 @@ impl NetConnection {
         }
 
         if !self.shunned {
-            self.server.send(NetMessage::Disconnect(self.out.connection_id()))
-                .expect(SEND_FAIL_MSG);
+            let _ = self.server.send(NetMessage::Disconnect(self.out.connection_id()));
         }
 
         self.shunned = true;
@@ -53,12 +50,17 @@ impl NetConnection {
 
 impl Handler for NetConnection {
     fn on_open(&mut self, _: Handshake) -> ws::Result<()> {
-        self.server.send(NetMessage::Connection(
+        let res = self.server.send(NetMessage::Connection(
             self.out.connection_id(),
             Responder {
                 sender: self.out.clone()
             }
-        )).expect(SEND_FAIL_MSG);
+        ));
+
+        if let Err(_) = res {
+            eprintln!("Shunning websocket connection due to closed server");
+            self.shun(true);
+        }
 
         Ok(())
     }
@@ -69,10 +71,15 @@ impl Handler for NetConnection {
         }
 
         if let Message::Text(message) = msg {
-            self.server.send(NetMessage::Message(
+            let res = self.server.send(NetMessage::Message(
                 self.out.connection_id(),
                 message
-            )).expect(SEND_FAIL_MSG);
+            ));
+
+            if let Err(_) = res {
+                eprintln!("Shunning websocket connection due to closed server");
+                self.shun(true);
+            }
         } else { //the client sent a binary message
             self.shun(true);
         }
