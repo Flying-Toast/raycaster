@@ -55,7 +55,8 @@ export function parseMap(string) {
 		let row = [];
 		for (let j = 0; j < keys.length; j++) {
 			if (keys[j] in types) {
-				row.push(types[keys[j]]);
+				const type = types[keys[j]];
+				row.push(new Tile(type, new Vector(j, i)));
 			} else {
 				throw new Error("Invalid map");
 			}
