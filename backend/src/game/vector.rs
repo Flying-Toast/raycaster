@@ -47,4 +47,12 @@ impl Vector {
             y: self.x,
         }
     }
+
+    /// Creates a vector pointing in the opposite direction as this one.
+    pub fn opposite(&self) -> Self {
+        Self {
+            x: -self.x,
+            y: -self.y,
+        }
+    }
 }
