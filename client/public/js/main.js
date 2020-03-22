@@ -1,4 +1,7 @@
 import { parseMap } from "./map.js";
+import { Game } from "./game.js";
+import { Renderer } from "./render.js";
+import { runGameLoop } from "./gameloop.js";
 
 let map = parseMap(
 `20
@@ -28,4 +31,6 @@ X                  X
 XXXXXXXXXXXXXXXXXXXX`
 );
 
-console.log(map)
+let game = new Game(map);
+let renderer = new Renderer(document.querySelector("#canvas"));
+runGameLoop(game, renderer);
