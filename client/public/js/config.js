@@ -5,5 +5,6 @@ export const cfg = {
 		wall: "#4D4D4D",
 		//floor color:
 		air: "#D3D0D0"
-	}
+	},
+	playerSpeed: 0.01
 };
