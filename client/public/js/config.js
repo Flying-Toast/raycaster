@@ -6,6 +6,6 @@ export const cfg = {
 		//floor color:
 		air: "#D3D0D0"
 	},
-	playerSpeed: 0.01,
+	playerSpeed: 0.005,
 	mouseSensitivity: 2,
 };

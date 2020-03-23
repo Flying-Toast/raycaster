@@ -1,4 +1,5 @@
 import { cfg } from "./config.js";
+import { castRay } from "./ray.js";
 
 export class Renderer {
 	constructor(canvas) {
@@ -15,20 +16,34 @@ export class Renderer {
 	}
 
 	render2D(game) {
+		this.renderMap2D(game.map);
+		this.renderSelf2D(game.self);
+
+		const ray = castRay(game.map, game.self.loc, game.self.dir).intersection;
+		let ctx = this.ctx;
+		ctx.strokeStyle = "red";
+		ctx.lineWidth = 2;
+		ctx.beginPath();
+		const realFrom = game.self.loc.stimes(cfg.tileSize);
+		const to = ray.stimes(cfg.tileSize);
+		ctx.moveTo(realFrom.x, realFrom.y);
+		ctx.lineTo(to.x, to.y);
+		ctx.stroke();
+	}
+
+	renderMap2D(map) {
 		let ctx = this.ctx;
 
 		ctx.clearRect(0, 0, this.width, this.height);
 		ctx.strokeStyle = "#000000";
 		ctx.lineWidth = 1;
-		for (const row of game.map.tiles) {
+		for (const row of map.tiles) {
 			for (const t of row) {
 				ctx.fillStyle = cfg.tileColors[t.type];
 				ctx.fillRect(t.location.x * cfg.tileSize, t.location.y * cfg.tileSize, cfg.tileSize, cfg.tileSize);
 				ctx.strokeRect(t.location.x * cfg.tileSize, t.location.y * cfg.tileSize, cfg.tileSize, cfg.tileSize);
 			}
 		}
-
-		this.renderSelf2D(game.self);
 	}
 
 	renderSelf2D(self) {

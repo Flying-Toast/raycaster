@@ -13,13 +13,12 @@ export class Vector {
 		return new Vector(this.x + v.x, this.y + v.y);
 	}
 
-	smult(s) {
-		this.x *= s;
-		this.y *= s;
-	}
-
 	stimes(s) {
 		return new Vector(this.x * s, this.y * s);
+	}
+
+	smod(s) {
+		return new Vector(this.x % s, this.y % s);
 	}
 
 	perp() {
@@ -28,5 +27,9 @@ export class Vector {
 
 	opp() {
 		return new Vector(-this.x, -this.y);
+	}
+
+	clone() {
+		return new Vector(this.x, this.y);
 	}
 }
