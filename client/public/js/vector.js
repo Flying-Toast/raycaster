@@ -13,20 +13,20 @@ export class Vector {
 		return new Vector(this.x + v.x, this.y + v.y);
 	}
 
-	mult(v) {
-		this.x *= v.x;
-		this.y *= v.y;
+	smult(s) {
+		this.x *= s;
+		this.y *= s;
 	}
 
-	times(v) {
-		return new Vector(this.x * v.x, this.y * v.y);
+	stimes(s) {
+		return new Vector(this.x * s, this.y * s);
 	}
 
 	perp() {
 		return new Vector(-this.y, this.x);
 	}
 
-	opposite() {
+	opp() {
 		return new Vector(-this.x, -this.y);
 	}
 }

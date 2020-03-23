@@ -26,17 +26,17 @@ impl Vector {
         }
     }
 
-    /// Multiplies this vector by `v`, modifying it in-place.
-    pub fn mult(&mut self, v: &Self) {
-        self.x *= v.x;
-        self.y *= v.y;
+    /// Multiplies this vector by the given scalar, modifying it in-place.
+    pub fn smult(&mut self, scalar: f64) {
+        self.x *= scalar;
+        self.y *= scalar;
     }
 
-    /// Multiplies this vector by `v`, returning the result as a new vector.
-    pub fn times(&self, v: &Self) -> Self {
+    /// Multiplies this vector by the given scalar, returning the result as a new vector.
+    pub fn stimes(&self, scalar: f64) -> Self {
         Self {
-            x: self.x * v.x,
-            y: self.y * v.y,
+            x: self.x * scalar,
+            y: self.y * scalar,
         }
     }
 
@@ -49,7 +49,7 @@ impl Vector {
     }
 
     /// Creates a vector pointing in the opposite direction as this one.
-    pub fn opposite(&self) -> Self {
+    pub fn opp(&self) -> Self {
         Self {
             x: -self.x,
             y: -self.y,
