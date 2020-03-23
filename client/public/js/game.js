@@ -1,6 +1,7 @@
 import { Vector } from "./vector.js";
 import { Entity } from "./entity.js";
 import { getInput } from "./input.js";
+import { angleToDir } from "./ray.js";
 
 export class Game {
 	constructor(map) {
@@ -10,7 +11,8 @@ export class Game {
 	}
 
 	update(dt) {
-
+		const inputState = getInput();
+		this.self.dir = angleToDir(inputState.rotation);
 	}
 
 	addEntity(entity) {
