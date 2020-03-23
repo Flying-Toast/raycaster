@@ -47,9 +47,13 @@ export function castRay(map, loc, dir) {
 		}
 	}
 
+	const dist = hitXWall ? xDistAlong - alongBetweenX : yDistAlong - alongBetweenY;
+
 	return {
-		// where the ray hit the first wall
-		intersection: loc.plus(dir.stimes(hitXWall ? xDistAlong - alongBetweenX : yDistAlong - alongBetweenY)),
+		// length of the ray
+		distance: dist,
+		// vector where the ray hit the first wall
+		intersection: loc.plus(dir.stimes(dist)),
 		// is the intersection on a west/east side?
 		isX: hitXWall
 	};
