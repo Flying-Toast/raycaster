@@ -1,5 +1,6 @@
 import { Vector } from "./vector.js";
 import { Entity } from "./entity.js";
+import { getInput } from "./input.js";
 
 export class Game {
 	constructor(map) {
