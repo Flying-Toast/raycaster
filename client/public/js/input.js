@@ -1,3 +1,5 @@
+import { cfg } from "./config.js";
+
 let up = false;
 let down = false;
 let left = false;
@@ -13,7 +15,8 @@ addEventListener("keyup", function(e) {
 });
 
 addEventListener("mousemove", function(e) {
-	angle = (e.clientX / innerWidth) * Math.PI*2;
+	let a = (e.clientX / innerWidth * cfg.mouseSensitivity) * Math.PI*2;
+	angle = a % Math.PI*2;
 });
 
 function keyEvent(setState, e) {
