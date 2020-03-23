@@ -1,6 +1,6 @@
 export const cfg = {
-	resolution: { width: 750, height: 400 },
-	tileSize: 15,
+	resolution: { width: 1100, height: 1100 },
+	tileSize: 50,
 	tileColors: {
 		wall: "#4D4D4D",
 		//floor color:
