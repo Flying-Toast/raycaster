@@ -1,8 +1,8 @@
-use std::error::Error;
 use std::io::{BufRead, BufReader};
 use std::fs::File;
 use std::collections::HashMap;
 use crate::game::vector::Vector;
+use crate::error::*;
 
 
 #[derive(Debug, Clone)]
@@ -12,12 +12,12 @@ pub enum TileType {
 }
 
 impl TileType {
-    fn from_str(string: &str) -> Result<Self, String> {
+    fn from_str(string: &str) -> Result<Self, RCE> {
         use TileType::*;
         match string {
             "air" => Ok(Air),
             "wall" => Ok(Wall),
-            _ => Err(format!("{} is not a valid tile type", string))
+            _ => Err(RCE::BadTileType)
         }
     }
 }
@@ -56,19 +56,21 @@ pub struct Map {
 }
 
 impl Map {
-    pub fn from_file(file_path: &str) -> Result<Self, Box<dyn Error>> {
-        let file = File::open(file_path)?;
+    pub fn from_file(file_path: &str) -> Result<Self, RCE> {
+        const E: RCE = RCE::BadMapFormat;
+
+        let file = File::open(file_path).to(E)?;
         let mut lines = BufReader::new(file).lines();
 
-        let width: u32 = lines.next().ok_or("Invalid map")??.parse()?;
-        let height: u32 = lines.next().ok_or("Invalid map")??.parse()?;
-        let num_tiletypes: u32 = lines.next().ok_or("Invalid map")??.parse()?;
+        let width: u32 = lines.next().to(E)?.to(E)?.parse().to(E)?;
+        let height: u32 = lines.next().to(E)?.to(E)?.parse().to(E)?;
+        let num_tiletypes: u32 = lines.next().to(E)?.to(E)?.parse().to(E)?;
 
         let mut tiletype_map = HashMap::new();
         for _ in 0..num_tiletypes {
-            let line = lines.next().ok_or("Invalid map")??;
+            let line = lines.next().to(E)?.to(E)?;
             let mut chars = line.chars();
-            let key = chars.next().ok_or("Invalid map")?;
+            let key = chars.next().to(E)?;
             chars.next();
             let type_str: String = chars.collect();
             let tiletype = TileType::from_str(&type_str)?;
@@ -77,13 +79,13 @@ impl Map {
 
         let mut tiles = Vec::new();
         for (y, line) in lines.enumerate() {
-            let line = line?;
+            let line = line.to(E)?;
             let mut row = Vec::new();
             let chars = line.chars();
             for (x, ch) in chars.enumerate() {
                 row.push(
                     Tile::new(
-                        tiletype_map.get(&ch).ok_or("Invalid map")?.clone(),
+                        tiletype_map.get(&ch).to(E)?.clone(),
                         x as u32,
                         y as u32
                     )

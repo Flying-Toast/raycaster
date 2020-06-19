@@ -1,5 +1,6 @@
 use std::sync::mpsc;
 use ws::{Handler, Message, Handshake, CloseCode, listen};
+use crate::error::*;
 
 
 /// Information that gets sent to the game thread.
@@ -94,12 +95,12 @@ impl Handler for NetConnection {
 
 /// Runs the websocket server in this thread.
 /// `game_tx` is the transmitting end of a channel for sending `NetMessage`s to the game thread.
-pub fn start_network(host: &str, game_tx: mpsc::Sender<NetMessage>) -> Result<(), String> {
+pub fn start_network(host: &str, game_tx: mpsc::Sender<NetMessage>) -> Result<(), RCE> {
     listen(host, |sender| {
         NetConnection {
             out: sender,
             game: game_tx.clone(),
             shunned: false,
         }
-    }).or(Err("Failed to start websocket server".to_string()))
+    }).or(Err(RCE::NetworkFailedToStart))
 }
