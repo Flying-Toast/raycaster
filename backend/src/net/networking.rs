@@ -7,7 +7,7 @@ pub enum NetMessage {
     /// Signifies that a new websocket connection has been made.
     /// The first field is an id that uniquely identifies this websocket.
     /// The second field is a `Responder` for sending messages back to the websocket.
-    Connection(u32, Responder),
+    Connect(u32, Responder),
     /// A message from the websocket.
     /// The first field is the id of the websocket that sent this message.
     /// The second field is the message contents.
@@ -50,7 +50,7 @@ impl NetConnection {
 
 impl Handler for NetConnection {
     fn on_open(&mut self, _: Handshake) -> ws::Result<()> {
-        let res = self.game.send(NetMessage::Connection(
+        let res = self.game.send(NetMessage::Connect(
             self.out.connection_id(),
             Responder {
                 sender: self.out.clone()
