@@ -3,6 +3,8 @@ pub enum RCE {
     NetworkFailedToStart,
     BadTileType,
     BadMapFormat,
+    /// There was a problem reading the map file
+    MapFileRead,
 }
 
 pub trait ErrTo<T> {

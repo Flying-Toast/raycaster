@@ -10,9 +10,9 @@ pub struct Game {
 }
 
 impl Game {
-    pub fn new(rx: Receiver<NetMessage>) -> Self {
+    pub fn new(rx: Receiver<NetMessage>, map: Map) -> Self {
         Self {
-            map: Map::from_file("../maps/default.map").expect("Failed to load map"),
+            map,
             rx,
         }
     }

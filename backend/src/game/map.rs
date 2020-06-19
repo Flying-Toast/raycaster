@@ -59,7 +59,7 @@ impl Map {
     pub fn from_file(file_path: &str) -> Result<Self, RCE> {
         const E: RCE = RCE::BadMapFormat;
 
-        let file = File::open(file_path).to(E)?;
+        let file = File::open(file_path).to(RCE::MapFileRead)?;
         let mut lines = BufReader::new(file).lines();
 
         let width: u32 = lines.next().to(E)?.to(E)?.parse().to(E)?;
