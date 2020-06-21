@@ -3,18 +3,26 @@ use std::str::{Lines, FromStr};
 use strum_macros::{EnumString, AsRefStr};
 
 macro_rules! def_messages {
-($($msg_type:literal, $enum_variant:ident, $payload_ident:ident),*$(,)?) => {
+($($msg_key:literal, $enum_variant:ident, $payload_ident:ident),*$(,)?) => {
     pub enum ProtocolMessage {
         $(
             $enum_variant($payload_ident),
         )*
     }
 
+    $(
+        impl $payload_ident {
+            fn msg_key() -> &'static str {
+                $msg_key
+            }
+        }
+    )*
+
     pub(super) fn next_message(lines: &mut Lines) -> Option<Result<ProtocolMessage, RCE>> {
-        let msg_type = lines.next()?;
-        Some(match msg_type {
+        let msg_key = lines.next()?;
+        Some(match msg_key {
             $(
-                $msg_type => {
+                $msg_key => {
                     let payload = $payload_ident::parse(lines);
                     match payload {
                         Err(e) => Err(e),
