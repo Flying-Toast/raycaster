@@ -10,7 +10,7 @@ macro_rules! def_messages {
         )*
     }
 
-    pub fn next_message(lines: &mut Lines) -> Option<Result<ProtocolMessage, RCE>> {
+    pub(super) fn next_message(lines: &mut Lines) -> Option<Result<ProtocolMessage, RCE>> {
         let msg_type = lines.next()?;
         Some(match msg_type {
             $(

@@ -1,6 +1,7 @@
 use std::sync::mpsc;
 use ws::{Handler, Message, Handshake, CloseCode, listen};
 use crate::error::*;
+use crate::net::protocol::{ProtocolMessage, next_message};
 
 
 /// Information that gets sent to the game thread.
@@ -12,7 +13,7 @@ pub enum NetEvent {
     /// A message from the websocket.
     /// The first field is the id of the websocket that sent this message.
     /// The second field is the message contents.
-    Message(u32, String),
+    Message(u32, ProtocolMessage),
     /// Signifies that a websocket has disconnected.
     /// The field is the id of the websocket that disconnected.
     Disconnect(u32),
@@ -71,17 +72,29 @@ impl Handler for NetConnection {
             return Ok(());
         }
 
-        if let Message::Text(message) = msg {
-            let res = self.game.send(NetEvent::Message(
-                self.out.connection_id(),
-                message
-            ));
+        if let Message::Text(string) = msg {
+            let mut lines = string.lines();
 
-            if let Err(_) = res {
-                eprintln!("Closing websocket connection due to closed game thread");
-                self.shun(true);
+            loop {
+                let message;
+                match next_message(&mut lines) {
+                    None => break,
+                    Some(Err(_)) => break,
+                    Some(Ok(m)) => message = m,
+                }
+
+                let res = self.game.send(NetEvent::Message(
+                    self.out.connection_id(),
+                    message
+                ));
+
+                if let Err(_) = res {
+                    eprintln!("Killing websocket #{} because of closed game thread", self.out.connection_id());
+                    self.shun(true);
+                }
             }
-        } else { //the client sent a binary message
+        } else {
+            eprintln!("Websocket #{} sent a binary message - killing it", self.out.connection_id());
             self.shun(true);
         }
 
