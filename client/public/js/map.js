@@ -1,9 +1,8 @@
 import { Vector } from "./vector.js";
 
 export class Tile {
-	constructor(type, location) {
+	constructor(type) {
 		this.type = type;
-		this.location = location;
 	}
 }
 
@@ -31,7 +30,7 @@ export function parseMap(string) {
 
 	let types = {};
 	for (let i = 0; i < numTypes; i++) {
-		const parts = lines.shift().split("=").filter(i => i != "");
+		const parts = lines.shift().split("=").filter(x => x != "");
 		if (parts.length != 2 || parts[0].length != 1) {
 			throw new Error("Invalid map");
 		}
@@ -53,10 +52,10 @@ export function parseMap(string) {
 			throw new Error("Invalid map");
 		}
 		let row = [];
-		for (let j = 0; j < keys.length; j++) {
-			if (keys[j] in types) {
-				const type = types[keys[j]];
-				row.push(new Tile(type, new Vector(j, i)));
+		for (const key of keys) {
+			if (key in types) {
+				const type = types[key];
+				row.push(new Tile(type));
 			} else {
 				throw new Error("Invalid map");
 			}

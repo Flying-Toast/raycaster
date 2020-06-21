@@ -7,8 +7,8 @@ let map = parseMap(
 `20
 20
 2
-X=wall
- =air
+X=Wall
+ =Air
 XXXXXXXXXXXXXXXXXXXX
 X                  X
 X                  X

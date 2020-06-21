@@ -37,11 +37,11 @@ export class Renderer {
 		ctx.clearRect(0, 0, this.width, this.height);
 		ctx.strokeStyle = "#000000";
 		ctx.lineWidth = 1;
-		for (const row of map.tiles) {
-			for (const t of row) {
+		for (const [y, row] of map.tiles.entries()) {
+			for (const [x, t] of row.entries()) {
 				ctx.fillStyle = cfg.tileColors[t.type];
-				ctx.fillRect(t.location.x * cfg.tileSize, t.location.y * cfg.tileSize, cfg.tileSize, cfg.tileSize);
-				ctx.strokeRect(t.location.x * cfg.tileSize, t.location.y * cfg.tileSize, cfg.tileSize, cfg.tileSize);
+				ctx.fillRect(x * cfg.tileSize, y * cfg.tileSize, cfg.tileSize, cfg.tileSize);
+				ctx.strokeRect(x * cfg.tileSize, y * cfg.tileSize, cfg.tileSize, cfg.tileSize);
 			}
 		}
 	}

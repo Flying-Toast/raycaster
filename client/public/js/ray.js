@@ -35,7 +35,7 @@ export function castRay(map, loc, dir) {
 
 	let hitXWall;
 
-	while (map.getTile(currentLoc).type != "wall") {
+	while (map.getTile(currentLoc).type != "Wall") {
 		if (xDistAlong < yDistAlong) {
 			xDistAlong += alongBetweenX;
 			currentLoc.x += absoluteXDir;
