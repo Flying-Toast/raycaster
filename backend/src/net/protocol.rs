@@ -49,6 +49,12 @@ pub enum GameMode { FFA }
 
 // PAYLOADS //
 
+macro_rules! lines {
+    () => {
+        vec![Self::msg_key()]
+    };
+}
+
 /// Client <- Server
 pub struct NewGamePayload {
     pub map_name: String,
@@ -67,7 +73,7 @@ impl NewGamePayload {
     }
 
     fn encode(&self) -> Result<String, RCE> {
-        let mut lines: Vec<&str> = Vec::new();
+        let mut lines = lines!();
         lines.push(&self.map_name[..]);
         lines.push(self.gamemode.as_ref());
 
