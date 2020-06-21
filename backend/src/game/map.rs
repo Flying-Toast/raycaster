@@ -16,26 +16,17 @@ pub enum TileType {
 #[derive(Debug)]
 pub struct Tile {
     tile_type: TileType,
-    location: Vector,
 }
 
 impl Tile {
-    fn new(tile_type: TileType, x: u32, y: u32) -> Self {
+    fn new(tile_type: TileType) -> Self {
         Self {
             tile_type,
-            location: Vector {
-                x: x as f64,
-                y: y as f64,
-            }
         }
     }
 
     pub fn tile_type(&self) -> &TileType {
         &self.tile_type
-    }
-
-    pub fn location(&self) -> &Vector {
-        &self.location
     }
 }
 
@@ -69,16 +60,14 @@ impl Map {
         }
 
         let mut tiles = Vec::new();
-        for (y, line) in lines.enumerate() {
+        for line in lines {
             let line = line.to(E)?;
             let mut row = Vec::new();
             let chars = line.chars();
-            for (x, ch) in chars.enumerate() {
+            for ch in chars {
                 row.push(
                     Tile::new(
-                        tiletype_map.get(&ch).to(E)?.clone(),
-                        x as u32,
-                        y as u32
+                        tiletype_map.get(&ch).to(E)?.clone()
                     )
                 );
             }
