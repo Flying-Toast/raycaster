@@ -3,23 +3,14 @@ use std::fs::File;
 use std::collections::HashMap;
 use crate::game::vector::Vector;
 use crate::error::*;
+use strum_macros::EnumString;
+use std::str::FromStr;
 
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, EnumString)]
 pub enum TileType {
     Air,
     Wall,
-}
-
-impl TileType {
-    fn from_str(string: &str) -> Result<Self, RCE> {
-        use TileType::*;
-        match string {
-            "air" => Ok(Air),
-            "wall" => Ok(Wall),
-            _ => Err(RCE::BadTileType)
-        }
-    }
 }
 
 #[derive(Debug)]
@@ -73,7 +64,7 @@ impl Map {
             let key = chars.next().to(E)?;
             chars.next();
             let type_str: String = chars.collect();
-            let tiletype = TileType::from_str(&type_str)?;
+            let tiletype = TileType::from_str(&type_str).to(RCE::BadTileType)?;
             tiletype_map.insert(key, tiletype);
         }
 
