@@ -79,7 +79,14 @@ impl Handler for NetConnection {
                 let message;
                 match next_message(&mut lines) {
                     None => break,
-                    Some(Err(_)) => break,
+                    Some(Err(e)) => {
+                        eprintln!("Error while parsing message from websocket #{}: {:?}", self.out.connection_id(), e);
+                        eprintln!("The (entire) packet containing the message with an error:");
+                        eprintln!("=======================");
+                        eprintln!("{}", string);
+                        eprintln!("=======================");
+                        break;
+                    },
                     Some(Ok(m)) => message = m,
                 }
 

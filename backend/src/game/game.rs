@@ -19,6 +19,8 @@ impl Game {
 
     /// Starts the game loop.
     pub fn run(&mut self) {
+        loop {
 
+        }
     }
 }
