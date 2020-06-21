@@ -6,3 +6,5 @@ edition = "2018"
 
 [dependencies]
 ws = "0.9.1"
+strum = "0.18.0"
+strum_macros = "0.18.0"
