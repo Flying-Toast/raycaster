@@ -1,16 +1,16 @@
 use std::sync::mpsc::Receiver;
-use crate::net::networking::NetMessage;
+use crate::net::networking::NetEvent;
 use crate::game::map::Map;
 
 
 pub struct Game {
     map: Map,
     /// The receiving end of the channel from the network thread.
-    rx: Receiver<NetMessage>,
+    rx: Receiver<NetEvent>,
 }
 
 impl Game {
-    pub fn new(rx: Receiver<NetMessage>, map: Map) -> Self {
+    pub fn new(rx: Receiver<NetEvent>, map: Map) -> Self {
         Self {
             map,
             rx,

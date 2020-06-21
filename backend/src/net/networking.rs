@@ -4,7 +4,7 @@ use crate::error::*;
 
 
 /// Information that gets sent to the game thread.
-pub enum NetMessage {
+pub enum NetEvent {
     /// Signifies that a new websocket connection has been made.
     /// The first field is an id that uniquely identifies this websocket.
     /// The second field is a `Responder` for sending messages back to the websocket.
@@ -31,7 +31,7 @@ impl Responder {
 struct NetConnection {
     out: ws::Sender,
     /// For sending messages to the game thread.
-    game: mpsc::Sender<NetMessage>,
+    game: mpsc::Sender<NetEvent>,
     shunned: bool,
 }
 
@@ -42,7 +42,7 @@ impl NetConnection {
         }
 
         if !self.shunned {
-            let _ = self.game.send(NetMessage::Disconnect(self.out.connection_id()));
+            let _ = self.game.send(NetEvent::Disconnect(self.out.connection_id()));
         }
 
         self.shunned = true;
@@ -51,7 +51,7 @@ impl NetConnection {
 
 impl Handler for NetConnection {
     fn on_open(&mut self, _: Handshake) -> ws::Result<()> {
-        let res = self.game.send(NetMessage::Connect(
+        let res = self.game.send(NetEvent::Connect(
             self.out.connection_id(),
             Responder {
                 sender: self.out.clone()
@@ -72,7 +72,7 @@ impl Handler for NetConnection {
         }
 
         if let Message::Text(message) = msg {
-            let res = self.game.send(NetMessage::Message(
+            let res = self.game.send(NetEvent::Message(
                 self.out.connection_id(),
                 message
             ));
@@ -94,8 +94,8 @@ impl Handler for NetConnection {
 }
 
 /// Runs the websocket server in this thread.
-/// `game_tx` is the transmitting end of a channel for sending `NetMessage`s to the game thread.
-pub fn start_network(host: &str, game_tx: mpsc::Sender<NetMessage>) -> Result<(), RCE> {
+/// `game_tx` is the transmitting end of a channel for sending `NetEvent`s to the game thread.
+pub fn start_network(host: &str, game_tx: mpsc::Sender<NetEvent>) -> Result<(), RCE> {
     listen(host, |sender| {
         NetConnection {
             out: sender,
