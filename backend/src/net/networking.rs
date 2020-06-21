@@ -60,7 +60,7 @@ impl Handler for NetConnection {
         ));
 
         if let Err(_) = res {
-            eprintln!("Closing websocket connection due to closed game thread");
+            eprintln!("Killing websocket #{} because of closed game thread", self.out.connection_id());
             self.shun(true);
         }
 
@@ -81,7 +81,7 @@ impl Handler for NetConnection {
                     None => break,
                     Some(Err(e)) => {
                         eprintln!("Error while parsing message from websocket #{}: {:?}", self.out.connection_id(), e);
-                        eprintln!("The (entire) packet containing the message with an error:");
+                        eprintln!("The (entire) packet containing the bad message follows:");
                         eprintln!("=======================");
                         eprintln!("{}", string);
                         eprintln!("=======================");
