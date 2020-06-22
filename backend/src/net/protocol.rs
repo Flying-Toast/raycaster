@@ -33,14 +33,6 @@ macro_rules! def_messages {
             _ => Err(RCE::BadProtocolMessageType),
         })
     }
-
-    pub(super) fn encode_message(message: ProtocolMessage) -> String {
-        match message {
-            $(
-                ProtocolMessage::$enum_variant(payload) => payload.encode(),
-            )*
-        }
-    }
 };
 }
 
@@ -57,6 +49,11 @@ pub enum GameMode { FFA }
 
 // PAYLOADS //
 
+pub trait Payload {
+    fn parse(lines: &mut Lines) -> Result<Self, RCE> where Self: std::marker::Sized;
+    fn encode(&self) -> String;
+}
+
 macro_rules! lines {
     () => {
         vec![Self::msg_key()]
@@ -68,7 +65,7 @@ pub struct NewGamePayload {
     pub map_name: String,
     pub gamemode: GameMode,
 }
-impl NewGamePayload {
+impl Payload for NewGamePayload {
     fn parse(lines: &mut Lines) -> Result<Self, RCE> {
         const E: RCE = RCE::ProtocolDecode;
         let map_name = lines.next().to(E)?.to_string();

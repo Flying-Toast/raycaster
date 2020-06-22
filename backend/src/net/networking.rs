@@ -1,7 +1,7 @@
 use std::sync::mpsc;
 use ws::{Handler, Message, Handshake, CloseCode, listen};
 use crate::error::*;
-use crate::net::protocol::{ProtocolMessage, next_message, encode_message};
+use crate::net::protocol::{ProtocolMessage, next_message, Payload};
 
 
 /// Information that gets sent to the game thread.
@@ -24,8 +24,8 @@ pub struct Responder {
 }
 
 impl Responder {
-    pub fn send(&mut self, message: ProtocolMessage) {
-        let _ = self.sender.send(encode_message(message));
+    pub fn send(&mut self, payload: impl Payload) {
+        let _ = self.sender.send(payload.encode());
     }
 }
 
