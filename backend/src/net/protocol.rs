@@ -2,21 +2,13 @@ use crate::error::*;
 use std::str::{Lines, FromStr};
 use strum_macros::{EnumString, AsRefStr};
 
-macro_rules! def_messages {
+macro_rules! client_to_server_messages {
 ($($msg_key:literal, $enum_variant:ident, $payload_ident:ident),*$(,)?) => {
     pub enum ClientMessage {
         $(
             $enum_variant($payload_ident),
         )*
     }
-
-    $(
-        impl $payload_ident {
-            fn msg_key() -> &'static str {
-                $msg_key
-            }
-        }
-    )*
 
     pub(super) fn next_message(lines: &mut Lines) -> Option<Result<ClientMessage, RCE>> {
         let msg_key = lines.next()?;
@@ -36,7 +28,7 @@ macro_rules! def_messages {
 };
 }
 
-def_messages!(
+client_to_server_messages!(
     "ng", NewGame, NewGamePayload,
 );
 
@@ -51,6 +43,7 @@ pub enum GameMode { FFA }
 
 /// Server-to-Client payload
 pub trait S2CPayload {
+    fn msg_key() -> &'static str;
     fn encode(&self) -> String;
 }
 /// Client-to-Server payload
@@ -64,11 +57,19 @@ macro_rules! lines {
     };
 }
 
+macro_rules! msg_key {
+    ($key:literal) => {
+        fn msg_key() -> &'static str { $key }
+    }
+}
+
 pub struct NewGamePayload {
     pub map_name: String,
     pub gamemode: GameMode,
 }
 impl S2CPayload for NewGamePayload {
+    msg_key!("ng");
+
     fn encode(&self) -> String {
         let mut lines = lines!();
         lines.push(&self.map_name[..]);
@@ -88,5 +89,4 @@ impl C2SPayload for NewGamePayload {
             gamemode,
         })
     }
-
 }
