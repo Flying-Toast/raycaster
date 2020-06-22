@@ -33,6 +33,14 @@ macro_rules! def_messages {
             _ => Err(RCE::BadProtocolMessageType),
         })
     }
+
+    pub(super) fn encode_message(message: ProtocolMessage) -> String {
+        match message {
+            $(
+                ProtocolMessage::$enum_variant(payload) => payload.encode(),
+            )*
+        }
+    }
 };
 }
 
