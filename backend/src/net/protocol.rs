@@ -72,11 +72,11 @@ impl NewGamePayload {
         })
     }
 
-    fn encode(&self) -> Result<String, RCE> {
+    fn encode(&self) -> String {
         let mut lines = lines!();
         lines.push(&self.map_name[..]);
         lines.push(self.gamemode.as_ref());
 
-        Ok(lines.join("\n"))
+        lines.join("\n")
     }
 }
