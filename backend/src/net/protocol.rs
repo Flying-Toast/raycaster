@@ -49,9 +49,13 @@ pub enum GameMode { FFA }
 
 // PAYLOADS //
 
-pub trait Payload {
-    fn parse(lines: &mut Lines) -> Result<Self, RCE> where Self: std::marker::Sized;
+/// Server-to-Client payload
+pub trait S2CPayload {
     fn encode(&self) -> String;
+}
+/// Client-to-Server payload
+pub trait C2SPayload {
+    fn parse(lines: &mut Lines) -> Result<Self, RCE> where Self: std::marker::Sized;
 }
 
 macro_rules! lines {
@@ -60,12 +64,20 @@ macro_rules! lines {
     };
 }
 
-/// Client <- Server
 pub struct NewGamePayload {
     pub map_name: String,
     pub gamemode: GameMode,
 }
-impl Payload for NewGamePayload {
+impl S2CPayload for NewGamePayload {
+    fn encode(&self) -> String {
+        let mut lines = lines!();
+        lines.push(&self.map_name[..]);
+        lines.push(self.gamemode.as_ref());
+
+        lines.join("\n")
+    }
+}
+impl C2SPayload for NewGamePayload {
     fn parse(lines: &mut Lines) -> Result<Self, RCE> {
         const E: RCE = RCE::ProtocolDecode;
         let map_name = lines.next().to(E)?.to_string();
@@ -77,11 +89,4 @@ impl Payload for NewGamePayload {
         })
     }
 
-    fn encode(&self) -> String {
-        let mut lines = lines!();
-        lines.push(&self.map_name[..]);
-        lines.push(self.gamemode.as_ref());
-
-        lines.join("\n")
-    }
 }
