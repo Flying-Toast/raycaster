@@ -4,7 +4,7 @@ use strum_macros::{EnumString, AsRefStr};
 
 macro_rules! def_messages {
 ($($msg_key:literal, $enum_variant:ident, $payload_ident:ident),*$(,)?) => {
-    pub enum ProtocolMessage {
+    pub enum ClientMessage {
         $(
             $enum_variant($payload_ident),
         )*
@@ -18,7 +18,7 @@ macro_rules! def_messages {
         }
     )*
 
-    pub(super) fn next_message(lines: &mut Lines) -> Option<Result<ProtocolMessage, RCE>> {
+    pub(super) fn next_message(lines: &mut Lines) -> Option<Result<ClientMessage, RCE>> {
         let msg_key = lines.next()?;
         Some(match msg_key {
             $(
@@ -26,11 +26,11 @@ macro_rules! def_messages {
                     let payload = $payload_ident::parse(lines);
                     match payload {
                         Err(e) => Err(e),
-                        Ok(p) => Ok(ProtocolMessage::$enum_variant(p)),
+                        Ok(p) => Ok(ClientMessage::$enum_variant(p)),
                     }
                 },
             )*
-            _ => Err(RCE::BadProtocolMessageType),
+            _ => Err(RCE::BadClientMessageType),
         })
     }
 };

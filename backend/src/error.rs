@@ -6,7 +6,7 @@ pub enum RCE {
     /// There was a problem reading the map file
     MapFileRead,
     ProtocolDecode,
-    BadProtocolMessageType,
+    BadClientMessageType,
 }
 
 pub trait ErrTo<T> {

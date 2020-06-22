@@ -1,7 +1,7 @@
 use std::sync::mpsc;
 use ws::{Handler, Message, Handshake, CloseCode, listen};
 use crate::error::*;
-use crate::net::protocol::{ProtocolMessage, next_message, S2CPayload};
+use crate::net::protocol::{ClientMessage, next_message, S2CPayload};
 
 
 /// Information that gets sent to the game thread.
@@ -12,8 +12,8 @@ pub enum NetEvent {
     Connect(u32, Responder),
     /// A message from the websocket.
     /// The first field is the id of the websocket that sent this message.
-    /// The second field is the message contents.
-    Message(u32, ProtocolMessage),
+    /// The second field is the message.
+    Message(u32, ClientMessage),
     /// Signifies that a websocket has disconnected.
     /// The field is the id of the websocket that disconnected.
     Disconnect(u32),
