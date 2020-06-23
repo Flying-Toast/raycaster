@@ -1,7 +1,7 @@
 use std::sync::mpsc;
 use ws::{Handler, Message, Handshake, CloseCode, listen};
 use crate::error::*;
-use crate::net::protocol::{ClientMessage, next_message, S2CPayload};
+use crate::protocol::{ClientMessage, next_message, S2CPayload};
 
 
 /// Information that gets sent to the game thread.

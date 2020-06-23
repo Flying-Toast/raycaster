@@ -10,7 +10,7 @@ macro_rules! client_to_server_messages {
         )*
     }
 
-    pub(super) fn next_message(lines: &mut Lines) -> Option<Result<ClientMessage, RCE>> {
+    pub fn next_message(lines: &mut Lines) -> Option<Result<ClientMessage, RCE>> {
         let msg_key = lines.next()?;
         Some(match msg_key {
             $(
