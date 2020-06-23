@@ -7,8 +7,9 @@ macro_rules! client_to_server_messages {
         }
 
         pub fn next_message(pieces: &mut Pieces) -> Option<Result<ClientMessage, RCE>> {
-            let msg_key = match pieces.get_str()? {
+            let msg_key = match pieces.get_str() {
                 Ok(s) => s,
+                Err(RCE::EmptyPieces) => return None,
                 Err(e) => return Some(Err(e)),
             };
             Some(match msg_key {

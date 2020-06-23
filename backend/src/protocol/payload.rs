@@ -11,8 +11,11 @@ impl<'a> Pieces<'a> {
         Self { lines: raw.lines() }
     }
 
-    pub fn get_str(&mut self) -> Option<Result<&str, RCE>> {
-        Some(Ok(self.lines.next()?))
+    pub fn get_str(&mut self) -> Result<&str, RCE> {
+        match self.lines.next() {
+            Some(s) => Ok(s),
+            None => Err(RCE::EmptyPieces),
+        }
     }
 }
 

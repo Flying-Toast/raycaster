@@ -7,6 +7,7 @@ pub enum RCE {
     MapFileRead,
     PayloadDecode,
     BadClientMessageType,
+    EmptyPieces,
 }
 
 pub trait ErrTo<T> {
