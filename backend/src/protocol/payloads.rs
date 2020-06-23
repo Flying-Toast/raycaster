@@ -20,7 +20,6 @@ impl S2CPayload for NewGamePayload {
 }
 impl C2SPayload for NewGamePayload {
     fn parse(pieces: &mut Pieces) -> Result<Self, RCE> {
-        const E: RCE = RCE::PayloadDecode;
         let map_name: String = pieces.get()?;
         let gamemode: GameMode = pieces.get()?;
 

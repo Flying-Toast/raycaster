@@ -3,28 +3,31 @@ macro_rules! client_to_server_messages {
         /// A payload from the client
         pub enum ClientMessage {
             $(
-                $enum_variant($payload_ident),
+                $enum_variant(crate::protocol::payloads::$payload_ident),
             )*
         }
 
         /// Reads the next full payload from `pieces`
-        pub fn next_message(pieces: &mut Pieces) -> Option<Result<ClientMessage, RCE>> {
+        pub fn next_message(pieces: &mut crate::protocol::payload::Pieces)
+            -> Option<Result<ClientMessage, crate::error::RCE>>
+        {
+            use crate::protocol::payload::C2SPayload;
             let payload_key = match pieces.get_str() {
                 Ok(s) => s,
-                Err(RCE::EmptyPieces) => return None,
+                Err(crate::error::RCE::EmptyPieces) => return None,
                 Err(e) => return Some(Err(e)),
             };
             Some(match payload_key {
                 $(
                     $payload_key => {
-                        let payload = $payload_ident::parse(pieces);
+                        let payload = crate::protocol::payloads::$payload_ident::parse(pieces);
                         match payload {
                             Err(e) => Err(e),
                             Ok(p) => Ok(ClientMessage::$enum_variant(p)),
                         }
                     },
                 )*
-                _ => Err(RCE::BadClientMessageType),
+                _ => Err(crate::error::RCE::BadClientMessageType),
             })
         }
     };
