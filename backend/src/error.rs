@@ -5,7 +5,7 @@ pub enum RCE {
     BadMapFormat,
     /// There was a problem reading the map file
     MapFileRead,
-    ProtocolDecode,
+    PayloadDecode,
     BadClientMessageType,
 }
 

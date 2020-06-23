@@ -21,7 +21,7 @@ impl S2CPayload for NewGamePayload {
 }
 impl C2SPayload for NewGamePayload {
     fn parse(lines: &mut Lines) -> Result<Self, RCE> {
-        const E: RCE = RCE::ProtocolDecode;
+        const E: RCE = RCE::PayloadDecode;
         let map_name = lines.next().to(E)?.to_string();
         let gamemode = GameMode::from_str(lines.next().to(E)?).to(E)?;
 
