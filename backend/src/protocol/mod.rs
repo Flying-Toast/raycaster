@@ -5,9 +5,8 @@ pub mod payload;
 pub mod payloads;
 
 
-use crate::protocol::payload::C2SPayload;
+use crate::protocol::payload::{C2SPayload, Pieces};
 use crate::protocol::payloads::*;
-use std::str::{Lines};
 use crate::error::*;
 
 

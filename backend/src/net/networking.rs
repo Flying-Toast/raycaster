@@ -2,7 +2,7 @@ use std::sync::mpsc;
 use ws::{Handler, Message, Handshake, CloseCode, listen};
 use crate::error::*;
 use crate::protocol::{ClientMessage, next_message};
-use crate::protocol::payload::S2CPayload;
+use crate::protocol::payload::{S2CPayload, Pieces};
 
 
 /// Information that gets sent to the game thread.
@@ -74,11 +74,11 @@ impl Handler for NetConnection {
         }
 
         if let Message::Text(string) = msg {
-            let mut lines = string.lines();
+            let mut pieces = Pieces::new(&string);
 
             loop {
                 let message;
-                match next_message(&mut lines) {
+                match next_message(&mut pieces) {
                     None => break,
                     Some(Err(e)) => {
                         eprintln!("Error while parsing message from websocket #{}: {:?}", self.out.connection_id(), e);
