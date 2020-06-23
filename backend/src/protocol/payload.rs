@@ -21,7 +21,7 @@ impl<'a> Pieces<'a> {
     }
 
     /// Parse the next line into `T`
-    pub fn generic_get<T: FromStr>(&mut self) -> Result<T, RCE> {
+    pub fn get<T: FromStr>(&mut self) -> Result<T, RCE> {
         T::from_str(self.get_str()?).to(RCE::PayloadDecode)
     }
 }
