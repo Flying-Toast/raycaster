@@ -12,7 +12,7 @@ impl S2CPayload for NewGamePayload {
 
     fn encode(&self) -> String {
         let mut lines = lines!();
-        lines.push(&self.map_name[..]);
+        lines.push(&self.map_name);
         lines.push(self.gamemode.as_ref());
 
         lines.join("\n")
