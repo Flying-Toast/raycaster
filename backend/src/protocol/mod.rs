@@ -1,9 +1,11 @@
 pub mod types;
 #[macro_use]
 mod macros;
+pub mod payload;
 pub mod payloads;
 
 
+use crate::protocol::payload::{S2CPayload, C2SPayload};
 use crate::protocol::payloads::*;
 use std::str::{Lines};
 use crate::error::*;
