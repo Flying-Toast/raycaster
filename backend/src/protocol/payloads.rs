@@ -8,7 +8,7 @@ pub struct NewGamePayload {
     pub gamemode: GameMode,
 }
 impl S2CPayload for NewGamePayload {
-    msg_key!("ng");
+    key!("ng");
 
     fn encode(&self) -> String {
         let mut lines = lines!();

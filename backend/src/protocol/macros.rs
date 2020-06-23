@@ -1,20 +1,22 @@
 macro_rules! client_to_server_messages {
-    ($($msg_key:literal, $enum_variant:ident, $payload_ident:ident),*$(,)?) => {
+    ($($payload_key:literal, $enum_variant:ident, $payload_ident:ident),*$(,)?) => {
+        /// A payload from the client
         pub enum ClientMessage {
             $(
                 $enum_variant($payload_ident),
             )*
         }
 
+        /// Reads the next full payload from `pieces`
         pub fn next_message(pieces: &mut Pieces) -> Option<Result<ClientMessage, RCE>> {
-            let msg_key = match pieces.get_str() {
+            let payload_key = match pieces.get_str() {
                 Ok(s) => s,
                 Err(RCE::EmptyPieces) => return None,
                 Err(e) => return Some(Err(e)),
             };
-            Some(match msg_key {
+            Some(match payload_key {
                 $(
-                    $msg_key => {
+                    $payload_key => {
                         let payload = $payload_ident::parse(pieces);
                         match payload {
                             Err(e) => Err(e),
@@ -30,12 +32,13 @@ macro_rules! client_to_server_messages {
 
 macro_rules! lines {
     () => {
-        vec![Self::msg_key()]
+        vec![Self::payload_key()]
     };
 }
 
-macro_rules! msg_key {
+/// Shorthand for defining `S2CPayload::payload_key()`
+macro_rules! key {
     ($key:literal) => {
-        fn msg_key() -> &'static str { $key }
+        fn payload_key() -> &'static str { $key }
     }
 }

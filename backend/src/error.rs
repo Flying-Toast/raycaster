@@ -1,15 +1,17 @@
+/// Error type
 #[derive(Debug)]
 pub enum RCE {
     NetworkFailedToStart,
     BadTileType,
     BadMapFormat,
-    /// There was a problem reading the map file
+    /// Error reading a map file
     MapFileRead,
     PayloadDecode,
     BadClientMessageType,
     EmptyPieces,
 }
 
+/// Converts `Result<T, _>` to `Result<T, RCE>`. Also implemented on `Option`.
 pub trait ErrTo<T> {
     fn to(self, to: RCE) -> Result<T, RCE>;
 }
