@@ -1,6 +1,5 @@
 use crate::protocol::types::{GameMode};
 use crate::error::*;
-use std::str::FromStr;
 use crate::protocol::payload::{S2CPayload, C2SPayload, Pieces};
 
 
@@ -23,7 +22,7 @@ impl C2SPayload for NewGamePayload {
     fn parse(pieces: &mut Pieces) -> Result<Self, RCE> {
         const E: RCE = RCE::PayloadDecode;
         let map_name = pieces.get_str()?.to_string();
-        let gamemode = GameMode::from_str(pieces.get_str()?).to(E)?;
+        let gamemode: GameMode = pieces.generic_get()?;
 
         Ok(Self {
             map_name,

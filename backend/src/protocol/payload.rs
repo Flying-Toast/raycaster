@@ -1,5 +1,5 @@
 use crate::error::*;
-use std::str::Lines;
+use std::str::{Lines, FromStr};
 
 
 pub struct Pieces<'a> {
@@ -16,6 +16,10 @@ impl<'a> Pieces<'a> {
             Some(s) => Ok(s),
             None => Err(RCE::EmptyPieces),
         }
+    }
+
+    pub fn generic_get<T: FromStr>(&mut self) -> Result<T, RCE> {
+        T::from_str(self.get_str()?).to(RCE::PayloadDecode)
     }
 }
 
