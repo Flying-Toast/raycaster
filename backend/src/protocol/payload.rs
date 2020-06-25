@@ -34,5 +34,5 @@ pub trait S2CPayload {
 
 /// client-to-server payload
 pub trait C2SPayload {
-    fn parse(pieces: &mut Pieces) -> Result<Self, RCE> where Self: std::marker::Sized;
+    fn parse(pieces: &mut Pieces) -> Result<Self, RCE> where Self: Sized;
 }
