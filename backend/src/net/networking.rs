@@ -61,8 +61,7 @@ impl Handler for NetConnection {
         ));
 
         if let Err(_) = res {
-            eprintln!("Killing websocket #{} because of closed game thread", self.out.connection_id());
-            self.shun(true);
+            panic!("Can't reach the game thread");
         }
 
         Ok(())
