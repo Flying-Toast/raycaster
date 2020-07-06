@@ -1,6 +1,11 @@
+mod net;
+mod game;
+mod error;
+mod protocol;
+
 use std::sync::mpsc::channel;
-use backend::net::networking::start_network;
-use backend::game::start::run_game;
+use net::networking::start_network;
+use game::start::run_game;
 
 
 fn main() {
