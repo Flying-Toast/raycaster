@@ -67,8 +67,9 @@ impl Game {
         loop {
             self.process_net_events();
 
-            self.tick(last_tick.elapsed().as_micros());
-            last_tick = Instant::now();
+            let now = Instant::now();
+            self.tick((now - last_tick).as_micros());
+            last_tick = now;
 
             thread::sleep(Duration::from_micros(MIN_INTERVAL_MICROS));
         }
