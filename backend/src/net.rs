@@ -44,7 +44,9 @@ impl NetConnection {
         }
 
         if !self.shunned {
-            let _ = self.game.send(NetEvent::Disconnect(self.out.connection_id()));
+            if let Err(_) = self.game.send(NetEvent::Disconnect(self.out.connection_id())) {
+                panic!("Game channel disconnected");
+            }
         }
 
         self.shunned = true;
