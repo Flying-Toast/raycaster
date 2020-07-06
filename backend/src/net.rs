@@ -61,7 +61,7 @@ impl Handler for NetConnection {
         ));
 
         if let Err(_) = res {
-            panic!("Can't reach the game thread");
+            panic!("Game channel disconnected");
         }
 
         Ok(())
@@ -96,7 +96,7 @@ impl Handler for NetConnection {
                 ));
 
                 if let Err(_) = res {
-                    panic!("Game thread disconnected");
+                    panic!("Game channel disconnected");
                 }
             }
         } else {
