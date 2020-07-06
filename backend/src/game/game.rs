@@ -2,8 +2,6 @@ use std::sync::mpsc::{Receiver, TryRecvError};
 use crate::net::{NetEvent, Responder};
 use crate::game::map::Map;
 use crate::protocol::ClientMessage;
-use std::thread;
-use std::time::Duration;
 
 
 pub struct Game {
@@ -60,7 +58,6 @@ impl Game {
     pub fn run(&mut self) -> ! {
         loop {
             self.process_net_events();
-            thread::sleep(Duration::from_nanos(1));
         }
     }
 }
