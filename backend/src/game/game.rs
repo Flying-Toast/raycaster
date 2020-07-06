@@ -1,4 +1,5 @@
 use std::sync::mpsc::{Receiver, TryRecvError};
+use std::time::Instant;
 use crate::net::{NetEvent, Responder};
 use crate::game::map::Map;
 use crate::protocol::ClientMessage;
@@ -37,6 +38,11 @@ impl Game {
         }
     }
 
+    /// `dt` is the delta time in milliseconds
+    fn tick(&mut self, dt: u128) {
+
+    }
+
     /// Receives and processes pending NetEvents.
     /// Processes a maximum of 500 events each call.
     fn process_net_events(&mut self) {
@@ -56,8 +62,12 @@ impl Game {
 
     /// Starts the game loop.
     pub fn run(&mut self) -> ! {
+        let mut last_tick = Instant::now();
         loop {
             self.process_net_events();
+
+            self.tick(last_tick.elapsed().as_millis());
+            last_tick = Instant::now();
         }
     }
 }
