@@ -1,6 +1,6 @@
 use std::thread;
 use std::sync::mpsc::Receiver;
-use crate::net::networking::NetEvent;
+use crate::net::NetEvent;
 use crate::game::game::Game;
 use crate::game::map::Map;
 

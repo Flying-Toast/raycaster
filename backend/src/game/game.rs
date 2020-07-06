@@ -1,5 +1,5 @@
 use std::sync::mpsc::Receiver;
-use crate::net::networking::NetEvent;
+use crate::net::NetEvent;
 use crate::game::map::Map;
 
 

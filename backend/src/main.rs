@@ -4,7 +4,7 @@ mod error;
 mod protocol;
 
 use std::sync::mpsc::channel;
-use net::networking::start_network;
+use net::start_network;
 use game::start::run_game;
 
 
