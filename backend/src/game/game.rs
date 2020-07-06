@@ -48,7 +48,7 @@ impl Game {
                                  NetEvent::Disconnect(id) => self.on_client_disconnect(id),
                                  NetEvent::Message(id, message) => self.on_client_message(id, message),
                              },
-                Err(TryRecvError::Empty) => return,
+                Err(TryRecvError::Empty) => break,
                 Err(TryRecvError::Disconnected) => panic!("Network channel disconnected"),
             }
         }
