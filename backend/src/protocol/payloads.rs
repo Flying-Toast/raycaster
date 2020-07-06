@@ -2,10 +2,12 @@ use crate::error::*;
 use crate::protocol::payload::{S2CPayload, C2SPayload, Pieces};
 
 
-pub struct PingPayload {
+/// A 'ping' when in server->client direction,
+/// A 'pong' (response to an earlier 'ping') when in client->server direction.
+pub struct PingPongPayload {
     pub id: u32,
 }
-impl S2CPayload for PingPayload {
+impl S2CPayload for PingPongPayload {
     key!("p");
 
     fn encode(&self) -> String {
@@ -16,11 +18,7 @@ impl S2CPayload for PingPayload {
         lines.join("\n")
     }
 }
-
-pub struct PongPayload {
-    pub id: u32,
-}
-impl C2SPayload for PongPayload {
+impl C2SPayload for PingPongPayload {
     fn parse(pieces: &mut Pieces) -> Result<Self, RCE> {
         let id: u32 = pieces.get()?;
 
