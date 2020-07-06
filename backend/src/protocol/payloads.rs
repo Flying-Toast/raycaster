@@ -1,31 +1,31 @@
-use crate::protocol::types::{GameMode};
 use crate::error::*;
 use crate::protocol::payload::{S2CPayload, C2SPayload, Pieces};
 
 
-pub struct NewGamePayload {
-    pub map_name: String,
-    pub gamemode: GameMode,
+pub struct PingPayload {
+    pub id: u32,
 }
-impl S2CPayload for NewGamePayload {
-    key!("ng");
+impl S2CPayload for PingPayload {
+    key!("p");
 
     fn encode(&self) -> String {
         let mut lines = lines!();
-        lines.push(&self.map_name);
-        lines.push(self.gamemode.as_ref());
+        let id = self.id.to_string();
+        lines.push(&id);
 
         lines.join("\n")
     }
 }
-impl C2SPayload for NewGamePayload {
+
+pub struct PongPayload {
+    pub id: u32,
+}
+impl C2SPayload for PongPayload {
     fn parse(pieces: &mut Pieces) -> Result<Self, RCE> {
-        let map_name: String = pieces.get()?;
-        let gamemode: GameMode = pieces.get()?;
+        let id: u32 = pieces.get()?;
 
         Ok(Self {
-            map_name,
-            gamemode,
+            id,
         })
     }
 }

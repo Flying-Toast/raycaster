@@ -30,7 +30,11 @@ impl Game {
 
     /// Called for each message received from a client
     fn on_client_message(&mut self, connection_id: u32, message: ClientMessage) {
+        match message {
+            ClientMessage::Pong(payload) => {
 
+            },
+        }
     }
 
     /// Receives and processes pending NetEvents.

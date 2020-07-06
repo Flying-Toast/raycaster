@@ -1,5 +1,5 @@
-use strum_macros::{EnumString, AsRefStr};
+//use strum_macros::{EnumString, AsRefStr};
 
 
-#[derive(EnumString, AsRefStr)]
-pub enum GameMode { FFA }
+//#[derive(EnumString, AsRefStr)]
+//pub enum GameMode { FFA }
