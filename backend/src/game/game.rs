@@ -39,7 +39,7 @@ impl Game {
         }
     }
 
-    fn tick(&mut self, dt_micros: u128) {
+    fn tick(&mut self, dt: u128) {
 
     }
 
@@ -62,16 +62,16 @@ impl Game {
 
     /// Starts the game loop.
     pub fn run(&mut self) -> ! {
-        const MIN_INTERVAL_MICROS: u64 = 100;
+        const TIME_STEP_MILLIS: u64 = 100;
         let mut last_tick = Instant::now();
         loop {
             self.process_net_events();
 
             let now = Instant::now();
-            self.tick((now - last_tick).as_micros());
+            self.tick((now - last_tick).as_millis());
             last_tick = now;
 
-            thread::sleep(Duration::from_micros(MIN_INTERVAL_MICROS));
+            thread::sleep(Duration::from_millis(TIME_STEP_MILLIS));
         }
     }
 }
