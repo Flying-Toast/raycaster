@@ -1,4 +1,4 @@
-use std::sync::mpsc::{Receiver, TryRecvError};
+use flume::{Receiver, TryRecvError};
 use std::time::{Instant, Duration};
 use std::thread;
 use crate::net::{NetEvent, Responder};

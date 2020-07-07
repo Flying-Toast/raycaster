@@ -1,4 +1,3 @@
-use std::sync::mpsc;
 use ws::{Handler, Message, Handshake, CloseCode, listen};
 use crate::error::*;
 use crate::protocol::{ClientMessage, next_message};
@@ -33,7 +32,7 @@ impl Responder {
 struct NetConnection {
     out: ws::Sender,
     /// For sending messages to the game thread.
-    game: mpsc::Sender<NetEvent>,
+    game: flume::Sender<NetEvent>,
     shunned: bool,
 }
 
@@ -116,7 +115,7 @@ impl Handler for NetConnection {
 
 /// Runs the websocket server in this thread.
 /// `game_tx` is the transmitting end of a channel for sending `NetEvent`s to the game thread.
-pub fn start_network(host: &str, game_tx: mpsc::Sender<NetEvent>) -> Result<(), RCE> {
+pub fn start_network(host: &str, game_tx: flume::Sender<NetEvent>) -> Result<(), RCE> {
     listen(host, |sender| {
         NetConnection {
             out: sender,
