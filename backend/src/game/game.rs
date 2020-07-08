@@ -10,7 +10,7 @@ pub struct Game {
 impl Game {
     pub fn new() -> Self {
         Self {
-            map: Map::from_file("../maps/default").expect("Can't read default map"),
+            map: Map::from_file("../maps/default").expect("Error reading default map"),
         }
     }
 

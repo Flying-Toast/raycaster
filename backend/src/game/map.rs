@@ -32,8 +32,8 @@ impl Tile {
 
 #[derive(Debug)]
 pub struct Map {
-    width: u32,
-    height: u32,
+    width: usize,
+    height: usize,
     tiles: Vec<Vec<Tile>>,
 }
 
@@ -44,8 +44,8 @@ impl Map {
         let file = File::open(file_path).to(RCE::MapFileRead)?;
         let mut lines = BufReader::new(file).lines();
 
-        let width: u32 = lines.next().to(E)?.to(E)?.parse().to(E)?;
-        let height: u32 = lines.next().to(E)?.to(E)?.parse().to(E)?;
+        let width: usize = lines.next().to(E)?.to(E)?.parse().to(E)?;
+        let height: usize = lines.next().to(E)?.to(E)?.parse().to(E)?;
         let num_tiletypes: u32 = lines.next().to(E)?.to(E)?.parse().to(E)?;
 
         let mut tiletype_map = HashMap::new();
@@ -73,7 +73,13 @@ impl Map {
                     )
                 );
             }
+            if row.len() != width {
+                return Err(E);
+            }
             tiles.push(row);
+        }
+        if tiles.len() != height {
+            return Err(E);
         }
 
         Ok(Map {
