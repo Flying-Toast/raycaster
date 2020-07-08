@@ -2,6 +2,7 @@ mod net;
 mod server;
 mod error;
 mod protocol;
+mod game;
 
 use net::start_network;
 use server::run_server;
