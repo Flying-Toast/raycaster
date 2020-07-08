@@ -7,7 +7,7 @@ use crate::game::game::Game;
 
 /// Runs a `Server` in a new thread.
 /// `rx` is the receiver from the networking thread.
-pub fn run_server(rx: Receiver<NetEvent>) {
+pub fn run(rx: Receiver<NetEvent>) {
     thread::spawn(move || {
         let mut server = Server::new(rx);
         server.run();

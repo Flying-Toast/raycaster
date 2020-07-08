@@ -4,6 +4,18 @@ use crate::protocol::{ClientMessage, next_message};
 use crate::protocol::payload::{S2CPayload, Pieces};
 
 
+/// Runs the network server in this thread.
+/// `server_tx` is the transmitting end of a channel for sending `NetEvent`s to the server thread.
+pub fn start(server_tx: flume::Sender<NetEvent>, port: u16) -> Result<(), RCE> {
+    listen(format!("0.0.0.0:{}", port), |sender| {
+        NetConnection {
+            out: sender,
+            server: server_tx.clone(),
+            shunned: false,
+        }
+    }).or(Err(RCE::NetworkFailedToStart))
+}
+
 /// Type that is sent over a channel the server thread.
 pub enum NetEvent {
     /// A client connected.
@@ -111,16 +123,4 @@ impl Handler for NetConnection {
     fn on_close(&mut self, _: CloseCode, _: &str) {
         self.shun(false);
     }
-}
-
-/// Runs the network server in this thread.
-/// `server_tx` is the transmitting end of a channel for sending `NetEvent`s to the server thread.
-pub fn start_network(host: &str, server_tx: flume::Sender<NetEvent>) -> Result<(), RCE> {
-    listen(host, |sender| {
-        NetConnection {
-            out: sender,
-            server: server_tx.clone(),
-            shunned: false,
-        }
-    }).or(Err(RCE::NetworkFailedToStart))
 }
