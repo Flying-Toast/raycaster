@@ -2,7 +2,7 @@ use flume::Receiver;
 use std::time::{Instant, Duration};
 use std::thread;
 use crate::net::NetEvent;
-use crate::game::game::Game;
+use crate::game::Game;
 
 
 /// Runs a `Server` in a new thread.

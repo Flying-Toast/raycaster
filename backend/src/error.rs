@@ -5,6 +5,9 @@ pub enum RCE {
     PayloadDecode,
     BadClientMessageType,
     EmptyPieces,
+    MapFileRead,
+    BadMapFormat,
+    BadTileType,
 }
 
 /// Converts `Result<T, _>` to `Result<T, RCE>`. Also implemented on `Option`.
