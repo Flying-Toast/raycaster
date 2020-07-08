@@ -9,17 +9,17 @@ use crate::protocol::ClientMessage;
 /// `rx` is the receiver from the networking thread.
 pub fn run_server(rx: Receiver<NetEvent>) {
     thread::spawn(move || {
-        let mut game = Game::new(rx);
-        game.run();
+        let mut server = Server::new(rx);
+        server.run();
     });
 }
 
-pub struct Game {
+pub struct Server {
     /// The receiving end of the channel from the network thread.
     rx: Receiver<NetEvent>,
 }
 
-impl Game {
+impl Server {
     pub fn new(rx: Receiver<NetEvent>) -> Self {
         Self {
             rx,
@@ -67,7 +67,7 @@ impl Game {
         }
     }
 
-    /// Starts the game loop.
+    /// Starts the main loop.
     pub fn run(&mut self) -> ! {
         const TIME_STEP_MILLIS: u64 = 100;
         let mut last_tick = Instant::now();
