@@ -1,10 +1,10 @@
 use std::io::{BufRead, BufReader};
 use std::fs::File;
 use std::collections::HashMap;
-use crate::game::vector::Vector;
-use crate::error::*;
-use strum_macros::EnumString;
 use std::str::FromStr;
+use strum_macros::EnumString;
+use crate::error::*;
+use crate::game::vector::Vector;
 
 
 #[derive(Debug, Clone, EnumString)]
@@ -53,7 +53,9 @@ impl Map {
             let line = lines.next().to(E)?.to(E)?;
             let mut chars = line.chars();
             let key = chars.next().to(E)?;
-            chars.next();
+            if chars.next() != Some('=') {
+                return Err(E);
+            }
             let type_str: String = chars.collect();
             let tiletype = TileType::from_str(&type_str).to(RCE::BadTileType)?;
             tiletype_map.insert(key, tiletype);

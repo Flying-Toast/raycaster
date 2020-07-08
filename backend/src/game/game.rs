@@ -1,13 +1,16 @@
 use crate::net::Responder;
 use crate::protocol::ClientMessage;
+use crate::game::map::Map;
 
 
 pub struct Game {
+    map: Map,
 }
 
 impl Game {
     pub fn new() -> Self {
         Self {
+            map: Map::from_file("../maps/default").expect("Can't read default map"),
         }
     }
 
