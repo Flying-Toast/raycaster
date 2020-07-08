@@ -101,7 +101,7 @@ impl Handler for NetConnection {
                 }
             }
         } else {
-            eprintln!("Websocket #{} sent a binary message - killing it", self.out.connection_id());
+            eprintln!("Client #{} sent a binary message - killing it", self.out.connection_id());
             self.shun(true);
         }
 
