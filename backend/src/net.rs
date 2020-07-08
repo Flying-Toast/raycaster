@@ -8,11 +8,7 @@ use crate::protocol::payload::{S2CPayload, Pieces};
 /// `server_tx` is the transmitting end of a channel for sending `NetEvent`s to the server thread.
 pub fn start(server_tx: flume::Sender<NetEvent>, port: u16) -> Result<(), RCE> {
     listen(format!("0.0.0.0:{}", port), |sender| {
-        NetConnection {
-            out: sender,
-            server: server_tx.clone(),
-            shunned: false,
-        }
+        NetConnection::new(sender, server_tx.clone())
     }).or(Err(RCE::NetworkFailedToStart))
 }
 
@@ -44,6 +40,7 @@ impl Responder {
 }
 
 struct NetConnection {
+    id: u32,
     out: ws::Sender,
     /// For sending messages to the server thread.
     server: flume::Sender<NetEvent>,
@@ -51,13 +48,22 @@ struct NetConnection {
 }
 
 impl NetConnection {
+    fn new(out: ws::Sender, server: flume::Sender<NetEvent>) -> Self {
+        Self {
+            id: out.connection_id(),
+            out,
+            server,
+            shunned: false,
+        }
+    }
+
     fn shun(&mut self, close: bool) {
         if close {
             let _ = self.out.close(CloseCode::Normal);
         }
 
         if !self.shunned {
-            self.server.send(NetEvent::Disconnect(self.out.connection_id()))
+            self.server.send(NetEvent::Disconnect(self.id))
                 .expect("Server channel disconnected");
         }
 
@@ -68,7 +74,7 @@ impl NetConnection {
 impl Handler for NetConnection {
     fn on_open(&mut self, _: Handshake) -> ws::Result<()> {
         self.server.send(NetEvent::Connect(
-            self.out.connection_id(),
+            self.id,
             Responder {
                 sender: self.out.clone()
             }
@@ -90,7 +96,7 @@ impl Handler for NetConnection {
                 match next_message(&mut pieces) {
                     None => break,
                     Some(Err(e)) => {
-                        eprintln!("Error while parsing message from client #{}: {:?}", self.out.connection_id(), e);
+                        eprintln!("Error while parsing message from client #{}: {:?}", self.id, e);
                         eprintln!("The (entire) packet containing the bad message follows:");
                         eprintln!("=======================");
                         eprintln!("{}", string);
@@ -101,12 +107,12 @@ impl Handler for NetConnection {
                 }
 
                 self.server.send(NetEvent::Message(
-                    self.out.connection_id(),
+                    self.id,
                     message
                 )).expect("Server channel disconnected");
             }
         } else {
-            eprintln!("Client #{} sent a binary message - killing it", self.out.connection_id());
+            eprintln!("Client #{} sent a binary message - killing it", self.id);
             self.shun(true);
         }
 
