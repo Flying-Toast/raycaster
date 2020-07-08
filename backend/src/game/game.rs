@@ -2,20 +2,17 @@ use flume::{Receiver, TryRecvError};
 use std::time::{Instant, Duration};
 use std::thread;
 use crate::net::{NetEvent, Responder};
-use crate::game::map::Map;
 use crate::protocol::ClientMessage;
 
 
 pub struct Game {
-    map: Map,
     /// The receiving end of the channel from the network thread.
     rx: Receiver<NetEvent>,
 }
 
 impl Game {
-    pub fn new(rx: Receiver<NetEvent>, map: Map) -> Self {
+    pub fn new(rx: Receiver<NetEvent>) -> Self {
         Self {
-            map,
             rx,
         }
     }
