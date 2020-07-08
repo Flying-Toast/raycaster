@@ -4,18 +4,18 @@ use crate::protocol::{ClientMessage, next_message};
 use crate::protocol::payload::{S2CPayload, Pieces};
 
 
-/// Information that gets sent to the game thread.
+/// Type that is sent over a channel the server thread.
 pub enum NetEvent {
-    /// Signifies that a new websocket connection has been made.
-    /// The first field is an id that uniquely identifies this websocket.
-    /// The second field is a `Responder` for sending messages back to the websocket.
+    /// A client connected.
+    /// The first field is an id that uniquely identifies this client.
+    /// The second field is a `Responder` for sending messages back to the client.
     Connect(u32, Responder),
-    /// A message from the websocket.
-    /// The first field is the id of the websocket that sent this message.
+    /// A message from the client.
+    /// The first field is the id of the client who sent this message.
     /// The second field is the message.
     Message(u32, ClientMessage),
-    /// Signifies that a websocket has disconnected.
-    /// The field is the id of the websocket that disconnected.
+    /// A client disconnected.
+    /// The field is the id of the client who disconnected.
     Disconnect(u32),
 }
 
@@ -31,8 +31,8 @@ impl Responder {
 
 struct NetConnection {
     out: ws::Sender,
-    /// For sending messages to the game thread.
-    game: flume::Sender<NetEvent>,
+    /// For sending messages to the server thread.
+    server: flume::Sender<NetEvent>,
     shunned: bool,
 }
 
@@ -43,8 +43,8 @@ impl NetConnection {
         }
 
         if !self.shunned {
-            if let Err(_) = self.game.send(NetEvent::Disconnect(self.out.connection_id())) {
-                panic!("Game channel disconnected");
+            if let Err(_) = self.server.send(NetEvent::Disconnect(self.out.connection_id())) {
+                panic!("Server channel disconnected");
             }
         }
 
@@ -54,7 +54,7 @@ impl NetConnection {
 
 impl Handler for NetConnection {
     fn on_open(&mut self, _: Handshake) -> ws::Result<()> {
-        let res = self.game.send(NetEvent::Connect(
+        let res = self.server.send(NetEvent::Connect(
             self.out.connection_id(),
             Responder {
                 sender: self.out.clone()
@@ -62,7 +62,7 @@ impl Handler for NetConnection {
         ));
 
         if let Err(_) = res {
-            panic!("Game channel disconnected");
+            panic!("Server channel disconnected");
         }
 
         Ok(())
@@ -81,7 +81,7 @@ impl Handler for NetConnection {
                 match next_message(&mut pieces) {
                     None => break,
                     Some(Err(e)) => {
-                        eprintln!("Error while parsing message from websocket #{}: {:?}", self.out.connection_id(), e);
+                        eprintln!("Error while parsing message from client #{}: {:?}", self.out.connection_id(), e);
                         eprintln!("The (entire) packet containing the bad message follows:");
                         eprintln!("=======================");
                         eprintln!("{}", string);
@@ -91,13 +91,13 @@ impl Handler for NetConnection {
                     Some(Ok(m)) => message = m,
                 }
 
-                let res = self.game.send(NetEvent::Message(
+                let res = self.server.send(NetEvent::Message(
                     self.out.connection_id(),
                     message
                 ));
 
                 if let Err(_) = res {
-                    panic!("Game channel disconnected");
+                    panic!("Server channel disconnected");
                 }
             }
         } else {
@@ -113,13 +113,13 @@ impl Handler for NetConnection {
     }
 }
 
-/// Runs the websocket server in this thread.
-/// `game_tx` is the transmitting end of a channel for sending `NetEvent`s to the game thread.
-pub fn start_network(host: &str, game_tx: flume::Sender<NetEvent>) -> Result<(), RCE> {
+/// Runs the network server in this thread.
+/// `server_tx` is the transmitting end of a channel for sending `NetEvent`s to the server thread.
+pub fn start_network(host: &str, server_tx: flume::Sender<NetEvent>) -> Result<(), RCE> {
     listen(host, |sender| {
         NetConnection {
             out: sender,
-            game: game_tx.clone(),
+            server: server_tx.clone(),
             shunned: false,
         }
     }).or(Err(RCE::NetworkFailedToStart))

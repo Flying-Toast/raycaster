@@ -5,7 +5,7 @@ use crate::net::NetEvent;
 use crate::game::game::Game;
 
 
-/// Spawns a game thread.
+/// Runs a `Server` in a new thread.
 /// `rx` is the receiver from the networking thread.
 pub fn run_server(rx: Receiver<NetEvent>) {
     thread::spawn(move || {
