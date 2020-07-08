@@ -1,7 +1,7 @@
 use std::thread;
 use flume::Receiver;
 use crate::net::NetEvent;
-use crate::game::game::Game;
+use crate::server::game::Game;
 
 
 /// Spawns a game thread.

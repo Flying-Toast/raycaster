@@ -1,10 +1,10 @@
 mod net;
-mod game;
+mod server;
 mod error;
 mod protocol;
 
 use net::start_network;
-use game::start::run_game;
+use server::start::run_game;
 
 
 fn main() {
