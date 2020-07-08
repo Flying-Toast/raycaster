@@ -8,10 +8,12 @@ use crate::game::Game;
 /// Runs a `Server` in a new thread.
 /// `rx` is the receiver from the networking thread.
 pub fn run(rx: Receiver<NetEvent>) {
-    thread::spawn(move || {
-        let mut server = Server::new(rx);
-        server.run();
-    });
+    thread::Builder::new()
+        .name("server".to_string())
+        .spawn(move || {
+            let mut server = Server::new(rx);
+            server.run();
+        }).unwrap();
 }
 
 pub struct Server {
