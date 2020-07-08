@@ -1,4 +1,4 @@
-use flume::{Receiver, TryRecvError};
+use flume::Receiver;
 use std::time::{Instant, Duration};
 use std::thread;
 use crate::net::NetEvent;
@@ -29,19 +29,12 @@ impl Server {
     }
 
     /// Receives and processes pending NetEvents.
-    //TODO: remove 500 limit and use flume::Receiver::drain()
-    /// Processes a maximum of 500 events each call.
     fn process_net_events(&mut self) {
-        const MAX_EVENTS: u32 = 500;
-        for _ in 0..MAX_EVENTS {
-            match self.rx.try_recv() {
-                Ok(event) => match event {
-                                 NetEvent::Connect(id, responder) => self.game.on_client_connect(id, responder),
-                                 NetEvent::Disconnect(id) => self.game.on_client_disconnect(id),
-                                 NetEvent::Message(id, message) => self.game.on_client_message(id, message),
-                             },
-                Err(TryRecvError::Empty) => break,
-                Err(TryRecvError::Disconnected) => panic!("Network channel disconnected"),
+        for event in self.rx.drain() {
+            match event {
+                NetEvent::Connect(id, responder) => self.game.on_client_connect(id, responder),
+                NetEvent::Disconnect(id) => self.game.on_client_disconnect(id),
+                NetEvent::Message(id, message) => self.game.on_client_message(id, message),
             }
         }
     }
