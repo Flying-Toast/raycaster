@@ -17,6 +17,7 @@ pub fn start(server_tx: flume::Sender<NetEvent>, port: u16) -> Result<(), RCE> {
 }
 
 /// Type that is sent over a channel the server thread.
+#[derive(Debug)]
 pub enum NetEvent {
     /// A client connected.
     /// The first field is an id that uniquely identifies this client.
@@ -31,6 +32,7 @@ pub enum NetEvent {
     Disconnect(u32),
 }
 
+#[derive(Debug)]
 pub struct Responder {
     sender: ws::Sender,
 }
@@ -55,9 +57,8 @@ impl NetConnection {
         }
 
         if !self.shunned {
-            if let Err(_) = self.server.send(NetEvent::Disconnect(self.out.connection_id())) {
-                panic!("Server channel disconnected");
-            }
+            self.server.send(NetEvent::Disconnect(self.out.connection_id()))
+                .expect("Server channel disconnected");
         }
 
         self.shunned = true;
@@ -66,16 +67,12 @@ impl NetConnection {
 
 impl Handler for NetConnection {
     fn on_open(&mut self, _: Handshake) -> ws::Result<()> {
-        let res = self.server.send(NetEvent::Connect(
+        self.server.send(NetEvent::Connect(
             self.out.connection_id(),
             Responder {
                 sender: self.out.clone()
             }
-        ));
-
-        if let Err(_) = res {
-            panic!("Server channel disconnected");
-        }
+        )).expect("Server channel disconnected");
 
         Ok(())
     }
@@ -103,14 +100,10 @@ impl Handler for NetConnection {
                     Some(Ok(m)) => message = m,
                 }
 
-                let res = self.server.send(NetEvent::Message(
+                self.server.send(NetEvent::Message(
                     self.out.connection_id(),
                     message
-                ));
-
-                if let Err(_) = res {
-                    panic!("Server channel disconnected");
-                }
+                )).expect("Server channel disconnected");
             }
         } else {
             eprintln!("Client #{} sent a binary message - killing it", self.out.connection_id());

@@ -4,6 +4,7 @@ use crate::protocol::payload::{S2CPayload, C2SPayload, Pieces};
 
 /// A 'ping' when in server->client direction,
 /// A 'pong' (response to an earlier 'ping') when in client->server direction.
+#[derive(Debug)]
 pub struct PingPongPayload {
     pub id: u32,
 }

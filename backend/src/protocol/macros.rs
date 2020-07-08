@@ -1,6 +1,7 @@
 macro_rules! client_to_server_messages {
     ($($payload_key:literal, $enum_variant:ident, $payload_ident:ident),*$(,)?) => {
         /// A payload from the client
+        #[derive(Debug)]
         pub enum ClientMessage {
             $(
                 $enum_variant(crate::protocol::payloads::$payload_ident),
