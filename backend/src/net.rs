@@ -44,7 +44,6 @@ struct NetConnection {
     out: ws::Sender,
     /// For sending messages to the server thread.
     server: flume::Sender<NetEvent>,
-    shunned: bool,
 }
 
 impl NetConnection {
@@ -53,21 +52,7 @@ impl NetConnection {
             id: out.connection_id(),
             out,
             server,
-            shunned: false,
         }
-    }
-
-    fn shun(&mut self, close: bool) {
-        if close {
-            let _ = self.out.close(CloseCode::Normal);
-        }
-
-        if !self.shunned {
-            self.server.send(NetEvent::Disconnect(self.id))
-                .expect("Server channel disconnected");
-        }
-
-        self.shunned = true;
     }
 }
 
@@ -84,10 +69,6 @@ impl Handler for NetConnection {
     }
 
     fn on_message(&mut self, msg: Message) -> ws::Result<()> {
-        if self.shunned {
-            return Ok(());
-        }
-
         if let Message::Text(string) = msg {
             let mut pieces = Pieces::new(&string);
 
@@ -112,14 +93,14 @@ impl Handler for NetConnection {
                 )).expect("Server channel disconnected");
             }
         } else {
-            eprintln!("Client #{} sent a binary message - killing it", self.id);
-            self.shun(true);
+            eprintln!("Client #{} sent a binary message - ignoring it", self.id);
         }
 
         Ok(())
     }
 
     fn on_close(&mut self, _: CloseCode, _: &str) {
-        self.shun(false);
+        self.server.send(NetEvent::Disconnect(self.id))
+            .expect("Server channel disconnected");
     }
 }
