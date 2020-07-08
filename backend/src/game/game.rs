@@ -44,6 +44,7 @@ impl Game {
     }
 
     /// Receives and processes pending NetEvents.
+    //TODO: remove 500 limit and use flume::Receiver::drain()
     /// Processes a maximum of 500 events each call.
     fn process_net_events(&mut self) {
         const MAX_EVENTS: u32 = 500;
