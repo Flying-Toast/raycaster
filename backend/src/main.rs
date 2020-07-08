@@ -4,7 +4,7 @@ mod error;
 mod protocol;
 
 use net::start_network;
-use server::start::run_server;
+use server::run_server;
 
 
 fn main() {

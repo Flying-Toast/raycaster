@@ -2,10 +2,6 @@
 #[derive(Debug)]
 pub enum RCE {
     NetworkFailedToStart,
-    BadTileType,
-    BadMapFormat,
-    /// Error reading a map file
-    MapFileRead,
     PayloadDecode,
     BadClientMessageType,
     EmptyPieces,
