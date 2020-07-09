@@ -139,8 +139,8 @@ pub struct Responder {
 }
 
 impl Responder {
-    pub fn send(&mut self, payload: impl S2CPayload) -> Result<(), RCE> {
-        self.net_tx.send(ServerEvent::Message(payload.encode())).to(RCE::NetworkSend)
+    pub fn send(&mut self, payload: impl S2CPayload) {
+        let _ = self.net_tx.send(ServerEvent::Message(payload.encode()));
     }
 
     pub fn close(&mut self) {
