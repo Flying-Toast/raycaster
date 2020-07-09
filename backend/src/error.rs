@@ -3,6 +3,7 @@
 pub enum RCE {
     NetworkFailedToStart,
     NetworkClosed,
+    NetworkSend,
     PayloadDecode,
     BadClientMessageType,
     EmptyPieces,

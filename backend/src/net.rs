@@ -1,8 +1,9 @@
+use std::fmt;
 use tokio::runtime::Runtime;
 use tokio::net::{TcpListener, TcpStream};
 use tokio_tungstenite::accept_async;
 use tokio_tungstenite::tungstenite::Message;
-use futures_util::StreamExt;
+use futures_util::{StreamExt, SinkExt};
 use crate::error::*;
 use crate::protocol::{ClientMessage, next_message};
 use crate::protocol::payload::{S2CPayload, Pieces};
@@ -31,41 +32,60 @@ async fn handle_connection(stream: TcpStream, tx: flume::Sender<NetEvent>, id: u
                         Err(_) => return,
                     };
 
-    let (outgoing, mut incoming) = ws_stream.split();
+    let (mut outgoing, mut incoming) = ws_stream.split();
+
+    let (resp_tx, mut resp_rx) = flume::unbounded();
 
     tx.send(NetEvent::Connect(
         id,
         Responder {
+            net_tx: resp_tx,
         }
     )).expect("Server channel disconnected");
 
-    while let Some(message) = incoming.next().await {
-        match message {
-            Ok(Message::Text(string)) => {
-                let mut pieces = Pieces::new(&string);
-
-                loop {
-                    let message;
-                    match next_message(&mut pieces) {
-                        None => break,
-                        Some(Err(e)) => {
-                            eprintln!("Error while parsing message from client #{}: {:?}", id, e);
-                            eprintln!("The (entire) packet containing the bad message follows:");
-                            eprintln!("=======================");
-                            eprintln!("{}", string);
-                            eprintln!("=======================");
-                            break;
-                        },
-                        Some(Ok(m)) => message = m,
+    let server_events = async {
+        while let Ok(event) = resp_rx.recv_async().await {
+            match event {
+                ServerEvent::Message(string) => {
+                    if let Err(_) = outgoing.send(Message::Text(string)).await {
+                        return;
                     }
-
-                    tx.send(NetEvent::Message(id, message))
-                        .expect("Server channel disconnected");
                 }
-            },
-            _ => {},
+            }
         }
-    }
+    };
+
+    let net_events = async {
+        while let Some(message) = incoming.next().await {
+            match message {
+                Ok(Message::Text(string)) => {
+                    let mut pieces = Pieces::new(&string);
+
+                    loop {
+                        let message;
+                        match next_message(&mut pieces) {
+                            None => break,
+                            Some(Err(e)) => {
+                                eprintln!("Error while parsing message from client #{}: {:?}", id, e);
+                                eprintln!("The (entire) packet containing the bad message follows:");
+                                eprintln!("=======================");
+                                eprintln!("{}", string);
+                                eprintln!("=======================");
+                                break;
+                            },
+                            Some(Ok(m)) => message = m,
+                        }
+
+                        tx.send(NetEvent::Message(id, message))
+                            .expect("Server channel disconnected");
+                    }
+                },
+                _ => {},
+            }
+        }
+    };
+
+    futures_util::join!(server_events, net_events);
 
     tx.send(NetEvent::Disconnect(id))
         .expect("Server channel disconnected");
@@ -87,11 +107,27 @@ pub enum NetEvent {
     Disconnect(u32),
 }
 
+/// Sent from the server thread to the net thread
 #[derive(Debug)]
+enum ServerEvent {
+    /// An outgoing message.
+    Message(String),
+}
+
 pub struct Responder {
+    net_tx: flume::Sender<ServerEvent>,
+}
+
+impl fmt::Debug for Responder {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("Responder")
+         .field("net_tx", &"flume::Sender<ServerEvent>")
+         .finish()
+    }
 }
 
 impl Responder {
-    pub fn send(&mut self, payload: impl S2CPayload) {
+    pub fn send(&mut self, payload: impl S2CPayload) -> Result<(), RCE> {
+        self.net_tx.send(ServerEvent::Message(payload.encode())).to(RCE::NetworkSend)
     }
 }
