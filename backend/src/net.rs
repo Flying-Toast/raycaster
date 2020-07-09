@@ -17,19 +17,25 @@ pub fn start(server_tx: flume::Sender<NetEvent>, port: u16) -> Result<(), RCE> {
             .to(RCE::NetworkFailedToStart)?;
 
         let mut current_id: u32 = 0;
-        while let Ok((stream, _)) = listener.accept().await {
-            current_id = current_id.overflowing_add(1).0;
-            tokio::spawn(handle_connection(stream, server_tx.clone(), current_id));
+        loop {
+            match listener.accept().await {
+                Ok((stream, _)) => {
+                    tokio::spawn(handle_connection(stream, server_tx.clone(), current_id));
+                    current_id = current_id.overflowing_add(1).0;
+                },
+                Err(e) => eprintln!("Error accepting client (would be #{}): {}", current_id + 1, e),
+            }
         }
-
-        Err(RCE::NetworkClosed)
     })
 }
 
 async fn handle_connection(stream: TcpStream, tx: flume::Sender<NetEvent>, id: u32) {
     let ws_stream = match accept_async(stream).await {
                         Ok(s) => s,
-                        Err(_) => return,
+                        Err(e) => {
+                            eprintln!("Error with websocket handshake (client #{}): {}", id, e);
+                            return;
+                        },
                     };
 
     let (mut outgoing, mut incoming) = ws_stream.split();
@@ -44,7 +50,7 @@ async fn handle_connection(stream: TcpStream, tx: flume::Sender<NetEvent>, id: u
             match event {
                 ServerEvent::Message(string) => {
                     if let Err(e) = outgoing.send(Message::Text(string)).await {
-                        eprintln!("Error sending to client #{}: {:?} - disconnecting", id, e);
+                        eprintln!("Error sending to client #{}: {} - disconnecting", id, e);
                         return Err(());
                     }
                 },
