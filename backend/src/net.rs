@@ -39,7 +39,7 @@ async fn handle_connection(stream: TcpStream, tx: flume::Sender<NetEvent>, id: u
     tx.send(NetEvent::Connect(id, Responder::new(resp_tx)))
         .expect("Server channel disconnected");
 
-    let server_events = async {
+    let server_events = async move {
         while let Ok(event) = resp_rx.recv_async().await {
             match event {
                 ServerEvent::Message(string) => {
@@ -60,7 +60,8 @@ async fn handle_connection(stream: TcpStream, tx: flume::Sender<NetEvent>, id: u
         Result::<(), ()>::Err(())
     };
 
-    let net_events = async {
+    let tx2 = tx.clone();
+    let net_events = async move {
         while let Some(message) = incoming.next().await {
             match message {
                 Ok(Message::Text(string)) => {
@@ -81,7 +82,7 @@ async fn handle_connection(stream: TcpStream, tx: flume::Sender<NetEvent>, id: u
                             Some(Ok(m)) => message = m,
                         }
 
-                        tx.send(NetEvent::Message(id, message))
+                        tx2.send(NetEvent::Message(id, message))
                             .expect("Server channel disconnected");
                     }
                 },
