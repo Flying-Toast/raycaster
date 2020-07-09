@@ -50,7 +50,7 @@ async fn handle_connection(stream: TcpStream, tx: flume::Sender<NetEvent>, id: u
                     if let Err(_) = outgoing.send(Message::Text(string)).await {
                         return;
                     }
-                }
+                },
             }
         }
     };
