@@ -36,12 +36,8 @@ async fn handle_connection(stream: TcpStream, tx: flume::Sender<NetEvent>, id: u
 
     let (resp_tx, mut resp_rx) = flume::unbounded();
 
-    tx.send(NetEvent::Connect(
-        id,
-        Responder {
-            net_tx: resp_tx,
-        }
-    )).expect("Server channel disconnected");
+    tx.send(NetEvent::Connect(id, Responder::new(resp_tx)))
+        .expect("Server channel disconnected");
 
     let server_events = async {
         while let Ok(event) = resp_rx.recv_async().await {
@@ -118,16 +114,22 @@ pub struct Responder {
     net_tx: flume::Sender<ServerEvent>,
 }
 
+impl Responder {
+    pub fn send(&mut self, payload: impl S2CPayload) -> Result<(), RCE> {
+        self.net_tx.send(ServerEvent::Message(payload.encode())).to(RCE::NetworkSend)
+    }
+
+    fn new(net_tx: flume::Sender<ServerEvent>) -> Self {
+        Self {
+            net_tx,
+        }
+    }
+}
+
 impl fmt::Debug for Responder {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("Responder")
          .field("net_tx", &"flume::Sender<ServerEvent>")
          .finish()
-    }
-}
-
-impl Responder {
-    pub fn send(&mut self, payload: impl S2CPayload) -> Result<(), RCE> {
-        self.net_tx.send(ServerEvent::Message(payload.encode())).to(RCE::NetworkSend)
     }
 }
