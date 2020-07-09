@@ -44,11 +44,16 @@ async fn handle_connection(stream: TcpStream, tx: flume::Sender<NetEvent>, id: u
             match event {
                 ServerEvent::Message(string) => {
                     if let Err(_) = outgoing.send(Message::Text(string)).await {
-                        return;
+                        return Err(());
                     }
+                },
+                ServerEvent::Close => {
+                    return Err(());
                 },
             }
         }
+
+        Result::<(), ()>::Err(())
     };
 
     let net_events = async {
@@ -79,9 +84,10 @@ async fn handle_connection(stream: TcpStream, tx: flume::Sender<NetEvent>, id: u
                 _ => {},
             }
         }
+        Result::<(), ()>::Err(())
     };
 
-    futures_util::join!(server_events, net_events);
+    let _ = futures_util::try_join!(server_events, net_events);
 
     tx.send(NetEvent::Disconnect(id))
         .expect("Server channel disconnected");
@@ -108,6 +114,8 @@ pub enum NetEvent {
 enum ServerEvent {
     /// An outgoing message.
     Message(String),
+    /// Instructs the net thread to close the websocket.
+    Close,
 }
 
 pub struct Responder {
@@ -117,6 +125,10 @@ pub struct Responder {
 impl Responder {
     pub fn send(&mut self, payload: impl S2CPayload) -> Result<(), RCE> {
         self.net_tx.send(ServerEvent::Message(payload.encode())).to(RCE::NetworkSend)
+    }
+
+    pub fn close(&mut self) -> Result<(), RCE> {
+        self.net_tx.send(ServerEvent::Close).to(RCE::NetworkSend)
     }
 
     fn new(net_tx: flume::Sender<ServerEvent>) -> Self {
