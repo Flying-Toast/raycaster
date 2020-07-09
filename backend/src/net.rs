@@ -43,7 +43,8 @@ async fn handle_connection(stream: TcpStream, tx: flume::Sender<NetEvent>, id: u
         while let Ok(event) = resp_rx.recv_async().await {
             match event {
                 ServerEvent::Message(string) => {
-                    if let Err(_) = outgoing.send(Message::Text(string)).await {
+                    if let Err(e) = outgoing.send(Message::Text(string)).await {
+                        eprintln!("Error sending to client #{}: {:?} - disconnecting", id, e);
                         return Err(());
                     }
                 },
@@ -53,6 +54,9 @@ async fn handle_connection(stream: TcpStream, tx: flume::Sender<NetEvent>, id: u
             }
         }
 
+        eprintln!("Client #{}'s `Responder` was dropped without explicitly disconnecting - disconnecting now", id);
+        // Return `Err` here so that the websocket will be disconnected if
+        // the server thread drops the channel transmitter.
         Result::<(), ()>::Err(())
     };
 
@@ -84,6 +88,7 @@ async fn handle_connection(stream: TcpStream, tx: flume::Sender<NetEvent>, id: u
                 _ => {},
             }
         }
+
         Result::<(), ()>::Err(())
     };
 
