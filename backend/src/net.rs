@@ -13,8 +13,10 @@ use crate::protocol::payload::{S2CPayload, Pieces};
 /// `server_tx` is the transmitting end of a channel for sending `NetEvent`s to the server thread.
 pub fn start(server_tx: flume::Sender<NetEvent>, port: u16) -> Result<(), RCE> {
     Runtime::new().to(RCE::NetworkFailedToStart)?.block_on(async {
-        let mut listener = TcpListener::bind(format!("0.0.0.0:{}", port)).await
+        let address = format!("0.0.0.0:{}", port);
+        let mut listener = TcpListener::bind(&address).await
             .to(RCE::NetworkFailedToStart)?;
+        eprintln!("Listening on {}", address);
 
         let mut current_id: u32 = 0;
         loop {
