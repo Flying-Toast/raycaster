@@ -16,10 +16,10 @@ pub fn start(server_tx: flume::Sender<NetEvent>, port: u16) -> Result<(), RCE> {
         let mut listener = TcpListener::bind(format!("0.0.0.0:{}", port)).await
             .to(RCE::NetworkFailedToStart)?;
 
+        let mut current_id: u32 = 0;
         while let Ok((stream, _)) = listener.accept().await {
-            //TODO: GENERATE ID
-            let id = 12345;
-            tokio::spawn(handle_connection(stream, server_tx.clone(), id));
+            current_id = current_id.overflowing_add(1).0;
+            tokio::spawn(handle_connection(stream, server_tx.clone(), current_id));
         }
 
         Err(RCE::NetworkClosed)
