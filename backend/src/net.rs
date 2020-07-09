@@ -53,19 +53,21 @@ async fn handle_connection(stream: TcpStream, tx: flume::Sender<NetEvent>, id: u
                 ServerEvent::Message(string) => {
                     if let Err(e) = outgoing.send(Message::Text(string)).await {
                         eprintln!("Error sending to client #{}: {} - disconnecting", id, e);
-                        return Err(());
+                        let _ = outgoing.close().await;
+                        return Ok(());
                     }
                 },
                 ServerEvent::Close => {
-                    return Err(());
+                    let _ = outgoing.close().await;
+                    return Ok(());
                 },
             }
         }
 
         eprintln!("Client #{}'s `Responder` was dropped without explicitly disconnecting - disconnecting now", id);
-        // Return `Err` here so that the websocket will be disconnected if
-        // the server thread drops the channel transmitter.
-        Result::<(), ()>::Err(())
+        let _ = outgoing.close().await;
+
+        Result::<(), ()>::Ok(())
     };
 
     let tx2 = tx.clone();
