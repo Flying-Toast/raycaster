@@ -1,4 +1,8 @@
-use ws::{Handler, Message, Handshake, CloseCode, listen};
+use tokio::runtime::Runtime;
+use tokio::net::{TcpListener, TcpStream};
+use tokio_tungstenite::accept_async;
+use tokio_tungstenite::tungstenite::Message;
+use futures_util::StreamExt;
 use crate::error::*;
 use crate::protocol::{ClientMessage, next_message};
 use crate::protocol::payload::{S2CPayload, Pieces};
@@ -7,9 +11,64 @@ use crate::protocol::payload::{S2CPayload, Pieces};
 /// Runs the network server in this thread.
 /// `server_tx` is the transmitting end of a channel for sending `NetEvent`s to the server thread.
 pub fn start(server_tx: flume::Sender<NetEvent>, port: u16) -> Result<(), RCE> {
-    listen(format!("0.0.0.0:{}", port), |sender| {
-        NetConnection::new(sender, server_tx.clone())
-    }).or(Err(RCE::NetworkFailedToStart))
+    Runtime::new().to(RCE::NetworkFailedToStart)?.block_on(async {
+        let mut listener = TcpListener::bind(format!("0.0.0.0:{}", port)).await
+            .to(RCE::NetworkFailedToStart)?;
+
+        while let Ok((stream, _)) = listener.accept().await {
+            //TODO: GENERATE ID
+            let id = 12345;
+            tokio::spawn(handle_connection(stream, server_tx.clone(), id));
+        }
+
+        Err(RCE::NetworkClosed)
+    })
+}
+
+async fn handle_connection(stream: TcpStream, tx: flume::Sender<NetEvent>, id: u32) {
+    let ws_stream = match accept_async(stream).await {
+                        Ok(s) => s,
+                        Err(_) => return,
+                    };
+
+    let (outgoing, mut incoming) = ws_stream.split();
+
+    tx.send(NetEvent::Connect(
+        id,
+        Responder {
+        }
+    )).expect("Server channel disconnected");
+
+    while let Some(message) = incoming.next().await {
+        match message {
+            Ok(Message::Text(string)) => {
+                let mut pieces = Pieces::new(&string);
+
+                loop {
+                    let message;
+                    match next_message(&mut pieces) {
+                        None => break,
+                        Some(Err(e)) => {
+                            eprintln!("Error while parsing message from client #{}: {:?}", id, e);
+                            eprintln!("The (entire) packet containing the bad message follows:");
+                            eprintln!("=======================");
+                            eprintln!("{}", string);
+                            eprintln!("=======================");
+                            break;
+                        },
+                        Some(Ok(m)) => message = m,
+                    }
+
+                    tx.send(NetEvent::Message(id, message))
+                        .expect("Server channel disconnected");
+                }
+            },
+            _ => {},
+        }
+    }
+
+    tx.send(NetEvent::Disconnect(id))
+        .expect("Server channel disconnected");
 }
 
 /// Type that is sent over a channel the server thread.
@@ -30,77 +89,9 @@ pub enum NetEvent {
 
 #[derive(Debug)]
 pub struct Responder {
-    sender: ws::Sender,
 }
 
 impl Responder {
     pub fn send(&mut self, payload: impl S2CPayload) {
-        let _ = self.sender.send(payload.encode());
-    }
-}
-
-struct NetConnection {
-    id: u32,
-    out: ws::Sender,
-    /// For sending messages to the server thread.
-    server: flume::Sender<NetEvent>,
-}
-
-impl NetConnection {
-    fn new(out: ws::Sender, server: flume::Sender<NetEvent>) -> Self {
-        Self {
-            id: out.connection_id(),
-            out,
-            server,
-        }
-    }
-}
-
-impl Handler for NetConnection {
-    fn on_open(&mut self, _: Handshake) -> ws::Result<()> {
-        self.server.send(NetEvent::Connect(
-            self.id,
-            Responder {
-                sender: self.out.clone()
-            }
-        )).expect("Server channel disconnected");
-
-        Ok(())
-    }
-
-    fn on_message(&mut self, msg: Message) -> ws::Result<()> {
-        if let Message::Text(string) = msg {
-            let mut pieces = Pieces::new(&string);
-
-            loop {
-                let message;
-                match next_message(&mut pieces) {
-                    None => break,
-                    Some(Err(e)) => {
-                        eprintln!("Error while parsing message from client #{}: {:?}", self.id, e);
-                        eprintln!("The (entire) packet containing the bad message follows:");
-                        eprintln!("=======================");
-                        eprintln!("{}", string);
-                        eprintln!("=======================");
-                        break;
-                    },
-                    Some(Ok(m)) => message = m,
-                }
-
-                self.server.send(NetEvent::Message(
-                    self.id,
-                    message
-                )).expect("Server channel disconnected");
-            }
-        } else {
-            eprintln!("Client #{} sent a binary message - ignoring it", self.id);
-        }
-
-        Ok(())
-    }
-
-    fn on_close(&mut self, _: CloseCode, _: &str) {
-        self.server.send(NetEvent::Disconnect(self.id))
-            .expect("Server channel disconnected");
     }
 }

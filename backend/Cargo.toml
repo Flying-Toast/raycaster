@@ -5,7 +5,9 @@ authors = ["Flying-Toast"]
 edition = "2018"
 
 [dependencies]
-ws = "0.9"
+tokio-tungstenite = "0.10"
+tokio = "0.2"
+futures-util = "0.3"
 strum = "0.18"
 strum_macros = "0.18"
 flume = "0.7"

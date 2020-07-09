@@ -2,6 +2,7 @@
 #[derive(Debug)]
 pub enum RCE {
     NetworkFailedToStart,
+    NetworkClosed,
     PayloadDecode,
     BadClientMessageType,
     EmptyPieces,
