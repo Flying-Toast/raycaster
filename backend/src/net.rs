@@ -132,8 +132,8 @@ impl Responder {
         self.net_tx.send(ServerEvent::Message(payload.encode())).to(RCE::NetworkSend)
     }
 
-    pub fn close(&mut self) -> Result<(), RCE> {
-        self.net_tx.send(ServerEvent::Close).to(RCE::NetworkSend)
+    pub fn close(&mut self) {
+        let _ = self.net_tx.send(ServerEvent::Close);
     }
 
     fn new(net_tx: flume::Sender<ServerEvent>) -> Self {
