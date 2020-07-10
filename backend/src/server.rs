@@ -16,7 +16,7 @@ pub fn run(rx: Receiver<NetEvent>) {
         }).unwrap();
 }
 
-pub struct Server {
+struct Server {
     /// The receiving end of the channel from the network thread.
     rx: Receiver<NetEvent>,
     game: Game,
@@ -32,6 +32,8 @@ impl Server {
 
     /// Receives and processes pending NetEvents.
     fn process_net_events(&mut self) {
+        // "drain" the receiver and iterate over the drained values,
+        // so that this doesnt get caught in an infinite loop if messages arrive during processing
         for event in self.rx.drain() {
             match event {
                 NetEvent::Connect(id, responder) => self.game.on_client_connect(id, responder),
