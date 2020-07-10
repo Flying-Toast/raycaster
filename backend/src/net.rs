@@ -23,7 +23,7 @@ pub fn start(server_tx: flume::Sender<NetEvent>, port: u16) -> Result<(), RCE> {
             match listener.accept().await {
                 Ok((stream, _)) => {
                     tokio::spawn(handle_connection(stream, server_tx.clone(), current_id));
-                    current_id = current_id.overflowing_add(1).0;
+                    current_id = current_id.wrapping_add(1);
                 },
                 Err(e) => eprintln!("Error accepting client (would be #{}): {}", current_id + 1, e),
             }
