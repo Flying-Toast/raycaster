@@ -42,11 +42,13 @@ async fn handle_connection(stream: TcpStream, tx: flume::Sender<NetEvent>, id: u
 
     let (mut outgoing, mut incoming) = ws_stream.split();
 
+    // channel for the `Responder` to send things to this websocket
     let (resp_tx, mut resp_rx) = flume::unbounded();
 
     tx.send(NetEvent::Connect(id, Responder::new(resp_tx)))
         .expect("Server channel disconnected");
 
+    // future that waits for messages from the `Responder` and forwards them to the websocket
     let server_events = async move {
         while let Ok(event) = resp_rx.recv_async().await {
             match event {
@@ -67,42 +69,46 @@ async fn handle_connection(stream: TcpStream, tx: flume::Sender<NetEvent>, id: u
         eprintln!("Client #{}'s `Responder` was dropped without explicitly disconnecting - disconnecting now", id);
         let _ = outgoing.close().await;
 
+        // this future always returns Ok, so that it wont stop the try_join
         Result::<(), ()>::Ok(())
     };
 
     let tx2 = tx.clone();
+    //future that forwards messages received from the websocket to the server thread
     let net_events = async move {
         while let Some(message) = incoming.next().await {
-            match message {
-                Ok(Message::Text(string)) => {
-                    let mut pieces = Pieces::new(&string);
+            if let Ok(Message::Text(string)) = message {
+                let mut pieces = Pieces::new(&string);
 
-                    loop {
-                        let message;
-                        match next_message(&mut pieces) {
-                            None => break,
-                            Some(Err(e)) => {
-                                eprintln!("Error while parsing message from client #{}: {:?}", id, e);
-                                eprintln!("The (entire) packet containing the bad message follows:");
-                                eprintln!("=======================");
-                                eprintln!("{}", string);
-                                eprintln!("=======================");
-                                break;
-                            },
-                            Some(Ok(m)) => message = m,
-                        }
-
-                        tx2.send(NetEvent::Message(id, message))
-                            .expect("Server channel disconnected");
+                loop {
+                    let message;
+                    match next_message(&mut pieces) {
+                        None => break,
+                        Some(Err(e)) => {
+                            eprintln!("Error while parsing message from client #{}: {:?}", id, e);
+                            eprintln!("The (entire) packet containing the bad message follows:");
+                            eprintln!("=======================");
+                            eprintln!("{}", string);
+                            eprintln!("=======================");
+                            break;
+                        },
+                        Some(Ok(m)) => message = m,
                     }
-                },
-                _ => {},
+
+                    tx2.send(NetEvent::Message(id, message))
+                        .expect("Server channel disconnected");
+                }
             }
         }
 
+        // stop the try_join once the websocket is closed and all pending incoming
+        // messages have been sent to the game thread.
+        // stopping the try_join causes server_events to be closed too so that the
+        // `Receiver` cant send any more messages.
         Result::<(), ()>::Err(())
     };
 
+    // use try_join so that when net_events returns Err (the websocket closes), server_events will be stopped too
     let _ = futures_util::try_join!(server_events, net_events);
 
     tx.send(NetEvent::Disconnect(id))
