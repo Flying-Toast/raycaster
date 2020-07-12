@@ -18,7 +18,7 @@ impl YourIDPayload {
 impl S2CPayload for YourIDPayload {
     fn encode(&self) -> String {
         let mut lines = lines!();
-        let client_id = self.client_id.0.to_string();
+        let client_id = self.client_id.to_string();
         lines.push(&client_id);
 
         lines.join("\n")
