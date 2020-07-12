@@ -15,8 +15,6 @@ impl YourIDPayload {
     }
 }
 impl S2CPayload for YourIDPayload {
-    key!("u");
-
     fn encode(&self) -> String {
         let mut lines = lines!();
         let client_id = self.client_id.to_string();
@@ -33,8 +31,6 @@ pub struct PingPongPayload {
     pub id: u32,
 }
 impl S2CPayload for PingPongPayload {
-    key!("p");
-
     fn encode(&self) -> String {
         let mut lines = lines!();
         let id = self.id.to_string();

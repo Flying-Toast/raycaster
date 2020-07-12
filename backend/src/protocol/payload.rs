@@ -28,7 +28,6 @@ impl<'a> Pieces<'a> {
 
 /// server-to-client payload
 pub trait S2CPayload {
-    fn payload_key() -> &'static str;
     fn encode(&self) -> String;
 }
 

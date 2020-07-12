@@ -34,15 +34,31 @@ macro_rules! client_to_server_messages {
     };
 }
 
+macro_rules! s2c_payload_keys {
+    ($($payload_ident:ident, $payload_key:literal),*$(,)?) => {
+        // ensure payload keys are only used once
+        #[deny(warnings)] // NOTE: if this causes a compile error, it means a payload key was used more than once
+        fn _pretend_you_didnt_see_this_awful_hack() {
+            match "" {
+                $(
+                    $payload_key => (),
+                )*
+                _ => (),
+            }
+        }
+
+        $(
+            impl crate::protocol::payloads::$payload_ident {
+                pub fn payload_key() -> &'static str {
+                    $payload_key
+                }
+            }
+        )*
+    }
+}
+
 macro_rules! lines {
     () => {
         vec![Self::payload_key()]
     };
-}
-
-/// Shorthand for defining `S2CPayload::payload_key()`
-macro_rules! key {
-    ($key:literal) => {
-        fn payload_key() -> &'static str { $key }
-    }
 }
