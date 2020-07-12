@@ -25,6 +25,12 @@ impl Game {
     }
 
     pub fn on_client_disconnect(&mut self, connection_id: ClientID) {
+        if let Some(client) = self.clients.get(&connection_id) {
+            // remove the client's player
+            self.entities.remove(&client.player_entity);
+        }
+
+        // remove the client itself
         self.clients.remove(&connection_id);
     }
 
@@ -34,7 +40,7 @@ impl Game {
 
         let ent_id = self.gen_entity_id();
         self.entities.insert(ent_id, Entity::new());
-        self.clients.insert(connection_id, Client::new(responder));
+        self.clients.insert(connection_id, Client::new(responder, ent_id));
     }
 
     pub fn on_client_message(&mut self, connection_id: ClientID, message: ClientMessage) {
