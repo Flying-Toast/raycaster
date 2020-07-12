@@ -153,21 +153,35 @@ enum ServerEvent {
 
 pub struct Responder {
     net_tx: flume::Sender<ServerEvent>,
+    queue: Vec<String>,
 }
 
 impl Responder {
-    pub fn send(&mut self, payload: impl S2CPayload) {
-        let _ = self.net_tx.send(ServerEvent::Message(payload.encode()));
-    }
-
-    pub fn close(&mut self) {
-        let _ = self.net_tx.send(ServerEvent::Close);
-    }
-
     fn new(net_tx: flume::Sender<ServerEvent>) -> Self {
         Self {
             net_tx,
+            queue: Vec::new(),
         }
+    }
+
+    pub fn send(&mut self, payload: impl S2CPayload) {
+        self.queue.push(payload.encode());
+    }
+
+    pub fn flush(&mut self) {
+        // don't send an empty string for empty packets
+        if self.queue.len() == 0 {
+            return;
+        }
+
+        let _ = self.net_tx.send(ServerEvent::Message(self.queue.join("\n")));
+        self.queue.clear();
+    }
+
+    pub fn close(&mut self) {
+        // Send any queued messages before closing
+        self.flush();
+        let _ = self.net_tx.send(ServerEvent::Close);
     }
 }
 

@@ -51,6 +51,14 @@ impl Game {
     }
 
     pub fn tick(&mut self, dt: u128) {
+        self.send_queued_messages();
+    }
+
+    /// Flushes the outgoing message queues of all clients
+    fn send_queued_messages(&mut self) {
+        for client in self.clients.values_mut() {
+            client.responder.flush();
+        }
     }
 
     fn gen_entity_id(&mut self) -> EntityID {
