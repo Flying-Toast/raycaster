@@ -164,10 +164,12 @@ impl Responder {
         }
     }
 
+    /// Queues a payload
     pub fn send(&mut self, payload: impl S2CPayload) {
         self.queue.push(payload.encode());
     }
 
+    /// Sends all queued payloads in a single packet
     pub fn flush(&mut self) {
         // don't send an empty string for empty packets
         if self.queue.len() == 0 {
@@ -178,6 +180,7 @@ impl Responder {
         self.queue.clear();
     }
 
+    /// Sends any queued messages then closes the connection
     pub fn close(&mut self) {
         // Send any queued messages before closing
         self.flush();
