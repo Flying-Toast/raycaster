@@ -9,6 +9,7 @@ macro_rules! client_to_server_messages {
         }
 
         /// Reads the next full payload from `pieces`
+        #[deny(unreachable_patterns)] // NOTE: if this causes a compile error, it means a payload key was used more than once
         pub fn next_message(pieces: &mut crate::protocol::payload::Pieces)
             -> Option<Result<ClientMessage, crate::error::RCE>>
         {
@@ -36,9 +37,9 @@ macro_rules! client_to_server_messages {
 
 macro_rules! s2c_payload_keys {
     ($($payload_ident:ident, $payload_key:literal),*$(,)?) => {
-        // ensure payload keys are only used once
-        #[deny(warnings)] // NOTE: if this causes a compile error, it means a payload key was used more than once
-        fn _pretend_you_didnt_see_this_awful_hack() {
+        // HACK: ensure payload keys are only used once
+        #[deny(unreachable_patterns)] // NOTE: if this causes a compile error, it means a payload key was used more than once
+        fn _for_lint_only_do_not_call() {
             match "" {
                 $(
                     $payload_key => (),
