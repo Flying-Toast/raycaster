@@ -1,6 +1,7 @@
 use crate::net::Responder;
 use crate::protocol::ClientMessage;
 use crate::game::map::Map;
+use crate::protocol::payloads::*;
 
 
 pub struct Game {
@@ -17,7 +18,9 @@ impl Game {
     pub fn on_client_disconnect(&mut self, connection_id: u32) {
     }
 
-    pub fn on_client_connect(&mut self, connection_id: u32, responder: Responder) {
+    pub fn on_client_connect(&mut self, connection_id: u32, mut responder: Responder) {
+        // tell the client their id
+        responder.send(YourIDPayload::new(connection_id));
     }
 
     pub fn on_client_message(&mut self, connection_id: u32, message: ClientMessage) {
