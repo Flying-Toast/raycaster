@@ -45,7 +45,7 @@ async fn handle_connection(stream: TcpStream, tx: flume::Sender<NetEvent>, id: u
     // channel for the `Responder` to send things to this websocket
     let (resp_tx, mut resp_rx) = flume::unbounded();
 
-    tx.send(NetEvent::Connect(id, Responder::new(resp_tx)))
+    tx.send(NetEvent::Connect(ClientID(id), Responder::new(resp_tx)))
         .expect("Server channel disconnected");
 
     // future that waits for messages from the `Responder` and forwards them to the websocket
@@ -95,7 +95,7 @@ async fn handle_connection(stream: TcpStream, tx: flume::Sender<NetEvent>, id: u
                         Some(Ok(m)) => message = m,
                     }
 
-                    tx2.send(NetEvent::Message(id, message))
+                    tx2.send(NetEvent::Message(ClientID(id), message))
                         .expect("Server channel disconnected");
                 }
             }
@@ -111,9 +111,12 @@ async fn handle_connection(stream: TcpStream, tx: flume::Sender<NetEvent>, id: u
     // use try_join so that when net_events returns Err (the websocket closes), server_events will be stopped too
     let _ = futures_util::try_join!(server_events, net_events);
 
-    tx.send(NetEvent::Disconnect(id))
+    tx.send(NetEvent::Disconnect(ClientID(id)))
         .expect("Server channel disconnected");
 }
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
+pub struct ClientID(pub u32);
 
 /// Type that is sent over a channel the server thread.
 #[derive(Debug)]
@@ -121,14 +124,14 @@ pub enum NetEvent {
     /// A client connected.
     /// The first field is an id that uniquely identifies this client.
     /// The second field is a `Responder` for sending messages back to the client.
-    Connect(u32, Responder),
+    Connect(ClientID, Responder),
     /// A message from the client.
     /// The first field is the id of the client who sent this message.
     /// The second field is the message.
-    Message(u32, ClientMessage),
+    Message(ClientID, ClientMessage),
     /// A client disconnected.
     /// The field is the id of the client who disconnected.
-    Disconnect(u32),
+    Disconnect(ClientID),
 }
 
 /// Sent from the server thread to the net thread

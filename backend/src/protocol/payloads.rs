@@ -1,14 +1,15 @@
 use crate::error::*;
 use crate::protocol::payload::{S2CPayload, C2SPayload, Pieces};
+use crate::net::ClientID;
 
 
 /// Tells a client what their id is
 #[derive(Debug)]
 pub struct YourIDPayload {
-    pub client_id: u32,
+    pub client_id: ClientID,
 }
 impl YourIDPayload {
-    pub fn new(client_id: u32) -> Self {
+    pub fn new(client_id: ClientID) -> Self {
         Self {
             client_id,
         }
@@ -17,7 +18,7 @@ impl YourIDPayload {
 impl S2CPayload for YourIDPayload {
     fn encode(&self) -> String {
         let mut lines = lines!();
-        let client_id = self.client_id.to_string();
+        let client_id = self.client_id.0.to_string();
         lines.push(&client_id);
 
         lines.join("\n")

@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use crate::net::Responder;
+use crate::net::{Responder, ClientID};
 use crate::protocol::ClientMessage;
 use crate::game::map::Map;
 use crate::protocol::payloads::*;
@@ -8,7 +8,7 @@ use crate::game::client::Client;
 
 pub struct Game {
     map: Map,
-    clients: HashMap<u32, Client>,
+    clients: HashMap<ClientID, Client>,
 }
 
 impl Game {
@@ -19,18 +19,18 @@ impl Game {
         }
     }
 
-    pub fn on_client_disconnect(&mut self, connection_id: u32) {
+    pub fn on_client_disconnect(&mut self, connection_id: ClientID) {
         self.clients.remove(&connection_id);
     }
 
-    pub fn on_client_connect(&mut self, connection_id: u32, mut responder: Responder) {
+    pub fn on_client_connect(&mut self, connection_id: ClientID, mut responder: Responder) {
         // tell the client their id
         responder.send(YourIDPayload::new(connection_id));
 
         self.clients.insert(connection_id, Client::new(responder));
     }
 
-    pub fn on_client_message(&mut self, connection_id: u32, message: ClientMessage) {
+    pub fn on_client_message(&mut self, connection_id: ClientID, message: ClientMessage) {
         match message {
             ClientMessage::Pong(payload) => {
             },
