@@ -39,6 +39,7 @@ macro_rules! s2c_payload_keys {
     ($($payload_ident:ident, $payload_key:literal),*$(,)?) => {
         // HACK: ensure payload keys are only used once
         #[deny(unreachable_patterns)] // NOTE: if this causes a compile error, it means a payload key was used more than once
+        #[doc(hidden)]
         fn _for_lint_only_do_not_call() {
             match "" {
                 $(
