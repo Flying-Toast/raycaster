@@ -24,20 +24,26 @@ impl Game {
         }
     }
 
-    pub fn on_client_disconnect(&mut self, connection_id: ClientID) {
-        self.remove_client(connection_id);
+    pub fn on_client_disconnect(&mut self, client_id: ClientID) {
+        self.remove_client(client_id);
     }
 
-    pub fn on_client_connect(&mut self, connection_id: ClientID, mut responder: Responder) {
+    pub fn on_client_connect(&mut self, client_id: ClientID, mut responder: Responder) {
         // tell the client their id
-        responder.send(YourIDPayload::new(connection_id));
+        responder.send(YourIDPayload::new(client_id));
 
         let ent_id = self.gen_entity_id();
         self.entities.insert(ent_id, Entity::new());
-        self.clients.insert(connection_id, Client::new(responder, ent_id));
+        self.clients.insert(client_id, Client::new(responder, ent_id));
     }
 
-    pub fn on_client_message(&mut self, connection_id: ClientID, message: ClientMessage) {
+    pub fn on_client_message(&mut self, client_id: ClientID, message: ClientMessage) {
+        // ignore the message if we don't know a client with this id
+        if !self.clients.contains_key(&client_id) {
+            eprintln!("Ignoring a message from {:?} because they are not in the game", client_id);
+            return;
+        }
+
         match message {
             ClientMessage::Pong(payload) => {
             },
