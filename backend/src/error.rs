@@ -1,10 +1,15 @@
 /// Error type
 #[derive(Debug)]
 pub enum RCE {
+    // network errors
     NetworkFailedToStart,
+
+    // protocol errors
     PayloadDecode,
     BadClientMessageType,
     EmptyPieces,
+
+    // map parsing errors
     MapFileRead,
     BadMapFormat,
     BadTileType,

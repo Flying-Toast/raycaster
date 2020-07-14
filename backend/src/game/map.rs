@@ -1,4 +1,4 @@
-use std::io::{BufRead, BufReader};
+use std::io::{BufRead, BufReader, Lines};
 use std::fs::File;
 use std::collections::HashMap;
 use std::str::FromStr;
@@ -37,6 +37,18 @@ pub struct Map {
     tiles: Vec<Vec<Tile>>,
 }
 
+trait LinesExt {
+    fn parse_next_line<T: FromStr>(&mut self) -> Option<T>;
+}
+impl LinesExt for Lines<BufReader<File>> {
+    fn parse_next_line<T: FromStr>(&mut self) -> Option<T> {
+        match self.next() {
+            Some(Ok(line)) => line.parse().ok(),
+            _ => None,
+        }
+    }
+}
+
 impl Map {
     pub fn from_file(file_path: &str) -> Result<Self, RCE> {
         const E: RCE = RCE::BadMapFormat;
@@ -44,9 +56,9 @@ impl Map {
         let file = File::open(file_path).to(RCE::MapFileRead)?;
         let mut lines = BufReader::new(file).lines();
 
-        let width: usize = lines.next().to(E)?.to(E)?.parse().to(E)?;
-        let height: usize = lines.next().to(E)?.to(E)?.parse().to(E)?;
-        let num_tiletypes: u32 = lines.next().to(E)?.to(E)?.parse().to(E)?;
+        let width: usize = lines.parse_next_line().to(E)?;
+        let height: usize = lines.parse_next_line().to(E)?;
+        let num_tiletypes: u32 = lines.parse_next_line().to(E)?;
 
         let mut tiletype_map = HashMap::new();
         for _ in 0..num_tiletypes {
