@@ -16,7 +16,7 @@ pub fn start(server_tx: flume::Sender<NetEvent>, port: u16) -> Result<(), RCE> {
         let address = format!("0.0.0.0:{}", port);
         let mut listener = TcpListener::bind(&address).await
             .to(RCE::NetworkFailedToStart)?;
-        eprintln!("Listening on {}", address);
+        println!("Listening on {}", address);
 
         let mut current_id: u32 = 0;
         loop {
