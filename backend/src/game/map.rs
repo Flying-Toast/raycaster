@@ -51,22 +51,27 @@ impl LinesExt for Lines<BufReader<File>> {
 
 impl Map {
     pub fn from_file(file_path: &str) -> Result<Self, RCE> {
-        const E: RCE = RCE::BadMapFormat;
+        use RCE::BadMapFormat as BMF;
 
         let file = File::open(file_path).to(RCE::MapFileRead)?;
         let mut lines = BufReader::new(file).lines();
+        let mut line_num = 0;
 
-        let width: usize = lines.parse_next_line().to(E)?;
-        let height: usize = lines.parse_next_line().to(E)?;
-        let num_tiletypes: u32 = lines.parse_next_line().to(E)?;
+        line_num += 1;
+        let width: usize = lines.parse_next_line().to(BMF{line_num})?;
+        line_num += 1;
+        let height: usize = lines.parse_next_line().to(BMF{line_num})?;
+        line_num += 1;
+        let num_tiletypes: u32 = lines.parse_next_line().to(BMF{line_num})?;
 
         let mut tiletype_map = HashMap::new();
         for _ in 0..num_tiletypes {
-            let line = lines.next().to(E)?.to(E)?;
+            line_num += 1;
+            let line = lines.next().to(BMF{line_num})?.to(BMF{line_num})?;
             let mut chars = line.chars();
-            let key = chars.next().to(E)?;
+            let key = chars.next().to(BMF{line_num})?;
             if chars.next() != Some('=') {
-                return Err(E);
+                return Err(BMF{line_num});
             }
             let type_str: String = chars.collect();
             let tiletype = TileType::from_str(&type_str).to(RCE::BadTileType)?;
@@ -75,23 +80,24 @@ impl Map {
 
         let mut tiles = Vec::new();
         for line in lines {
-            let line = line.to(E)?;
+            line_num += 1;
+            let line = line.to(BMF{line_num})?;
             let mut row = Vec::new();
             let chars = line.chars();
             for ch in chars {
                 row.push(
                     Tile::new(
-                        tiletype_map.get(&ch).to(E)?.clone()
+                        tiletype_map.get(&ch).to(BMF{line_num})?.clone()
                     )
                 );
             }
             if row.len() != width {
-                return Err(E);
+                return Err(BMF{line_num});
             }
             tiles.push(row);
         }
         if tiles.len() != height {
-            return Err(E);
+            return Err(BMF{line_num});
         }
 
         Ok(Map {

@@ -11,7 +11,7 @@ pub enum RCE {
 
     // map parsing errors
     MapFileRead,
-    BadMapFormat,
+    BadMapFormat{line_num: usize},
     BadTileType,
 }
 
