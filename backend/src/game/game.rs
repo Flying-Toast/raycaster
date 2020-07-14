@@ -25,13 +25,7 @@ impl Game {
     }
 
     pub fn on_client_disconnect(&mut self, connection_id: ClientID) {
-        if let Some(client) = self.clients.get(&connection_id) {
-            // remove the client's player
-            self.entities.remove(&client.player_entity);
-        }
-
-        // remove the client itself
-        self.clients.remove(&connection_id);
+        self.remove_client(connection_id);
     }
 
     pub fn on_client_connect(&mut self, connection_id: ClientID, mut responder: Responder) {
@@ -65,5 +59,26 @@ impl Game {
         self.next_entity_id = self.next_entity_id.wrapping_add(1);
 
         EntityID::new(self.next_entity_id)
+    }
+
+    /// Removes the specified client, and its player entity.
+    /// Returns the removed `Client` (if one was removed).
+    /// NOTE: this does not close the client's connection (see `close_and_remove_client()`).
+    fn remove_client(&mut self, client_id: ClientID) -> Option<Client> {
+        if let Some(client) = self.clients.remove(&client_id) {
+            // remove the client's player
+            self.entities.remove(&client.player_entity);
+
+            Some(client)
+        } else {
+            None
+        }
+    }
+
+    /// The same as `remove_client()`, but also closes the client's connection.
+    fn close_and_remove_client(&mut self, client_id: ClientID) {
+        if let Some(client) = self.remove_client(client_id) {
+            client.responder.close();
+        }
     }
 }

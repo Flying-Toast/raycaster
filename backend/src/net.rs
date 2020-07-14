@@ -181,7 +181,7 @@ impl Responder {
     }
 
     /// Sends any queued messages then closes the connection
-    pub fn close(&mut self) {
+    pub fn close(mut self) { // take owned self so that the Responder can't be used after closed
         // Send any queued messages before closing
         self.flush();
         let _ = self.net_tx.send(ServerEvent::Close);
