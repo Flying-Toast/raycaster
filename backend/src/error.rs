@@ -12,7 +12,7 @@ pub enum RCE {
     // map parsing errors
     MapFileRead,
     BadMapFormat{line_num: usize},
-    BadTileType,
+    BadTileType{type_string: String},
 }
 
 /// Converts `Result<T, _>` to `Result<T, RCE>`. Also implemented on `Option`.

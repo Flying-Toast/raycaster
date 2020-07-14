@@ -73,8 +73,8 @@ impl Map {
             if chars.next() != Some('=') {
                 return Err(BMF{line_num});
             }
-            let type_str: String = chars.collect();
-            let tiletype = TileType::from_str(&type_str).to(RCE::BadTileType)?;
+            let type_string: String = chars.collect();
+            let tiletype = TileType::from_str(&type_string).to(RCE::BadTileType{type_string})?;
             tiletype_map.insert(key, tiletype);
         }
 
