@@ -14,14 +14,14 @@ class IncomingPayload {
 }
 
 class YourIDPayload extends IncomingPayload {
-	constructor(clientID) {
+	constructor(entityID) {
 		super("YourID");
-		this.clientID = clientID;
+		this.entityID = entityID;
 	}
 
 	static parse(lines) {
-		let clientID = Number(lines.shift());
-		return new YourIDPayload(clientID);
+		let entityID = Number(lines.shift());
+		return new YourIDPayload(entityID);
 	}
 }
 

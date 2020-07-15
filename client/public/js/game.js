@@ -1,13 +1,13 @@
 export class Game {
 	constructor(responder) {
 		this.responder = responder;
-		this.myID = null;
+		this.myEntityID = null;
 	}
 
 	handleMessage(message) {
 		switch (message.type) {
 			case "YourID": {
-				this.myID = message.clientID;
+				this.myEntityID = message.entityID;
 				break;
 			}
 		}
