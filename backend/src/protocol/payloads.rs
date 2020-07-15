@@ -1,25 +1,25 @@
 use crate::error::*;
 use crate::protocol::payload::{S2CPayload, C2SPayload, Pieces};
-use crate::net::ClientID;
+use crate::game::entity::EntityID;
 
 
-/// Tells a client what their id is
+/// Tells a client what their player entity's id is
 #[derive(Debug)]
 pub struct YourIDPayload {
-    pub client_id: ClientID,
+    pub entity_id: EntityID,
 }
 impl YourIDPayload {
-    pub fn new(client_id: ClientID) -> Self {
+    pub fn new(entity_id: EntityID) -> Self {
         Self {
-            client_id,
+            entity_id,
         }
     }
 }
 impl S2CPayload for YourIDPayload {
     fn encode(&self) -> String {
         let mut lines = lines!();
-        let client_id = self.client_id.to_string();
-        lines.push(&client_id);
+        let entity_id = self.entity_id.to_string();
+        lines.push(&entity_id);
 
         lines.join("\n")
     }

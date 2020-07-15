@@ -115,16 +115,11 @@ async fn handle_connection(stream: TcpStream, tx: flume::Sender<NetEvent>, id: u
         .expect("Server channel disconnected");
 }
 
-/// ID that is unique among clients (websockets)
+/// ID that is unique among clients (websockets).
+/// `ClientID`s are only for the server's use - clients should know nothing about the existence of `ClientID`s.
+/// Clients are only told what their player's *EntityID* is.
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 pub struct ClientID(u32);
-
-// for encoding in payloads
-impl ToString for ClientID {
-    fn to_string(&self) -> String {
-        self.0.to_string()
-    }
-}
 
 /// Type that is sent over a channel the server thread.
 #[derive(Debug)]

@@ -29,18 +29,17 @@ impl Game {
     }
 
     pub fn on_client_connect(&mut self, client_id: ClientID, mut responder: Responder) {
-        // tell the client their id
-        responder.send(YourIDPayload::new(client_id));
-
         let ent_id = self.gen_entity_id();
         self.entities.insert(ent_id, Entity::new());
+        // tell the client their player entity's id
+        responder.send(YourIDPayload::new(ent_id));
         self.clients.insert(client_id, Client::new(responder, ent_id));
     }
 
     pub fn on_client_message(&mut self, client_id: ClientID, message: ClientMessage) {
         // ignore the message if we don't know a client with this id
         if !self.clients.contains_key(&client_id) {
-            eprintln!("Ignoring a message from {:?} because they are not in the game", client_id);
+            eprintln!("Ignoring a message from client #{:?} because they are not in the game", client_id);
             return;
         }
 
