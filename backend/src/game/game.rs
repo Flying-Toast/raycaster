@@ -25,7 +25,9 @@ impl Game {
     }
 
     pub fn on_client_disconnect(&mut self, client_id: ClientID) {
-        self.remove_client(client_id);
+        if let Some(_) = self.remove_client(client_id) {
+            eprintln!("Client {:?} disconnected unexpectedly", client_id);
+        }
     }
 
     pub fn on_client_connect(&mut self, client_id: ClientID, mut responder: Responder) {
