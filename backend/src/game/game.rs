@@ -66,13 +66,17 @@ impl Game {
         EntityID::new(self.next_entity_id)
     }
 
+    fn remove_entity(&mut self, entity_id: EntityID) {
+        self.entities.remove(&entity_id);
+    }
+
     /// Removes the specified client, and its player entity.
     /// Returns the removed `Client` (if one was removed).
     /// NOTE: this does not close the client's connection (see `close_and_remove_client()`).
     fn remove_client(&mut self, client_id: ClientID) -> Option<Client> {
         if let Some(client) = self.clients.remove(&client_id) {
             // remove the client's player
-            self.entities.remove(&client.player_entity);
+            self.remove_entity(client.player_entity);
 
             Some(client)
         } else {
