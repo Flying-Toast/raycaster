@@ -1,11 +1,11 @@
 #[derive(Debug)]
 pub struct Vector {
-    pub x: f64,
-    pub y: f64,
+    pub x: f32,
+    pub y: f32,
 }
 
 impl Vector {
-    pub fn new(x: f64, y: f64) -> Self {
+    pub fn new(x: f32, y: f32) -> Self {
         Self {
             x,
             y,
@@ -27,13 +27,13 @@ impl Vector {
     }
 
     /// Multiplies this vector by the given scalar, modifying it in-place.
-    pub fn smult(&mut self, scalar: f64) {
+    pub fn smult(&mut self, scalar: f32) {
         self.x *= scalar;
         self.y *= scalar;
     }
 
     /// Multiplies this vector by the given scalar, returning the result as a new vector.
-    pub fn stimes(&self, scalar: f64) -> Self {
+    pub fn stimes(&self, scalar: f32) -> Self {
         Self {
             x: self.x * scalar,
             y: self.y * scalar,
