@@ -33,7 +33,7 @@ pub struct PingPongPayload {
 impl S2CPayload for PingPongPayload {
     fn encode(&self) -> PayloadBuilder {
         let mut builder = builder!();
-        builder.add_str(&self.id.to_string());
+        builder.add_u32(self.id);
 
         builder
     }

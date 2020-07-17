@@ -58,6 +58,10 @@ impl PayloadBuilder {
         self.lines.push_str(string);
     }
 
+    pub fn add_u32(&mut self, int: u32) {
+        self.add_str(&int.to_string());
+    }
+
     pub fn build(self) -> String {
         self.lines
     }
