@@ -1,5 +1,5 @@
 use crate::error::*;
-use crate::protocol::payload::{S2CPayload, C2SPayload, Pieces};
+use crate::protocol::payload::{S2CPayload, C2SPayload, Pieces, PayloadBuilder};
 use crate::game::entity::EntityID;
 
 
@@ -16,11 +16,11 @@ impl YourIDPayload {
     }
 }
 impl S2CPayload for YourIDPayload {
-    fn encode(&self) -> String {
+    fn encode(&self) -> PayloadBuilder {
         let mut builder = builder!();
         builder.add_str(&self.entity_id.to_string());
 
-        builder.build()
+        builder
     }
 }
 
@@ -31,11 +31,11 @@ pub struct PingPongPayload {
     pub id: u32,
 }
 impl S2CPayload for PingPongPayload {
-    fn encode(&self) -> String {
+    fn encode(&self) -> PayloadBuilder {
         let mut builder = builder!();
         builder.add_str(&self.id.to_string());
 
-        builder.build()
+        builder
     }
 }
 impl C2SPayload for PingPongPayload {

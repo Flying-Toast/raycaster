@@ -65,7 +65,7 @@ impl PayloadBuilder {
 
 /// server-to-client payload
 pub trait S2CPayload {
-    fn encode(&self) -> String;
+    fn encode(&self) -> PayloadBuilder;
 }
 
 /// client-to-server payload

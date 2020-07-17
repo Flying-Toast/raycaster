@@ -161,7 +161,7 @@ impl Responder {
 
     /// Queues a payload
     pub fn send(&mut self, payload: impl S2CPayload) {
-        self.queue.push(payload.encode());
+        self.queue.push(payload.encode().build());
     }
 
     /// Sends all queued payloads in a single packet
