@@ -18,7 +18,7 @@ impl YourIDPayload {
 impl S2CPayload for YourIDPayload {
     fn encode(&self) -> PayloadBuilder {
         let mut builder = builder!();
-        builder.add_str(&self.entity_id.to_string());
+        builder.add_u32(self.entity_id.0);
 
         builder
     }

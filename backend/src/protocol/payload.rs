@@ -1,5 +1,5 @@
-use crate::error::*;
 use std::str::Lines;
+use crate::error::*;
 
 
 /// Abstraction around `std::str::Lines` for parsing payloads
