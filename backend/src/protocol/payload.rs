@@ -63,6 +63,10 @@ impl PayloadBuilder {
         self.add_str(&int.to_string());
     }
 
+    pub fn add_f32(&mut self, float: f32) {
+        self.add_u32(float.to_bits())
+    }
+
     pub fn add_ent_id(&mut self, id: EntityID) {
         self.add_u32(id.0);
     }
