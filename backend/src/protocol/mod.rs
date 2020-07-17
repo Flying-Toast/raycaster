@@ -1,5 +1,3 @@
-/// Definitions of all types that can be sent over the network
-pub mod types;
 #[macro_use]
 mod macros;
 pub mod payload;
