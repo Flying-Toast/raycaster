@@ -42,7 +42,7 @@ impl S2CPayload for PingPongPayload {
 }
 impl C2SPayload for PingPongPayload {
     fn parse(pieces: &mut Pieces) -> Result<Self, RCE> {
-        let id: u32 = pieces.get()?;
+        let id = pieces.get_u32()?;
 
         Ok(Self {
             id,

@@ -1,5 +1,5 @@
 use crate::error::*;
-use std::str::{Lines, FromStr};
+use std::str::Lines;
 
 
 /// Abstraction around `std::str::Lines` for parsing payloads
@@ -27,13 +27,17 @@ impl<'a> Pieces<'a> {
         }
     }
 
-    /// Parse the next line into `T`
-    pub fn get<T: FromStr>(&mut self) -> Result<T, RCE> {
-        let line = self.get_str()?;
-        T::from_str(line).to(RCE::PayloadParse {
-                                    attempted_parse_type: std::any::type_name::<T>(),
-                                    packet_line_num: self.current_line,
-                                  })
+    pub fn get_u32(&mut self) -> Result<u32, RCE> {
+        self.get_str()?
+            .parse()
+            .to(self.parse_error::<u32>())
+    }
+
+    fn parse_error<T>(&self) -> RCE {
+        RCE::PayloadParse {
+            attempted_parse_type: std::any::type_name::<T>(),
+            packet_line_num: self.current_line,
+        }
     }
 }
 
