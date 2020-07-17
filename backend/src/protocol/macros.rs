@@ -59,8 +59,8 @@ macro_rules! s2c_payload_keys {
     }
 }
 
-macro_rules! lines {
+macro_rules! builder {
     () => {
-        vec![Self::payload_key()]
+        crate::protocol::payload::PayloadBuilder::new(Self::payload_key())
     };
 }

@@ -41,6 +41,28 @@ impl<'a> Pieces<'a> {
     }
 }
 
+/// Builds an encoded payload for a packet
+pub struct PayloadBuilder {
+    lines: String,
+}
+
+impl PayloadBuilder {
+    pub fn new(payload_key: &str) -> Self {
+        Self {
+            lines: String::from(payload_key),
+        }
+    }
+
+    pub fn add_str(&mut self, string: &str) {
+        self.lines.push('\n');
+        self.lines.push_str(string);
+    }
+
+    pub fn build(self) -> String {
+        self.lines
+    }
+}
+
 /// server-to-client payload
 pub trait S2CPayload {
     fn encode(&self) -> String;

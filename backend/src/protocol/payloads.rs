@@ -17,11 +17,10 @@ impl YourIDPayload {
 }
 impl S2CPayload for YourIDPayload {
     fn encode(&self) -> String {
-        let mut lines = lines!();
-        let entity_id = self.entity_id.to_string();
-        lines.push(&entity_id);
+        let mut builder = builder!();
+        builder.add_str(&self.entity_id.to_string());
 
-        lines.join("\n")
+        builder.build()
     }
 }
 
@@ -33,11 +32,10 @@ pub struct PingPongPayload {
 }
 impl S2CPayload for PingPongPayload {
     fn encode(&self) -> String {
-        let mut lines = lines!();
-        let id = self.id.to_string();
-        lines.push(&id);
+        let mut builder = builder!();
+        builder.add_str(&self.id.to_string());
 
-        lines.join("\n")
+        builder.build()
     }
 }
 impl C2SPayload for PingPongPayload {
