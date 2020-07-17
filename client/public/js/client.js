@@ -12,7 +12,7 @@ export class Client {
 
 	start() {
 		this.net.connect();
-		this.game = new Game(this.net.makeResponder());
+		this.game = new Game(this.net.getResponder());
 		this.mainLoop();
 	}
 
@@ -20,6 +20,8 @@ export class Client {
 		for (const message of this.net.drainMessages()) {
 			this.game.handleMessage(message);
 		}
+
+		this.net.flush();
 
 		this.renderer.render(this.game);
 

@@ -4,21 +4,33 @@ import { decodePacket } from "./protocol.js";
 class Responder {
 	constructor(ws) {
 		this._ws = ws;
+		this.queue = [];
 	}
 
 	send(message) {
-		this._ws.send(message);
+		this.queue.push(message);
+	}
+
+	flush() {
+		if (this.queue.length == 0) {
+			return;
+		}
+		let packet = this.queue.join("\n");
+		this.queue = [];
+		this._ws.send(packet);
 	}
 }
 
 export class Network {
 	constructor() {
 		this.messageBuffer = [];
+		this.responder = null;
 	}
 
 	connect() {
 		this.ws = new WebSocket("ws://localhost:8000");
 		this.ws.addEventListener("message", m => this.handlePacket(m.data));
+		this.responder = new Responder(this.ws);
 	}
 
 	handlePacket(packet) {
@@ -33,7 +45,11 @@ export class Network {
 		return drained;
 	}
 
-	makeResponder() {
-		return new Responder(this.ws);
+	getResponder() {
+		return this.responder;
+	}
+
+	flush() {
+		this.responder.flush();
 	}
 }
