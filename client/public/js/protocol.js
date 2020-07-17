@@ -1,10 +1,36 @@
-export function decodePacket(packet) {
-	let messages = [];
-	let lines = packet.split("\n");
-	while (lines.length != 0) {
-		messages.push(nextMessage(lines));
+class Pieces {
+	constructor(string) {
+		this.lines = string.split("\n");
 	}
-	return messages;
+
+	getString() {
+		if (this.empty()) {
+			throw new Error("Empty pieces");
+		}
+		return this.lines.shift();
+	}
+
+	getInt() {
+		let string = this.getString();
+		let parsed = parseInt(string, 10);
+		if (Number.isNaN(parsed)) {
+			throw new Error(`Error parsing int from "${string}"`);
+		}
+		return parsed;
+	}
+
+	empty() {
+		return this.lines.length == 0;
+	}
+}
+
+export function decodePacket(packet) {
+	let payloads = [];
+	let pieces = new Pieces(packet);
+	while (!pieces.empty()) {
+		payloads.push(nextMessage(pieces));
+	}
+	return payloads;
 }
 
 class IncomingPayload {
@@ -19,18 +45,18 @@ class YourIDPayload extends IncomingPayload {
 		this.entityID = entityID;
 	}
 
-	static parse(lines) {
-		let entityID = Number(lines.shift());
+	static parse(pieces) {
+		let entityID = pieces.getInt();
 		return new YourIDPayload(entityID);
 	}
 }
 
-function nextMessage(lines) {
-	const payloadKey = lines.shift();
+function nextMessage(pieces) {
+	const payloadKey = pieces.getString();
 
 	switch (payloadKey) {
 		case "u":
-			return YourIDPayload.parse(lines);
+			return YourIDPayload.parse(pieces);
 		default:
 			throw new Error(`unknown payload key "${payloadKey}"`);
 	}
