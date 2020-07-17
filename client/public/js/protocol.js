@@ -19,6 +19,14 @@ class Pieces {
 		return parsed;
 	}
 
+	getFloat() {
+		return (
+			new Float32Array(
+				Uint32Array.of(this.getInt()).buffer
+			)
+		)[0];
+	}
+
 	empty() {
 		return this.lines.length == 0;
 	}
