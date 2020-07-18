@@ -4,7 +4,6 @@ use crate::game::entity::EntityID;
 
 
 /// Tells a client what their player entity's id is
-#[derive(Debug)]
 pub struct YourIDPayload;
 impl YourIDPayload {
     pub fn assemble(entity_id: EntityID) -> BuiltPayload {
