@@ -35,9 +35,9 @@ impl Game {
         let ent_id = self.gen_entity_id();
         responder.send(YourIDPayload::assemble(ent_id));
         let entity = Entity::new(ent_id, self.map.find_spawnpoint());
+        self.clients.insert(client_id, Client::new(responder, ent_id));
         self.announce_entity(&entity);
         self.entities.insert(ent_id, entity);
-        self.clients.insert(client_id, Client::new(responder, ent_id));
     }
 
     pub fn on_client_message(&mut self, client_id: ClientID, message: ClientMessage) {
