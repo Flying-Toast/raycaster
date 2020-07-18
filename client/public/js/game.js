@@ -1,5 +1,6 @@
 export class Entity {
-	constructor(location) {
+	constructor(id, location) {
+		this.id = id;
 		this.location = location;
 	}
 }
@@ -22,7 +23,7 @@ export class Game {
 				break;
 			}
 			case "NewEntity": {
-				this.entities.set(message.entityID, message.entity);
+				this.entities.set(message.entity.id, message.entity);
 				break;
 			}
 			default:

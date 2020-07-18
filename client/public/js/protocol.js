@@ -82,16 +82,15 @@ class RemoveEntityPayload extends IncomingPayload {
 }
 
 class NewEntityPayload extends IncomingPayload {
-	constructor(entityID, entity) {
+	constructor(entity) {
 		super("NewEntity");
-		this.entityID = entityID;
 		this.entity = entity;
 	}
 
 	static parse(pieces) {
 		let id = pieces.getInt();
 		let location = pieces.getVector();
-		return new NewEntityPayload(id, new Entity(location));
+		return new NewEntityPayload(new Entity(id, location));
 	}
 }
 
