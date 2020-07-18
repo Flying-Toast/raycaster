@@ -17,7 +17,7 @@ export class Game {
 			}
 			default:
 				console.error("Error handling message: ", message);
-				throw new Error("Error handling message: ");
+				throw new Error("Error handling message");
 		}
 	}
 }
