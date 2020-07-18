@@ -33,11 +33,11 @@ impl Game {
 
     pub fn on_client_connect(&mut self, client_id: ClientID, mut responder: Responder) {
         let ent_id = self.gen_entity_id();
-        self.entities.insert(ent_id, Entity::new(self.map.find_spawnpoint()));
-        // tell the client their player entity's id
         responder.send(YourIDPayload::assemble(ent_id));
+        let entity = Entity::new(ent_id, self.map.find_spawnpoint());
+        self.announce_entity(&entity);
+        self.entities.insert(ent_id, entity);
         self.clients.insert(client_id, Client::new(responder, ent_id));
-        self.announce_entity(ent_id);
     }
 
     pub fn on_client_message(&mut self, client_id: ClientID, message: ClientMessage) {
@@ -105,11 +105,7 @@ impl Game {
     }
 
     /// Tells all clients about a new entity
-    fn announce_entity(&mut self, entity_id: EntityID) {
-        if let Some(entity) = self.entities.get(&entity_id) {
-            self.broadcast_message(NewEntityPayload::assemble(entity_id, &entity));
-        } else {
-            eprintln!("Can't announce entity ({:?}) - no such entity", entity_id);
-        }
+    fn announce_entity(&mut self, entity: &Entity) {
+        self.broadcast_message(NewEntityPayload::assemble(entity));
     }
 }

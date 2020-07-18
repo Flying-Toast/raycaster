@@ -12,12 +12,14 @@ impl EntityID {
 
 pub struct Entity {
     location: Vector,
+    pub id: EntityID,
 }
 
 impl Entity {
-    pub fn new(location: Vector) -> Self {
+    pub fn new(id: EntityID, location: Vector) -> Self {
         Self {
             location,
+            id,
         }
     }
 

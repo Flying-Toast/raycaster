@@ -28,9 +28,9 @@ impl RemoveEntityPayload {
 /// Announces the creation of a new entity
 pub struct NewEntityPayload;
 impl NewEntityPayload {
-    pub fn assemble(entity_id: EntityID, entity: &Entity) -> BuiltPayload {
+    pub fn assemble(entity: &Entity) -> BuiltPayload {
         let mut builder = builder!();
-        builder.add_ent_id(entity_id);
+        builder.add_ent_id(entity.id);
         builder.add_vector(entity.location());
 
         builder.build()
