@@ -6,7 +6,7 @@ use tokio_tungstenite::tungstenite::Message;
 use futures_util::{StreamExt, SinkExt};
 use crate::error::*;
 use crate::protocol::{ClientMessage, next_message};
-use crate::protocol::payload::{S2CPayload, Pieces};
+use crate::protocol::payload::{BuiltPayload, Pieces};
 
 
 /// Runs the network server in this thread.
@@ -160,8 +160,8 @@ impl Responder {
     }
 
     /// Queues a payload
-    pub fn send(&mut self, payload: impl S2CPayload) {
-        self.queue.push(payload.encode().build());
+    pub fn send(&mut self, payload: BuiltPayload) {
+        self.queue.push(payload.encode());
     }
 
     /// Sends all queued payloads in a single packet

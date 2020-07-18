@@ -42,6 +42,15 @@ impl<'a> Pieces<'a> {
     }
 }
 
+/// An outgoing payload ready to be sent. Produced by a `PaylodBuilder`.
+pub struct BuiltPayload(String);
+
+impl BuiltPayload {
+    pub fn encode(self) -> String {
+        self.0
+    }
+}
+
 /// Builds an encoded payload for a packet
 pub struct PayloadBuilder {
     lines: String,
@@ -63,22 +72,13 @@ impl PayloadBuilder {
         self.add_str(&int.to_string());
     }
 
-    pub fn add_f32(&mut self, float: f32) {
-        self.add_u32(float.to_bits())
-    }
-
     pub fn add_ent_id(&mut self, id: EntityID) {
         self.add_u32(id.0);
     }
 
-    pub fn build(self) -> String {
-        self.lines
+    pub fn build(self) -> BuiltPayload {
+        BuiltPayload(self.lines)
     }
-}
-
-/// server-to-client payload
-pub trait S2CPayload {
-    fn encode(&self) -> PayloadBuilder;
 }
 
 /// client-to-server payload

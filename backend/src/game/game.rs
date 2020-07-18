@@ -34,7 +34,7 @@ impl Game {
         let ent_id = self.gen_entity_id();
         self.entities.insert(ent_id, Entity::new());
         // tell the client their player entity's id
-        responder.send(YourIDPayload::new(ent_id));
+        responder.send(YourIDPayload::assemble(ent_id));
         self.clients.insert(client_id, Client::new(responder, ent_id));
     }
 
@@ -46,7 +46,7 @@ impl Game {
         }
 
         match message {
-            ClientMessage::Pong(payload) => {
+            ClientMessage::Hello(_payload) => {
             },
         }
     }

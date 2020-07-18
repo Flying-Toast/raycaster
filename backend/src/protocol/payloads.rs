@@ -1,49 +1,34 @@
 use crate::error::*;
-use crate::protocol::payload::{S2CPayload, C2SPayload, Pieces, PayloadBuilder};
+use crate::protocol::payload::{BuiltPayload, C2SPayload, Pieces};
 use crate::game::entity::EntityID;
 
 
 /// Tells a client what their player entity's id is
 #[derive(Debug)]
-pub struct YourIDPayload {
-    pub entity_id: EntityID,
-}
+pub struct YourIDPayload;
 impl YourIDPayload {
-    pub fn new(entity_id: EntityID) -> Self {
-        Self {
-            entity_id,
-        }
-    }
-}
-impl S2CPayload for YourIDPayload {
-    fn encode(&self) -> PayloadBuilder {
+    pub fn assemble(entity_id: EntityID) -> BuiltPayload {
         let mut builder = builder!();
-        builder.add_ent_id(self.entity_id);
+        builder.add_ent_id(entity_id);
 
-        builder
+        builder.build()
     }
 }
 
-/// A 'ping' when in server->client direction,
-/// A 'pong' (response to an earlier 'ping') when in client->server direction.
+//TEMP
 #[derive(Debug)]
-pub struct PingPongPayload {
-    pub id: u32,
+pub struct ClientHelloPayload {
+    pub message: String,
+    pub random_u32: u32,
 }
-impl S2CPayload for PingPongPayload {
-    fn encode(&self) -> PayloadBuilder {
-        let mut builder = builder!();
-        builder.add_u32(self.id);
-
-        builder
-    }
-}
-impl C2SPayload for PingPongPayload {
+impl C2SPayload for ClientHelloPayload {
     fn parse(pieces: &mut Pieces) -> Result<Self, RCE> {
-        let id = pieces.get_u32()?;
+        let message = pieces.get_str()?.to_string();
+        let random_u32 = pieces.get_u32()?;
 
         Ok(Self {
-            id,
+            message,
+            random_u32,
         })
     }
 }
