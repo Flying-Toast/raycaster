@@ -1,3 +1,9 @@
+export class Entity {
+	constructor(location) {
+		this.location = location;
+	}
+}
+
 export class Game {
 	constructor(responder) {
 		this.responder = responder;
@@ -13,6 +19,10 @@ export class Game {
 			}
 			case "RemoveEntity": {
 				this.entities.remove(message.entityID);
+				break;
+			}
+			case "NewEntity": {
+				this.entities.set(message.entityID, message.entity);
 				break;
 			}
 			default:

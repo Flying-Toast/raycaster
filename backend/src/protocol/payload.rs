@@ -1,6 +1,7 @@
 use std::str::Lines;
 use crate::error::*;
 use crate::game::entity::EntityID;
+use crate::game::vector::Vector;
 
 
 /// Abstraction around `std::str::Lines` for parsing payloads
@@ -73,8 +74,17 @@ impl PayloadBuilder {
         self.add_str(&int.to_string());
     }
 
+    pub fn add_f32(&mut self, float: f32) {
+        self.add_u32(float.to_bits());
+    }
+
     pub fn add_ent_id(&mut self, id: EntityID) {
         self.add_u32(id.0);
+    }
+
+    pub fn add_vector(&mut self, vector: &Vector) {
+        self.add_f32(vector.x);
+        self.add_f32(vector.y);
     }
 
     pub fn build(self) -> BuiltPayload {

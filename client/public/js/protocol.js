@@ -1,3 +1,7 @@
+import { Vector } from "./vector.js";
+import { Entity } from "./game.js";
+
+
 class Pieces {
 	constructor(string) {
 		this.lines = string.split("\n");
@@ -25,6 +29,12 @@ class Pieces {
 				Uint32Array.of(this.getInt()).buffer
 			)
 		)[0];
+	}
+
+	getVector() {
+		let x = this.getFloat();
+		let y = this.getFloat();
+		return new Vector(x, y);
 	}
 
 	empty() {
@@ -71,6 +81,20 @@ class RemoveEntityPayload extends IncomingPayload {
 	}
 }
 
+class NewEntityPayload extends IncomingPayload {
+	constructor(entityID, entity) {
+		super("NewEntity");
+		this.entityID = entityID;
+		this.entity = entity;
+	}
+
+	static parse(pieces) {
+		let id = pieces.getInt();
+		let location = pieces.getVector();
+		return new NewEntityPayload(id, new Entity(location));
+	}
+}
+
 function nextMessage(pieces) {
 	const payloadKey = pieces.getString();
 
@@ -79,6 +103,8 @@ function nextMessage(pieces) {
 			return YourIDPayload.parse(pieces);
 		case "r":
 			return RemoveEntityPayload.parse(pieces);
+		case "n":
+			return NewEntityPayload.parse(pieces);
 		default:
 			throw new Error(`unknown payload key "${payloadKey}"`);
 	}

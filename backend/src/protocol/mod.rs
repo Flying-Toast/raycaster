@@ -14,4 +14,5 @@ client_to_server_messages!(
 s2c_payload_keys!(
     YourIDPayload, "u",
     RemoveEntityPayload, "r",
+    NewEntityPayload, "n",
 );

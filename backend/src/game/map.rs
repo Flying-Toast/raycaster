@@ -3,6 +3,7 @@ use std::fs::File;
 use std::collections::HashMap;
 use std::str::FromStr;
 use strum_macros::EnumString;
+use rand::{seq::IteratorRandom, thread_rng};
 use crate::error::*;
 use crate::game::vector::Vector;
 
@@ -11,22 +12,29 @@ use crate::game::vector::Vector;
 pub enum TileType {
     Air,
     Wall,
+    SpawnPoint,
 }
 
 #[derive(Debug)]
 pub struct Tile {
     tile_type: TileType,
+    location: Vector,
 }
 
 impl Tile {
-    fn new(tile_type: TileType) -> Self {
+    fn new(tile_type: TileType, location: Vector) -> Self {
         Self {
             tile_type,
+            location,
         }
     }
 
     pub fn tile_type(&self) -> &TileType {
         &self.tile_type
+    }
+
+    pub fn location(&self) -> &Vector {
+        &self.location
     }
 }
 
@@ -79,15 +87,16 @@ impl Map {
         }
 
         let mut tiles = Vec::new();
-        for line in lines {
+        for (y, line) in lines.enumerate() {
             line_num += 1;
             let line = line.to(BMF{line_num})?;
             let mut row = Vec::new();
             let chars = line.chars();
-            for ch in chars {
+            for (x, ch) in chars.enumerate() {
                 row.push(
                     Tile::new(
-                        tiletype_map.get(&ch).to(BMF{line_num})?.clone()
+                        tiletype_map.get(&ch).to(BMF{line_num})?.clone(),
+                        Vector::new(x as f32, y as f32)
                     )
                 );
             }
@@ -105,6 +114,19 @@ impl Map {
             height,
             tiles,
         })
+    }
+
+    pub fn find_spawnpoint(&self) -> Vector {
+        let (x, y) =
+            self.tiles
+                .iter()
+                .flatten()
+                .filter(|tile| matches!(tile.tile_type(), TileType::SpawnPoint))
+                .map(|tile| (tile.location().x, tile.location().y))
+                .choose(&mut thread_rng())
+                .unwrap_or((0.0, 0.0));
+
+        Vector::new(x + 0.5, y + 0.5)
     }
 
     /// Returns the tile that the given vector is in.
