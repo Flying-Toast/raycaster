@@ -18,7 +18,7 @@ export class Game {
 				break;
 			}
 			case "RemoveEntity": {
-				this.entities.remove(message.entityID);
+				this.entities.delete(message.entityID);
 				break;
 			}
 			case "NewEntity": {
