@@ -43,6 +43,7 @@ impl<'a> Pieces<'a> {
 }
 
 /// An outgoing payload ready to be sent. Produced by a `PaylodBuilder`.
+#[derive(Clone)]
 pub struct BuiltPayload(String);
 
 impl BuiltPayload {

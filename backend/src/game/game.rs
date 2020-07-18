@@ -5,6 +5,7 @@ use crate::game::map::Map;
 use crate::protocol::payloads::*;
 use crate::game::client::Client;
 use crate::game::entity::{Entity, EntityID};
+use crate::protocol::payload::BuiltPayload;
 
 
 pub struct Game {
@@ -69,7 +70,16 @@ impl Game {
     }
 
     fn remove_entity(&mut self, entity_id: EntityID) {
-        self.entities.remove(&entity_id);
+        if let Some(_) = self.entities.remove(&entity_id) {
+            self.broadcast_message(RemoveEntityPayload::assemble(entity_id));
+        }
+    }
+
+    /// Sends `message` to all connected clients
+    fn broadcast_message(&mut self, message: BuiltPayload) {
+        for client in self.clients.values_mut() {
+            client.responder.send(message.clone());
+        }
     }
 
     /// Removes the specified client, and its player entity.

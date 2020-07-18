@@ -35,6 +35,7 @@ export class Network {
 
 	handlePacket(packet) {
 		for (const message of decodePacket(packet)) {
+			console.log("Got message: ", message);
 			this.messageBuffer.push(message);
 		}
 	}

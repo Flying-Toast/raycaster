@@ -59,12 +59,26 @@ class YourIDPayload extends IncomingPayload {
 	}
 }
 
+class RemoveEntityPayload extends IncomingPayload {
+	constructor(entityID) {
+		super("RemoveEntity");
+		this.entityID = entityID;
+	}
+
+	static parse(pieces) {
+		let id = pieces.getInt();
+		return new RemoveEntityPayload(id);
+	}
+}
+
 function nextMessage(pieces) {
 	const payloadKey = pieces.getString();
 
 	switch (payloadKey) {
 		case "u":
 			return YourIDPayload.parse(pieces);
+		case "r":
+			return RemoveEntityPayload.parse(pieces);
 		default:
 			throw new Error(`unknown payload key "${payloadKey}"`);
 	}

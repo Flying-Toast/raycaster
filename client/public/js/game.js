@@ -10,6 +10,9 @@ export class Game {
 				this.myEntityID = message.entityID;
 				break;
 			}
+			default:
+				console.log("Error handling message: ", message);
+				throw new Error("Error handling message: ");
 		}
 	}
 }

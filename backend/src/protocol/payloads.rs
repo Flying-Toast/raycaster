@@ -14,6 +14,17 @@ impl YourIDPayload {
     }
 }
 
+/// Tells a client to remove the specified entity
+pub struct RemoveEntityPayload;
+impl RemoveEntityPayload {
+    pub fn assemble(entity: EntityID) -> BuiltPayload {
+        let mut builder = builder!();
+        builder.add_ent_id(entity);
+
+        builder.build()
+    }
+}
+
 //TEMP
 #[derive(Debug)]
 pub struct ClientHelloPayload {
