@@ -44,37 +44,43 @@ impl<'a> Pieces<'a> {
 }
 
 /// An outgoing payload ready to be sent. Produced by a `PaylodBuilder`.
-pub struct BuiltPayload(String);
+pub struct BuiltPayload(Vec<u8>);
 
 impl BuiltPayload {
-    pub fn encode(&self) -> &str {
+    pub fn encode(&self) -> &[u8] {
         &self.0
     }
 }
 
 /// Builds an encoded payload for a packet
 pub struct PayloadBuilder {
-    lines: String,
+    bytes: Vec<u8>,
 }
 
 impl PayloadBuilder {
     pub fn new(payload_key: &str) -> Self {
         Self {
-            lines: String::from(payload_key),
+            //TODO: u16 payload keys, vec is `vec![payload_key]`
+            bytes: Vec::new(),
         }
     }
 
     pub fn add_str(&mut self, string: &str) {
-        self.lines.push('\n');
-        self.lines.push_str(string);
+        let str_len = string.len() as u64;
+        self.add_u64(str_len);
+        self.bytes.extend_from_slice(string.as_bytes());
     }
 
     pub fn add_u32(&mut self, int: u32) {
-        self.add_str(&int.to_string());
+        self.bytes.extend_from_slice(&int.to_be_bytes());
+    }
+
+    pub fn add_u64(&mut self, int: u64) {
+        self.bytes.extend_from_slice(&int.to_be_bytes());
     }
 
     pub fn add_f32(&mut self, float: f32) {
-        self.add_u32(float.to_bits());
+        self.bytes.extend_from_slice(&float.to_be_bytes());
     }
 
     pub fn add_ent_id(&mut self, id: EntityID) {
@@ -87,7 +93,7 @@ impl PayloadBuilder {
     }
 
     pub fn build(self) -> BuiltPayload {
-        BuiltPayload(self.lines)
+        BuiltPayload(self.bytes)
     }
 }
 

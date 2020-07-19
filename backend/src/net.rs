@@ -52,8 +52,8 @@ async fn handle_connection(stream: TcpStream, tx: flume::Sender<NetEvent>, id: u
     let server_events = async move {
         while let Ok(event) = resp_rx.recv_async().await {
             match event {
-                ServerEvent::Message(string) => {
-                    if let Err(e) = outgoing.send(Message::Text(string)).await {
+                ServerEvent::Message(bytes) => {
+                    if let Err(e) = outgoing.send(Message::Binary(bytes)).await {
                         eprintln!("Error sending to client #{}: {} - disconnecting", id, e);
                         let _ = outgoing.close().await;
                         return Ok(());
@@ -141,14 +141,14 @@ pub enum NetEvent {
 #[derive(Debug)]
 enum ServerEvent {
     /// An outgoing message.
-    Message(String),
+    Message(Vec<u8>),
     /// Instructs the net thread to close the websocket.
     Close,
 }
 
 pub struct Responder {
     net_tx: flume::Sender<ServerEvent>,
-    queue: Vec<String>,
+    queue: Vec<u8>,
 }
 
 impl Responder {
@@ -161,18 +161,19 @@ impl Responder {
 
     /// Queues a payload
     pub fn send(&mut self, payload: &BuiltPayload) {
-        self.queue.push(payload.encode().to_string());
+        self.queue.extend_from_slice(payload.encode());
     }
 
     /// Sends all queued payloads in a single packet
     pub fn flush(&mut self) {
-        // don't send an empty string for empty packets
+        // don't send an empty message for empty packets
         if self.queue.len() == 0 {
             return;
         }
 
-        let _ = self.net_tx.send(ServerEvent::Message(self.queue.join("\n")));
-        self.queue.clear();
+        let mut queue = Vec::new();
+        std::mem::swap(&mut queue, &mut self.queue);
+        let _ = self.net_tx.send(ServerEvent::Message(queue));
     }
 
     /// Sends any queued messages then closes the connection
