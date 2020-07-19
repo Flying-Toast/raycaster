@@ -33,7 +33,7 @@ impl Game {
 
     pub fn on_client_connect(&mut self, client_id: ClientID, mut responder: Responder) {
         let ent_id = self.gen_entity_id();
-        responder.send(YourIDPayload::assemble(ent_id));
+        responder.send(&YourIDPayload::assemble(ent_id));
         let entity = Entity::new(ent_id, self.map.find_spawnpoint());
         self.announce_entity(&entity);
         self.entities.insert(ent_id, entity);
@@ -74,14 +74,14 @@ impl Game {
 
     fn remove_entity(&mut self, entity_id: EntityID) {
         if let Some(_) = self.entities.remove(&entity_id) {
-            self.broadcast_message(RemoveEntityPayload::assemble(entity_id));
+            self.broadcast_message(&RemoveEntityPayload::assemble(entity_id));
         }
     }
 
     /// Sends `message` to all connected clients
-    fn broadcast_message(&mut self, message: BuiltPayload) {
+    fn broadcast_message(&mut self, message: &BuiltPayload) {
         for client in self.clients.values_mut() {
-            client.responder.send(message.clone());
+            client.responder.send(message);
         }
     }
 
@@ -108,13 +108,13 @@ impl Game {
 
     /// Tells all clients about a new entity
     fn announce_entity(&mut self, entity: &Entity) {
-        self.broadcast_message(NewEntityPayload::assemble(entity));
+        self.broadcast_message(&NewEntityPayload::assemble(entity));
     }
 
     /// Tells the entire current game state to `client`
     fn update_new_client(&mut self, client: &mut Client) {
         for entity in self.entities.values() {
-            client.responder.send(NewEntityPayload::assemble(entity));
+            client.responder.send(&NewEntityPayload::assemble(entity));
         }
     }
 }

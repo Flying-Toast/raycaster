@@ -160,8 +160,8 @@ impl Responder {
     }
 
     /// Queues a payload
-    pub fn send(&mut self, payload: BuiltPayload) {
-        self.queue.push(payload.encode());
+    pub fn send(&mut self, payload: &BuiltPayload) {
+        self.queue.push(payload.encode().to_string());
     }
 
     /// Sends all queued payloads in a single packet

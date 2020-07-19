@@ -44,12 +44,11 @@ impl<'a> Pieces<'a> {
 }
 
 /// An outgoing payload ready to be sent. Produced by a `PaylodBuilder`.
-#[derive(Clone)]
 pub struct BuiltPayload(String);
 
 impl BuiltPayload {
-    pub fn encode(self) -> String {
-        self.0
+    pub fn encode(&self) -> &str {
+        &self.0
     }
 }
 
