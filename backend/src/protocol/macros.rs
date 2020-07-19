@@ -31,7 +31,7 @@ macro_rules! client_to_server_messages {
                         }
                     },
                 )*
-                _ => Err(crate::error::RCE::BadClientMessageType),
+                _ => Err(crate::error::RCE::BadClientMessageType{payload_key}),
             })
         }
     };

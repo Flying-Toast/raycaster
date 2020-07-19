@@ -22,7 +22,8 @@ impl Pieces {
     pub fn get_string(&mut self) -> Result<String, RCE> {
         let string_len = self.get_u32()?;
         let bytes = self.bytes_from_front(string_len as usize)?;
-        let string = String::from_utf8(bytes).to(RCE::BadString)?;
+        let string = String::from_utf8(bytes)
+            .map_err(|e| RCE::BadString{bytes: e.into_bytes()})?;
 
         Ok(string)
     }
@@ -56,7 +57,7 @@ impl Pieces {
     /// Removes the first `num` bytes from `self.bytes` and returns the removed bytes.
     fn bytes_from_front(&mut self, num: usize) -> Result<Vec<u8>, RCE> {
         if self.bytes.len() < num {
-            Err(RCE::NotEnoughBytes)
+            Err(RCE::NotEnoughBytes{requested: num, available: self.bytes.len()})
         } else {
             let mut front = self.bytes.split_off(num);
             mem::swap(&mut front, &mut self.bytes);

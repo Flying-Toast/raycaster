@@ -2,17 +2,24 @@
 #[derive(Debug)]
 pub enum RCE {
     // network errors
+
     NetworkFailedToStart,
 
+
     // protocol errors
-    BadClientMessageType,
+
+    BadClientMessageType{payload_key: u16},
     /// Tried to parse a type which requires more bytes than
     /// there are left in the packet.
-    NotEnoughBytes,
+    /// `requested` is how many bytes the read operation requested,
+    /// `available` is how many bytes there were available.
+    NotEnoughBytes{requested: usize, available: usize},
     /// Invalid string (the bytes were not valid UTF-8)
-    BadString,
+    BadString{bytes: Vec<u8>},
+
 
     // map parsing errors
+
     MapFileRead,
     BadMapFormat{line_num: usize},
     BadTileType{type_string: String},
