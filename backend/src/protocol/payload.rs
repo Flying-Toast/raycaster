@@ -6,6 +6,7 @@ use crate::game::vector::Vector;
 
 
 /// Parses incoming payloads
+#[derive(Debug)]
 pub struct Pieces {
     bytes: Vec<u8>,
 }
@@ -26,6 +27,7 @@ impl Pieces {
         Ok(string)
     }
 
+    /// Parse the next `u32`
     pub fn get_u32(&mut self) -> Result<u32, RCE> {
         type Int = u32;
         Ok(Int::from_be_bytes(
@@ -36,6 +38,7 @@ impl Pieces {
         ))
     }
 
+    /// Parse the next `u16`
     pub fn get_u16(&mut self) -> Result<u16, RCE> {
         type Int = u16;
         Ok(Int::from_be_bytes(
