@@ -11,7 +11,7 @@ class Pieces {
 
 	getString() {
 		const len = this.getUint32();
-		assertAtLeastNBytes(len);
+		this.assertAtLeastNBytes(len);
 		let bytes = new Uint8Array(len);
 		for (let i = 0; i < len; i++) {
 			bytes[i] = this.getUint8();
