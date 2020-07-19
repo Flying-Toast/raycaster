@@ -1,44 +1,74 @@
-use std::str::Lines;
+use std::mem;
+use std::convert::TryInto;
 use crate::error::*;
 use crate::game::entity::EntityID;
 use crate::game::vector::Vector;
 
 
-/// Abstraction around `std::str::Lines` for parsing payloads
-pub struct Pieces<'a> {
-    lines: Lines<'a>,
-    current_line: usize,
+/// Parses incoming payloads
+pub struct Pieces {
+    bytes: Vec<u8>,
 }
 
-impl<'a> Pieces<'a> {
-    pub fn new(raw: &'a str) -> Self {
+impl Pieces {
+    pub fn new(bytes: Vec<u8>) -> Self {
         Self {
-            lines: raw.lines(),
-            current_line: 0,
+            bytes,
         }
     }
 
-    /// Parse the next line into a `&str`
-    pub fn get_str(&mut self) -> Result<&str, RCE> {
-        match self.lines.next() {
-            Some(s) => {
-                self.current_line += 1;
-                Ok(s)
-            },
-            None => Err(RCE::EmptyPieces),
-        }
+    /// Parse the next `String`
+    pub fn get_string(&mut self) -> Result<String, RCE> {
+        let string_len = self.get_u64()?;
+        let bytes = self.bytes_from_front(string_len as usize)?;
+        let string = String::from_utf8(bytes).to(RCE::BadString)?;
+
+        Ok(string)
     }
 
     pub fn get_u32(&mut self) -> Result<u32, RCE> {
-        self.get_str()?
-            .parse()
-            .to(self.parse_error::<u32>())
+        type Int = u32;
+        Ok(Int::from_be_bytes(
+            self.bytes_from_front(mem::size_of::<Int>())?
+                .as_slice()
+                .try_into()
+                .unwrap()
+        ))
     }
 
-    fn parse_error<T>(&self) -> RCE {
-        RCE::PayloadParse {
-            attempted_parse_type: std::any::type_name::<T>(),
-            packet_line_num: self.current_line,
+    pub fn get_u16(&mut self) -> Result<u16, RCE> {
+        type Int = u16;
+        Ok(Int::from_be_bytes(
+            self.bytes_from_front(mem::size_of::<Int>())?
+                .as_slice()
+                .try_into()
+                .unwrap()
+        ))
+    }
+
+    pub fn get_u64(&mut self) -> Result<u64, RCE> {
+        type Int = u64;
+        Ok(Int::from_be_bytes(
+            self.bytes_from_front(mem::size_of::<Int>())?
+                .as_slice()
+                .try_into()
+                .unwrap()
+        ))
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.bytes.is_empty()
+    }
+
+    /// Removes the first `num` bytes from `self.bytes` and returns the removed bytes.
+    fn bytes_from_front(&mut self, num: usize) -> Result<Vec<u8>, RCE> {
+        if self.bytes.len() < num {
+            Err(RCE::NotEnoughBytes)
+        } else {
+            let mut front = self.bytes.split_off(num);
+            mem::swap(&mut front, &mut self.bytes);
+
+            Ok(front)
         }
     }
 }
@@ -58,10 +88,9 @@ pub struct PayloadBuilder {
 }
 
 impl PayloadBuilder {
-    pub fn new(payload_key: &str) -> Self {
+    pub fn new(payload_key: u16) -> Self {
         Self {
-            //TODO: u16 payload keys, vec is `vec![payload_key]`
-            bytes: Vec::new(),
+            bytes: Vec::from(payload_key.to_be_bytes()),
         }
     }
 

@@ -77,8 +77,8 @@ async fn handle_connection(stream: TcpStream, tx: flume::Sender<NetEvent>, id: u
     //future that forwards messages received from the websocket to the server thread
     let net_events = async move {
         while let Some(message) = incoming.next().await {
-            if let Ok(Message::Text(string)) = message {
-                let mut pieces = Pieces::new(&string);
+            if let Ok(Message::Binary(bytes)) = message {
+                let mut pieces = Pieces::new(bytes);
 
                 loop {
                     let message;
@@ -86,10 +86,7 @@ async fn handle_connection(stream: TcpStream, tx: flume::Sender<NetEvent>, id: u
                         None => break,
                         Some(Err(e)) => {
                             eprintln!("Error while parsing message from client #{}: {:?}", id, e);
-                            eprintln!("The (entire) packet containing the bad message follows:");
-                            eprintln!("=========START=========");
-                            eprintln!("{}", string);
-                            eprintln!("==========END==========");
+                            //TODO: better error message (include the erred payload)
                             break;
                         },
                         Some(Ok(m)) => message = m,

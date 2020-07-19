@@ -6,11 +6,11 @@ pub enum RCE {
 
     // protocol errors
     BadClientMessageType,
-    /// An error when trying to parse a line from a payload string.
-    /// `attempted_parse_type` is the name of the type that couldn't be parsed.
-    /// `packet_line_num` is the line number within the packet that caused the parsing error.
-    PayloadParse{attempted_parse_type: &'static str, packet_line_num: usize},
-    EmptyPieces,
+    /// Tried to parse a type which requires more bytes than
+    /// there are left in the packet.
+    NotEnoughBytes,
+    /// Invalid string (the bytes were not valid UTF-8)
+    BadString,
 
     // map parsing errors
     MapFileRead,

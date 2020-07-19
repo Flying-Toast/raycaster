@@ -14,9 +14,11 @@ macro_rules! client_to_server_messages {
             -> Option<Result<ClientMessage, crate::error::RCE>>
         {
             use crate::protocol::payload::C2SPayload;
-            let payload_key = match pieces.get_str() {
+            if pieces.is_empty() {
+                return None;
+            }
+            let payload_key = match pieces.get_u16() {
                 Ok(s) => s,
-                Err(crate::error::RCE::EmptyPieces) => return None,
                 Err(e) => return Some(Err(e)),
             };
             Some(match payload_key {
@@ -41,7 +43,7 @@ macro_rules! s2c_payload_keys {
         #[deny(unreachable_patterns)] // NOTE: if this causes a compile error, it means a payload key was used more than once
         #[doc(hidden)]
         fn _for_lint_only_do_not_call() {
-            match "" {
+            match 0 {
                 $(
                     $payload_key => (),
                 )*
@@ -51,7 +53,7 @@ macro_rules! s2c_payload_keys {
 
         $(
             impl crate::protocol::payloads::$payload_ident {
-                pub fn payload_key() -> &'static str {
+                pub fn payload_key() -> u16 {
                     $payload_key
                 }
             }
