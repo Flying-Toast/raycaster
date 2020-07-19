@@ -78,8 +78,7 @@ async fn handle_connection(stream: TcpStream, tx: flume::Sender<NetEvent>, id: u
     let net_events = async move {
         while let Some(message) = incoming.next().await {
             if let Ok(Message::Binary(bytes)) = message {
-                let packet = bytes.clone();
-                let mut pieces = Pieces::new(bytes);
+                let mut pieces = Pieces::new(&bytes);
 
                 loop {
                     let message;
@@ -89,7 +88,7 @@ async fn handle_connection(stream: TcpStream, tx: flume::Sender<NetEvent>, id: u
                             eprintln!("Error while parsing message from client #{}: {:?}", id, e);
                             eprintln!("The (entire) packet containing the error:");
                             eprintln!("======START======");
-                            eprintln!("{:#?}", packet);
+                            eprintln!("{:#?}", bytes);
                             eprintln!("=======END=======");
                             break;
                         },
