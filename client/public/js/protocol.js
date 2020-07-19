@@ -3,48 +3,71 @@ import { Entity } from "./game.js";
 
 
 class Pieces {
-	constructor(string) {
-		this.lines = string.split("\n");
+	constructor(view) {
+		this.view = view;
+		this.offset = 0;
+		this.decoder = new TextDecoder();
 	}
 
 	getString() {
-		if (this.empty()) {
-			throw new Error("Empty pieces");
+		const len = this.getUint32();
+		assertAtLeastNBytes(len);
+		let bytes = new Uint8Array(len);
+		for (let i = 0; i < len; i++) {
+			bytes[i] = this.getUint8();
 		}
-		return this.lines.shift();
+		return this.decoder.decode(bytes.buffer);
 	}
 
-	getInt() {
-		let string = this.getString();
-		let parsed = parseInt(string, 10);
-		if (Number.isNaN(parsed)) {
-			throw new Error(`Error parsing int from "${string}"`);
-		}
-		return parsed;
+	getUint8() {
+		this.assertAtLeastNBytes(8/8);
+		const int = this.view.getUint8(this.offset);
+		this.offset += 8/8;
+		return int;
 	}
 
-	getFloat() {
-		return (
-			new Float32Array(
-				Uint32Array.of(this.getInt()).buffer
-			)
-		)[0];
+	getUint32() {
+		this.assertAtLeastNBytes(32/8);
+		const int = this.view.getUint32(this.offset);
+		this.offset += 32/8;
+		return int;
+	}
+
+	getUint16() {
+		this.assertAtLeastNBytes(16/8);
+		const int = this.view.getUint16(this.offset);
+		this.offset += 16/8;
+		return int;
+	}
+
+	getFloat32() {
+		this.assertAtLeastNBytes(32/8);
+		const float = this.view.getFloat32(this.offset);
+		this.offset += 32/8;
+		return float;
 	}
 
 	getVector() {
-		let x = this.getFloat();
-		let y = this.getFloat();
+		let x = this.getFloat32();
+		let y = this.getFloat32();
 		return new Vector(x, y);
 	}
 
+	assertAtLeastNBytes(n) {
+		const remaining = this.view.byteLength - this.offset;
+		if (remaining < n) {
+			throw new Error("Not enough bytes left");
+		}
+	}
+
 	empty() {
-		return this.lines.length == 0;
+		return this.offset >= this.view.byteLength;
 	}
 }
 
 export function decodePacket(packet) {
 	let payloads = [];
-	let pieces = new Pieces(packet);
+	let pieces = new Pieces(new DataView(packet));
 	while (!pieces.empty()) {
 		payloads.push(nextMessage(pieces));
 	}
@@ -64,7 +87,7 @@ class YourIDPayload extends IncomingPayload {
 	}
 
 	static parse(pieces) {
-		let entityID = pieces.getInt();
+		let entityID = pieces.getUint32();
 		return new YourIDPayload(entityID);
 	}
 }
@@ -76,7 +99,7 @@ class RemoveEntityPayload extends IncomingPayload {
 	}
 
 	static parse(pieces) {
-		let id = pieces.getInt();
+		let id = pieces.getUint32();
 		return new RemoveEntityPayload(id);
 	}
 }
@@ -88,21 +111,21 @@ class NewEntityPayload extends IncomingPayload {
 	}
 
 	static parse(pieces) {
-		let id = pieces.getInt();
+		let id = pieces.getUint32();
 		let location = pieces.getVector();
 		return new NewEntityPayload(new Entity(id, location));
 	}
 }
 
 function nextMessage(pieces) {
-	const payloadKey = pieces.getString();
+	const payloadKey = pieces.getUint16();
 
 	switch (payloadKey) {
-		case "u":
+		case 1:
 			return YourIDPayload.parse(pieces);
-		case "r":
+		case 2:
 			return RemoveEntityPayload.parse(pieces);
-		case "n":
+		case 3:
 			return NewEntityPayload.parse(pieces);
 		default:
 			throw new Error(`unknown payload key "${payloadKey}"`);

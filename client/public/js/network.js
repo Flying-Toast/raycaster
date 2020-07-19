@@ -29,6 +29,7 @@ export class Network {
 
 	connect() {
 		this.ws = new WebSocket("ws://localhost:8000");
+		this.ws.binaryType = "arraybuffer";
 		this.ws.addEventListener("message", m => this.handlePacket(m.data));
 		this.responder = new Responder(this.ws);
 	}
