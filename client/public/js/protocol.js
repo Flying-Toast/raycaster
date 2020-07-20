@@ -65,6 +65,49 @@ class Pieces {
 	}
 }
 
+export class PayloadBuilder {
+	constructor() {
+		this.bytes = [];
+		this.encoder = new TextEncoder();
+	}
+
+	addString(string) {
+		const stringBytes = this.encoder.encode(string);
+		this.addUint32(stringBytes.length);
+		for (let i = 0; i < stringBytes.length; i++) {
+			this.bytes.push(stringBytes[i]);
+		}
+	}
+
+	addUint32(int) {
+		let view = new DataView((new Uint32Array(1)).buffer);//change `new xxArray`
+		view.setUint32(0, int);//change `view.setXX`
+		for (let i = 0; i < 32/8; i++) {//change `xx/8`
+			this.bytes.push(view.getUint8(i));
+		}
+	}
+
+	addUint16(int) {
+		let view = new DataView((new Uint16Array(1)).buffer);//change `new xxArray`
+		view.setUint16(0, int);//change `view.setXX`
+		for (let i = 0; i < 16/8; i++) {//change `xx/8`
+			this.bytes.push(view.getUint8(i));
+		}
+	}
+
+	addFloat32(float) {
+		let view = new DataView((new Float32Array(1)).buffer);//change `new xxArray`
+		view.setFloat32(0, float);//change `view.setXX`
+		for (let i = 0; i < 32/8; i++) {//change `xx/8`
+			this.bytes.push(view.getUint8(i));
+		}
+	}
+
+	build() {
+		return (new Uint8Array(this.bytes).buffer);
+	}
+}
+
 export function decodePacket(packet) {
 	let payloads = [];
 	let pieces = new Pieces(new DataView(packet));
