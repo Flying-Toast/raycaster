@@ -130,7 +130,7 @@ impl Map {
     }
 
     /// Returns the tile that the given vector is in.
-    pub fn get_tile(&self, v: Vector) -> Option<&Tile> {
+    pub fn get_tile(&self, v: &Vector) -> Option<&Tile> {
         self.tiles.get(v.y as usize)?.get(v.x as usize)
     }
 }
