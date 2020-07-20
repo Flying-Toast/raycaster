@@ -1,3 +1,5 @@
+import * as PLD from "./protocol.js";
+
 export class Entity {
 	constructor(id, location) {
 		this.id = id;
@@ -16,6 +18,8 @@ export class Game {
 		switch (message.type) {
 			case "YourID": {
 				this.myEntityID = message.entityID;
+				//TEMP
+				this.responder.send(new PLD.ClientHelloPayload("👋Hello from the client", 1234));
 				break;
 			}
 			case "RemoveEntity": {

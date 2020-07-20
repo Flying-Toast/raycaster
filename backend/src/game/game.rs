@@ -50,7 +50,8 @@ impl Game {
         }
 
         match message {
-            ClientMessage::Hello(_payload) => {
+            ClientMessage::Hello(payload) => {
+                println!("Got ClientHelloPayload: {:?}", payload);
             },
         }
     }

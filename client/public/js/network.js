@@ -7,17 +7,17 @@ class Responder {
 		this.queue = [];
 	}
 
-	send(message) {
-		this.queue.push(message);
+	send(outgoingPayload) {
+		this.queue = this.queue.concat(outgoingPayload.encodeToBytes());
 	}
 
 	flush() {
 		if (this.queue.length == 0) {
 			return;
 		}
-		let packet = this.queue.join("\n");
-		this.queue = [];
+		let packet = (new Uint8Array(this.queue)).buffer;
 		this._ws.send(packet);
+		this.queue = [];
 	}
 }
 

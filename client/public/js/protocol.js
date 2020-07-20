@@ -66,9 +66,10 @@ class Pieces {
 }
 
 export class PayloadBuilder {
-	constructor() {
+	constructor(outgoingPayload) {
 		this.bytes = [];
 		this.encoder = new TextEncoder();
+		this.addUint16(outgoingPayload.key);
 	}
 
 	addString(string) {
@@ -104,7 +105,7 @@ export class PayloadBuilder {
 	}
 
 	build() {
-		return (new Uint8Array(this.bytes).buffer);
+		return this.bytes;
 	}
 }
 
@@ -122,6 +123,16 @@ class IncomingPayload {
 		this.type = type;
 	}
 }
+
+class OutgoingPayload {
+	constructor(key) {
+		this.key = key;
+	}
+}
+
+/////////////////////////
+//  INCOMING PAYLOADS  //
+/////////////////////////
 
 class YourIDPayload extends IncomingPayload {
 	constructor(entityID) {
@@ -159,6 +170,29 @@ class NewEntityPayload extends IncomingPayload {
 		return new NewEntityPayload(new Entity(id, location));
 	}
 }
+
+/////////////////////////
+//  OUTGOING PAYLOADS  //
+/////////////////////////
+
+//TEMP
+export class ClientHelloPayload extends OutgoingPayload {
+	constructor(message, randomU32) {
+		super(1);
+		this.message = message;
+		this.randomU32 = randomU32;
+	}
+
+	encodeToBytes() {
+		let builder = new PayloadBuilder(this);
+		builder.addString(this.message);
+		builder.addUint32(this.randomU32);
+
+		return builder.build();
+	}
+}
+
+//////////////////////////
 
 function nextMessage(pieces) {
 	const payloadKey = pieces.getUint16();
