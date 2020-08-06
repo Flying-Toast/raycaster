@@ -178,7 +178,7 @@ class NewEntityPayload extends IncomingPayload {
 //TEMP
 export class ClientHelloPayload extends OutgoingPayload {
 	constructor(message, randomU32) {
-		super(1);
+		super(0);
 		this.message = message;
 		this.randomU32 = randomU32;
 	}
@@ -198,11 +198,11 @@ function nextMessage(pieces) {
 	const payloadKey = pieces.getUint16();
 
 	switch (payloadKey) {
-		case 1:
+		case 0:
 			return YourIDPayload.parse(pieces);
-		case 2:
+		case 1:
 			return RemoveEntityPayload.parse(pieces);
-		case 3:
+		case 2:
 			return NewEntityPayload.parse(pieces);
 		default:
 			throw new Error(`unknown payload key "${payloadKey}"`);
