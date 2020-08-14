@@ -20,7 +20,7 @@ on_change.running_process = None
 
 if __name__ == "__main__":
     watch_files(
-        on_change, 3,
+        on_change, 1,
         watch_dirs=["src", "../common/src"],
         watch_files=["Cargo.toml", "../common/Cargo.toml"]
     )
