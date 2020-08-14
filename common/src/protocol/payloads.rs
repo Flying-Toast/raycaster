@@ -68,11 +68,11 @@ impl NewEntityPayload {
 
 //TEMP
 #[derive(Debug)]
-pub struct ClientHelloPayload {
+pub struct HelloPayload {
     pub message: String,
     pub random_u32: u32,
 }
-impl Payload for ClientHelloPayload {
+impl Payload for HelloPayload {
     fn parse(pieces: &mut Pieces) -> Result<Self, CME> {
         Ok(Self {
             message: pieces.get_string()?,
@@ -80,7 +80,7 @@ impl Payload for ClientHelloPayload {
         })
     }
 }
-impl ClientHelloPayload {
+impl HelloPayload {
     pub fn assemble(message: &str, random_u32: u32) -> BuiltPayload {
         let mut builder = builder!();
         builder.add_str(message);
