@@ -19,8 +19,8 @@ impl<'a> Pieces<'a> {
     }
 
     /// Parse the next `String`
-    pub fn get_string(&mut self) -> Result<String, CME> {
-        let string_len = self.get_u32()?;
+    pub fn string(&mut self) -> Result<String, CME> {
+        let string_len = self.u32()?;
         let bytes = self.bytes_from_front(string_len as usize)?;
         let string = String::from_utf8(bytes.to_vec())
             .map_err(|e| CME::BadString{bytes: e.into_bytes()})?;
@@ -29,7 +29,7 @@ impl<'a> Pieces<'a> {
     }
 
     /// Parse the next `u32`
-    pub fn get_u32(&mut self) -> Result<u32, CME> {
+    pub fn u32(&mut self) -> Result<u32, CME> {
         type Thing = u32;
         Ok(Thing::from_be_bytes(
             self.bytes_from_front(mem::size_of::<Thing>())?
@@ -39,7 +39,7 @@ impl<'a> Pieces<'a> {
     }
 
     /// Parse the next `u16`
-    pub fn get_u16(&mut self) -> Result<u16, CME> {
+    pub fn u16(&mut self) -> Result<u16, CME> {
         type Thing = u16;
         Ok(Thing::from_be_bytes(
             self.bytes_from_front(mem::size_of::<Thing>())?
@@ -48,7 +48,7 @@ impl<'a> Pieces<'a> {
         ))
     }
 
-    pub fn get_f32(&mut self) -> Result<f32, CME> {
+    pub fn f32(&mut self) -> Result<f32, CME> {
         type Thing = f32;
         Ok(Thing::from_be_bytes(
             self.bytes_from_front(mem::size_of::<Thing>())?
@@ -57,21 +57,21 @@ impl<'a> Pieces<'a> {
         ))
     }
 
-    pub fn get_ent_id(&mut self) -> Result<EntityID, CME> {
+    pub fn ent_id(&mut self) -> Result<EntityID, CME> {
         Ok(
-            EntityID::new(self.get_u32()?)
+            EntityID::new(self.u32()?)
         )
     }
 
-    pub fn get_vector(&mut self) -> Result<Vector, CME> {
+    pub fn vector(&mut self) -> Result<Vector, CME> {
         Ok(
-            Vector::new(self.get_f32()?, self.get_f32()?)
+            Vector::new(self.f32()?, self.f32()?)
         )
     }
 
-    pub fn get_entity(&mut self) -> Result<Entity, CME> {
+    pub fn entity(&mut self) -> Result<Entity, CME> {
         Ok(
-            Entity::new(self.get_ent_id()?, self.get_vector()?)
+            Entity::new(self.ent_id()?, self.vector()?)
         )
     }
 
@@ -113,32 +113,38 @@ impl PayloadBuilder {
         }
     }
 
-    pub fn add_string(&mut self, string: &str) {
+    /// Adds a `&str` to the payload
+    pub fn string(&mut self, string: &str) {
         let str_len = string.len() as u32;
-        self.add_u32(str_len);
+        self.u32(str_len);
         self.bytes.extend_from_slice(string.as_bytes());
     }
 
-    pub fn add_u32(&mut self, int: u32) {
+    /// Adds a `u32` to the payload
+    pub fn u32(&mut self, int: u32) {
         self.bytes.extend_from_slice(&int.to_be_bytes());
     }
 
-    pub fn add_f32(&mut self, float: f32) {
+    /// Adds a `f32` to the payload
+    pub fn f32(&mut self, float: f32) {
         self.bytes.extend_from_slice(&float.to_be_bytes());
     }
 
-    pub fn add_ent_id(&mut self, id: EntityID) {
-        self.add_u32(id.0);
+    /// Adds an `EntityID` to the payload
+    pub fn ent_id(&mut self, id: EntityID) {
+        self.u32(id.0);
     }
 
-    pub fn add_entity(&mut self, entity: &Entity) {
-        self.add_ent_id(entity.id);
-        self.add_vector(entity.location());
+    /// Adds an `Entity` to the payload
+    pub fn entity(&mut self, entity: &Entity) {
+        self.ent_id(entity.id);
+        self.vector(entity.location());
     }
 
-    pub fn add_vector(&mut self, vector: &Vector) {
-        self.add_f32(vector.x);
-        self.add_f32(vector.y);
+    /// Adds a `Vector` to the payload
+    pub fn vector(&mut self, vector: &Vector) {
+        self.f32(vector.x);
+        self.f32(vector.y);
     }
 
     pub fn build(self) -> BuiltPayload {
