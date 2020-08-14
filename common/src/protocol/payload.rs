@@ -30,9 +30,9 @@ impl<'a> Pieces<'a> {
 
     /// Parse the next `u32`
     pub fn get_u32(&mut self) -> Result<u32, CME> {
-        type Int = u32;
-        Ok(Int::from_be_bytes(
-            self.bytes_from_front(mem::size_of::<Int>())?
+        type Thing = u32;
+        Ok(Thing::from_be_bytes(
+            self.bytes_from_front(mem::size_of::<Thing>())?
                 .try_into()
                 .unwrap()
         ))
@@ -40,9 +40,9 @@ impl<'a> Pieces<'a> {
 
     /// Parse the next `u16`
     pub fn get_u16(&mut self) -> Result<u16, CME> {
-        type Int = u16;
-        Ok(Int::from_be_bytes(
-            self.bytes_from_front(mem::size_of::<Int>())?
+        type Thing = u16;
+        Ok(Thing::from_be_bytes(
+            self.bytes_from_front(mem::size_of::<Thing>())?
                 .try_into()
                 .unwrap()
         ))
