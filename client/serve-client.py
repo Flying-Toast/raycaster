@@ -28,6 +28,7 @@ def watch_files():
     prev_checksums = []
     while True:
         files = sorted(list(filter(lambda i: os.path.isfile(i), glob(f"{watch_dir}/**", recursive=True))))
+        files.append("Cargo.toml")
         curr_checksums = list(map(lambda i: f"{i}: {hash(Path(i).read_text())}", files))
         if curr_checksums != prev_checksums:
             build_wasm()
