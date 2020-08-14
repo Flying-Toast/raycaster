@@ -4,7 +4,7 @@ pub mod payload;
 pub mod payloads;
 
 
-client_to_server_messages!(
+c2s_payloads!(
 //  payload key   name of enum variant            payload struct type
     0,            Hello,                          ClientHelloPayload,
 );

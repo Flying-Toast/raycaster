@@ -1,4 +1,4 @@
-macro_rules! client_to_server_messages {
+macro_rules! c2s_payloads {
     ($($payload_key:literal, $enum_variant:ident, $payload_ident:ident),*$(,)?) => {
         /// A payload from the client
         #[derive(Debug)]
