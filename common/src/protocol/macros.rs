@@ -34,6 +34,7 @@ macro_rules! generic_decl_payloads {
             )*
         }
 
+        #[repr(u16)]
         enum $keys_enum {
             $(
                 $enum_variant,
