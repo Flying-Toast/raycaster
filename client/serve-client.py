@@ -38,7 +38,7 @@ def watch_files():
 
 
 if __name__ == "__main__":
-    print(f"===== WATCHING FILES =====")
+    print("===== WATCHING FILES =====")
     watcher = Thread(target=watch_files, daemon=True)
     watcher.start()
     Handler = partial(SimpleHTTPRequestHandler, directory=serve_dir)
