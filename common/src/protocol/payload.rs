@@ -19,17 +19,17 @@ impl<'a> Pieces<'a> {
     }
 
     /// Parse the next `String`
-    pub fn get_string(&mut self) -> Result<String, RCE> {
+    pub fn get_string(&mut self) -> Result<String, CME> {
         let string_len = self.get_u32()?;
         let bytes = self.bytes_from_front(string_len as usize)?;
         let string = String::from_utf8(bytes.to_vec())
-            .map_err(|e| RCE::BadString{bytes: e.into_bytes()})?;
+            .map_err(|e| CME::BadString{bytes: e.into_bytes()})?;
 
         Ok(string)
     }
 
     /// Parse the next `u32`
-    pub fn get_u32(&mut self) -> Result<u32, RCE> {
+    pub fn get_u32(&mut self) -> Result<u32, CME> {
         type Int = u32;
         Ok(Int::from_be_bytes(
             self.bytes_from_front(mem::size_of::<Int>())?
@@ -39,7 +39,7 @@ impl<'a> Pieces<'a> {
     }
 
     /// Parse the next `u16`
-    pub fn get_u16(&mut self) -> Result<u16, RCE> {
+    pub fn get_u16(&mut self) -> Result<u16, CME> {
         type Int = u16;
         Ok(Int::from_be_bytes(
             self.bytes_from_front(mem::size_of::<Int>())?
@@ -53,9 +53,9 @@ impl<'a> Pieces<'a> {
     }
 
     /// Removes the first `num` bytes from `self.bytes` and returns the removed bytes.
-    fn bytes_from_front(&mut self, num: usize) -> Result<&[u8], RCE> {
+    fn bytes_from_front(&mut self, num: usize) -> Result<&[u8], CME> {
         if self.bytes.len() < num {
-            Err(RCE::NotEnoughBytes{requested: num, available: self.bytes.len()})
+            Err(CME::NotEnoughBytes{requested: num, available: self.bytes.len()})
         } else {
             let (front, back) = self.bytes.split_at(num);
             self.bytes = back;
@@ -116,5 +116,5 @@ impl PayloadBuilder {
 
 /// client-to-server payload
 pub trait C2SPayload {
-    fn parse(pieces: &mut Pieces) -> Result<Self, RCE> where Self: Sized;
+    fn parse(pieces: &mut Pieces) -> Result<Self, CME> where Self: Sized;
 }

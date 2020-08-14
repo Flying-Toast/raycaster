@@ -1,5 +1,6 @@
 mod net;
 mod server;
+mod error;
 mod game;
 
 

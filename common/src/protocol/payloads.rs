@@ -44,7 +44,7 @@ pub struct ClientHelloPayload {
     pub random_u32: u32,
 }
 impl C2SPayload for ClientHelloPayload {
-    fn parse(pieces: &mut Pieces) -> Result<Self, RCE> {
+    fn parse(pieces: &mut Pieces) -> Result<Self, CME> {
         let message = pieces.get_string()?;
         let random_u32 = pieces.get_u32()?;
 

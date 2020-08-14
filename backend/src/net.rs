@@ -4,18 +4,18 @@ use tokio::net::{TcpListener, TcpStream};
 use tokio_tungstenite::accept_async;
 use tokio_tungstenite::tungstenite::Message;
 use futures_util::{StreamExt, SinkExt};
-use common::error::*;
+use crate::error::*;
 use common::protocol::{ClientMessage, next_message};
 use common::protocol::payload::{BuiltPayload, Pieces};
 
 
 /// Runs the network server in this thread.
 /// `server_tx` is the transmitting end of a channel for sending `NetEvent`s to the server thread.
-pub fn start(server_tx: flume::Sender<NetEvent>, port: u16) -> Result<(), RCE> {
-    Runtime::new().to(RCE::NetworkFailedToStart)?.block_on(async {
+pub fn start(server_tx: flume::Sender<NetEvent>, port: u16) -> Result<(), BKE> {
+    Runtime::new().to(BKE::NetworkFailedToStart)?.block_on(async {
         let address = format!("0.0.0.0:{}", port);
         let mut listener = TcpListener::bind(&address).await
-            .to(RCE::NetworkFailedToStart)?;
+            .to(BKE::NetworkFailedToStart)?;
         println!("Listening on {}", address);
 
         let mut current_id: u32 = 0;

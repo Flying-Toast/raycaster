@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use std::str::FromStr;
 use strum_macros::EnumString;
 use rand::{seq::IteratorRandom, thread_rng};
-use common::error::*;
+use crate::error::*;
 use common::vector::Vector;
 
 
@@ -58,10 +58,10 @@ impl LinesExt for Lines<BufReader<File>> {
 }
 
 impl Map {
-    pub fn from_file(file_path: &str) -> Result<Self, RCE> {
-        use RCE::BadMapFormat as BMF;
+    pub fn from_file(file_path: &str) -> Result<Self, BKE> {
+        use BKE::BadMapFormat as BMF;
 
-        let file = File::open(file_path).to(RCE::MapFileRead)?;
+        let file = File::open(file_path).to(BKE::MapFileRead)?;
         let mut lines = BufReader::new(file).lines();
         let mut line_num = 0;
 
@@ -82,7 +82,7 @@ impl Map {
                 return Err(BMF{line_num});
             }
             let type_string: String = chars.collect();
-            let tiletype = TileType::from_str(&type_string).to(RCE::BadTileType{type_string})?;
+            let tiletype = TileType::from_str(&type_string).to(BKE::BadTileType{type_string})?;
             tiletype_map.insert(key, tiletype);
         }
 
