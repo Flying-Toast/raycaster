@@ -113,7 +113,7 @@ impl PayloadBuilder {
         }
     }
 
-    pub fn add_str(&mut self, string: &str) {
+    pub fn add_string(&mut self, string: &str) {
         let str_len = string.len() as u32;
         self.add_u32(str_len);
         self.bytes.extend_from_slice(string.as_bytes());

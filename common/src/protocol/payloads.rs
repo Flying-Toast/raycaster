@@ -83,7 +83,7 @@ impl Payload for HelloPayload {
 impl HelloPayload {
     pub fn assemble(message: &str, random_u32: u32) -> BuiltPayload {
         let mut builder = builder!();
-        builder.add_str(message);
+        builder.add_string(message);
         builder.add_u32(random_u32);
 
         builder.build()
