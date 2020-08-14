@@ -4,6 +4,9 @@ from functools import partial
 import subprocess
 import os
 from threading import Thread
+
+import sys
+sys.path.append("../util/filewatcher")
 from filewatcher import watch_files
 
 port = 8080
