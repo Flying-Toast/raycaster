@@ -5,7 +5,7 @@ use tokio_tungstenite::accept_async;
 use tokio_tungstenite::tungstenite::Message;
 use futures_util::{StreamExt, SinkExt};
 use crate::error::*;
-use common::protocol::{ClientMessage, next_message};
+use common::protocol::{ClientMessage, next_message_from_client};
 use common::protocol::payload::{BuiltPayload, Pieces};
 
 
@@ -82,7 +82,7 @@ async fn handle_connection(stream: TcpStream, tx: flume::Sender<NetEvent>, id: u
 
                 loop {
                     let message;
-                    match next_message(&mut pieces) {
+                    match next_message_from_client(&mut pieces) {
                         None => break,
                         Some(Err(e)) => {
                             eprintln!("Error while parsing message from client #{}: {:?}", id, e);

@@ -4,6 +4,7 @@ pub enum CME {
     // protocol errors
 
     BadClientMessageType{payload_key: u16},
+    BadServerMessageType{payload_key: u16},
     /// Tried to parse a type which requires more bytes than
     /// there are left in the packet.
     /// `requested` is how many bytes the read operation requested,

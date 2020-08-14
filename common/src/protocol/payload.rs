@@ -1,7 +1,7 @@
 use std::mem;
 use std::convert::TryInto;
 use crate::error::*;
-use crate::entity::EntityID;
+use crate::entity::{Entity, EntityID};
 use crate::vector::Vector;
 
 
@@ -46,6 +46,33 @@ impl<'a> Pieces<'a> {
                 .try_into()
                 .unwrap()
         ))
+    }
+
+    pub fn get_f32(&mut self) -> Result<f32, CME> {
+        type Thing = f32;
+        Ok(Thing::from_be_bytes(
+            self.bytes_from_front(mem::size_of::<Thing>())?
+                .try_into()
+                .unwrap()
+        ))
+    }
+
+    pub fn get_ent_id(&mut self) -> Result<EntityID, CME> {
+        Ok(
+            EntityID::new(self.get_u32()?)
+        )
+    }
+
+    pub fn get_vector(&mut self) -> Result<Vector, CME> {
+        Ok(
+            Vector::new(self.get_f32()?, self.get_f32()?)
+        )
+    }
+
+    pub fn get_entity(&mut self) -> Result<Entity, CME> {
+        Ok(
+            Entity::new(self.get_ent_id()?, self.get_vector()?)
+        )
     }
 
     pub fn is_empty(&self) -> bool {
@@ -102,6 +129,11 @@ impl PayloadBuilder {
 
     pub fn add_ent_id(&mut self, id: EntityID) {
         self.add_u32(id.0);
+    }
+
+    pub fn add_entity(&mut self, entity: &Entity) {
+        self.add_ent_id(entity.id);
+        self.add_vector(entity.location());
     }
 
     pub fn add_vector(&mut self, vector: &Vector) {

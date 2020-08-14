@@ -4,7 +4,17 @@ use crate::entity::{EntityID, Entity};
 
 
 /// Tells a client what their player entity's id is
-pub struct YourIDPayload;
+#[derive(Debug)]
+pub struct YourIDPayload {
+    pub id: EntityID,
+}
+impl Payload for YourIDPayload {
+    fn parse(pieces: &mut Pieces) -> Result<Self, CME> {
+        Ok(Self {
+            id: pieces.get_ent_id()?,
+        })
+    }
+}
 impl YourIDPayload {
     pub fn assemble(entity_id: EntityID) -> BuiltPayload {
         let mut builder = builder!();
@@ -15,7 +25,17 @@ impl YourIDPayload {
 }
 
 /// Tells a client to remove the specified entity
-pub struct RemoveEntityPayload;
+#[derive(Debug)]
+pub struct RemoveEntityPayload {
+    pub entity: EntityID,
+}
+impl Payload for RemoveEntityPayload {
+    fn parse(pieces: &mut Pieces) -> Result<Self, CME> {
+        Ok(Self {
+            entity: pieces.get_ent_id()?,
+        })
+    }
+}
 impl RemoveEntityPayload {
     pub fn assemble(entity: EntityID) -> BuiltPayload {
         let mut builder = builder!();
@@ -26,12 +46,21 @@ impl RemoveEntityPayload {
 }
 
 /// Announces the creation of a new entity
-pub struct NewEntityPayload;
+#[derive(Debug)]
+pub struct NewEntityPayload {
+    pub entity: Entity,
+}
+impl Payload for NewEntityPayload {
+    fn parse(pieces: &mut Pieces) -> Result<Self, CME> {
+        Ok(Self {
+            entity: pieces.get_entity()?,
+        })
+    }
+}
 impl NewEntityPayload {
     pub fn assemble(entity: &Entity) -> BuiltPayload {
         let mut builder = builder!();
-        builder.add_ent_id(entity.id);
-        builder.add_vector(entity.location());
+        builder.add_entity(&entity);
 
         builder.build()
     }
@@ -45,12 +74,18 @@ pub struct ClientHelloPayload {
 }
 impl Payload for ClientHelloPayload {
     fn parse(pieces: &mut Pieces) -> Result<Self, CME> {
-        let message = pieces.get_string()?;
-        let random_u32 = pieces.get_u32()?;
-
         Ok(Self {
-            message,
-            random_u32,
+            message: pieces.get_string()?,
+            random_u32: pieces.get_u32()?,
         })
+    }
+}
+impl ClientHelloPayload {
+    pub fn assemble(message: &str, random_u32: u32) -> BuiltPayload {
+        let mut builder = builder!();
+        builder.add_str(message);
+        builder.add_u32(random_u32);
+
+        builder.build()
     }
 }

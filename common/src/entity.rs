@@ -10,6 +10,7 @@ impl EntityID {
     }
 }
 
+#[derive(Debug)]
 pub struct Entity {
     location: Vector,
     pub id: EntityID,
