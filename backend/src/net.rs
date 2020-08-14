@@ -5,8 +5,8 @@ use tokio_tungstenite::accept_async;
 use tokio_tungstenite::tungstenite::Message;
 use futures_util::{StreamExt, SinkExt};
 use common::error::*;
-use crate::protocol::{ClientMessage, next_message};
-use crate::protocol::payload::{BuiltPayload, Pieces};
+use common::protocol::{ClientMessage, next_message};
+use common::protocol::payload::{BuiltPayload, Pieces};
 
 
 /// Runs the network server in this thread.

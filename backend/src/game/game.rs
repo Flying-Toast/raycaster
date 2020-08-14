@@ -1,11 +1,11 @@
 use std::collections::HashMap;
 use crate::net::{Responder, ClientID};
-use crate::protocol::ClientMessage;
+use common::protocol::ClientMessage;
 use crate::game::map::Map;
-use crate::protocol::payloads::*;
+use common::protocol::payloads::*;
 use crate::game::client::Client;
 use common::entity::{Entity, EntityID};
-use crate::protocol::payload::BuiltPayload;
+use common::protocol::payload::BuiltPayload;
 
 
 pub struct Game {
