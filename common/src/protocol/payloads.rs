@@ -1,5 +1,5 @@
 use crate::error::*;
-use crate::protocol::payload::{BuiltPayload, C2SPayload, Pieces};
+use crate::protocol::payload::{BuiltPayload, Payload, Pieces};
 use crate::entity::{EntityID, Entity};
 
 
@@ -43,7 +43,7 @@ pub struct ClientHelloPayload {
     pub message: String,
     pub random_u32: u32,
 }
-impl C2SPayload for ClientHelloPayload {
+impl Payload for ClientHelloPayload {
     fn parse(pieces: &mut Pieces) -> Result<Self, CME> {
         let message = pieces.get_string()?;
         let random_u32 = pieces.get_u32()?;

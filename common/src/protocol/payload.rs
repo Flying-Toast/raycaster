@@ -114,7 +114,6 @@ impl PayloadBuilder {
     }
 }
 
-/// client-to-server payload
-pub trait C2SPayload {
+pub trait Payload {
     fn parse(pieces: &mut Pieces) -> Result<Self, CME> where Self: Sized;
 }

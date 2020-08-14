@@ -13,7 +13,7 @@ macro_rules! client_to_server_messages {
         pub fn next_message(pieces: &mut crate::protocol::payload::Pieces)
             -> Option<Result<ClientMessage, crate::error::CME>>
         {
-            use crate::protocol::payload::C2SPayload;
+            use crate::protocol::payload::Payload;
             if pieces.is_empty() {
                 return None;
             }
