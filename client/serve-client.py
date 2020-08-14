@@ -7,7 +7,6 @@ import time
 import os
 from glob import glob
 from pathlib import Path
-import hashlib
 
 port = 8080
 file_watcher_delay_secs = 1
