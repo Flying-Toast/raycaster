@@ -24,8 +24,8 @@ macro_rules! def_serialized_fields {
 }
 
 macro_rules! generic_decl_payloads {
-    ($enum_name:ident, $next_message:ident, $error_type:ident,
-        $($payload_key:literal, $enum_variant:ident, $payload_ident:ident),*$(,)?) =>
+    ($keys_enum:ident, $enum_name:ident, $next_message:ident, $error_type:ident,
+        $($enum_variant:ident, $payload_ident:ident),*$(,)?) =>
     {
         #[derive(Debug)]
         pub enum $enum_name {
@@ -34,16 +34,21 @@ macro_rules! generic_decl_payloads {
             )*
         }
 
+        enum $keys_enum {
+            $(
+                $enum_variant,
+            )*
+        }
+
         $(
             impl crate::protocol::payloads::$payload_ident {
                 pub const fn payload_key() -> u16 {
-                    $payload_key
+                    $keys_enum::$enum_variant as u16
                 }
             }
         )*
 
         /// Reads the next full payload from `pieces`
-        #[deny(unreachable_patterns)] // NOTE: if this causes a compile error, it means a payload key was used more than once
         pub fn $next_message(pieces: &mut crate::protocol::payload::Pieces)
             -> Option<Result<$enum_name, crate::error::CME>>
         {
@@ -57,7 +62,7 @@ macro_rules! generic_decl_payloads {
             };
             Some(match payload_key {
                 $(
-                    $payload_key => {
+                    key if key == crate::protocol::payloads::$payload_ident::payload_key() => {
                         let payload = crate::protocol::payloads::$payload_ident::parse(pieces);
                         match payload {
                             Err(e) => Err(e),
@@ -72,26 +77,28 @@ macro_rules! generic_decl_payloads {
 }
 
 macro_rules! c2s_payloads {
-    ($($payload_key:literal, $enum_variant:ident, $payload_ident:ident),*$(,)?) => {
+    ($($enum_variant:ident, $payload_ident:ident),*$(,)?) => {
         generic_decl_payloads!(
+            ClientPayloadKeys,
             ClientMessage,
             next_message_from_client,
             BadClientMessageType,
             $(
-                $payload_key, $enum_variant, $payload_ident,
+                $enum_variant, $payload_ident,
             )*
         );
     };
 }
 
 macro_rules! s2c_payloads {
-    ($($payload_key:literal, $enum_variant:ident, $payload_ident:ident),*$(,)?) => {
+    ($($enum_variant:ident, $payload_ident:ident),*$(,)?) => {
         generic_decl_payloads!(
+            ServerPayloadKeys,
             ServerMessage,
             next_message_from_server,
             BadServerMessageType,
             $(
-                $payload_key, $enum_variant, $payload_ident,
+                $enum_variant, $payload_ident,
             )*
         );
     }
