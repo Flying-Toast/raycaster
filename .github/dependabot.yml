@@ -4,3 +4,8 @@ updates:
     directory: "/backend"
     schedule:
       interval: "daily"
+
+  - package-ecosystem: "cargo"
+    directory: "/common"
+    schedule:
+      interval: "daily"
