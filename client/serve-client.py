@@ -16,7 +16,7 @@ watch_dir = "src"
 
 def build_wasm():
     print("===== BUILDING WASM =====")
-    result = subprocess.run(["wasm-pack", "build", "--target", "no-modules"])
+    result = subprocess.run(["wasm-pack", "build", "--target", "web"])
     if result.returncode == 0:
         os.replace("pkg/client_bg.wasm", f"{serve_dir}/client_bg.wasm")
         os.replace("pkg/client.js", f"{serve_dir}/client.js")
