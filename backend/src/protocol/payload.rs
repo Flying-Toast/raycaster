@@ -1,8 +1,8 @@
 use std::mem;
 use std::convert::TryInto;
-use crate::error::*;
-use crate::game::entity::EntityID;
-use crate::game::vector::Vector;
+use common::error::*;
+use common::entity::EntityID;
+use common::vector::Vector;
 
 
 /// Parses incoming payloads

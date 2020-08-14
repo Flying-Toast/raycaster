@@ -1,5 +1,5 @@
 use crate::net::Responder;
-use crate::game::entity::EntityID;
+use common::entity::EntityID;
 
 
 pub struct Client {

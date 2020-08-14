@@ -4,7 +4,7 @@ use crate::protocol::ClientMessage;
 use crate::game::map::Map;
 use crate::protocol::payloads::*;
 use crate::game::client::Client;
-use crate::game::entity::{Entity, EntityID};
+use common::entity::{Entity, EntityID};
 use crate::protocol::payload::BuiltPayload;
 
 

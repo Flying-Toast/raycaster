@@ -4,8 +4,8 @@ use std::collections::HashMap;
 use std::str::FromStr;
 use strum_macros::EnumString;
 use rand::{seq::IteratorRandom, thread_rng};
-use crate::error::*;
-use crate::game::vector::Vector;
+use common::error::*;
+use common::vector::Vector;
 
 
 #[derive(Debug, Clone, EnumString)]

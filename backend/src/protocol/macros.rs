@@ -11,7 +11,7 @@ macro_rules! client_to_server_messages {
         /// Reads the next full payload from `pieces`
         #[deny(unreachable_patterns)] // NOTE: if this causes a compile error, it means a payload key was used more than once
         pub fn next_message(pieces: &mut crate::protocol::payload::Pieces)
-            -> Option<Result<ClientMessage, crate::error::RCE>>
+            -> Option<Result<ClientMessage, common::error::RCE>>
         {
             use crate::protocol::payload::C2SPayload;
             if pieces.is_empty() {
@@ -31,7 +31,7 @@ macro_rules! client_to_server_messages {
                         }
                     },
                 )*
-                _ => Err(crate::error::RCE::BadClientMessageType{payload_key}),
+                _ => Err(common::error::RCE::BadClientMessageType{payload_key}),
             })
         }
     };

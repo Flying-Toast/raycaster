@@ -4,7 +4,7 @@ use tokio::net::{TcpListener, TcpStream};
 use tokio_tungstenite::accept_async;
 use tokio_tungstenite::tungstenite::Message;
 use futures_util::{StreamExt, SinkExt};
-use crate::error::*;
+use common::error::*;
 use crate::protocol::{ClientMessage, next_message};
 use crate::protocol::payload::{BuiltPayload, Pieces};
 

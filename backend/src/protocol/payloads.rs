@@ -1,6 +1,6 @@
-use crate::error::*;
+use common::error::*;
 use crate::protocol::payload::{BuiltPayload, C2SPayload, Pieces};
-use crate::game::entity::{EntityID, Entity};
+use common::entity::{EntityID, Entity};
 
 
 /// Tells a client what their player entity's id is

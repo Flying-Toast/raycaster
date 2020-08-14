@@ -1,4 +1,4 @@
-use crate::game::vector::Vector;
+use crate::vector::Vector;
 
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
