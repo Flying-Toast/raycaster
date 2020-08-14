@@ -9,3 +9,8 @@ updates:
     directory: "/common"
     schedule:
       interval: "daily"
+
+  - package-ecosystem: "cargo"
+    directory: "/client"
+    schedule:
+      interval: "daily"
