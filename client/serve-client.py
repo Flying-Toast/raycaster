@@ -12,7 +12,7 @@ import hashlib
 port = 8080
 file_watcher_delay_secs = 1
 serve_dir = "static"
-watch_dir = "src"
+watch_dirs = ["src", "../common/src"]
 
 def build_wasm():
     print("===== BUILDING WASM =====")
@@ -26,8 +26,11 @@ def build_wasm():
 def watch_files():
     prev_checksums = []
     while True:
-        files = sorted(list(filter(lambda i: os.path.isfile(i), glob(f"{watch_dir}/**", recursive=True))))
+        files = []
+        for watchdir in watch_dirs:
+            files += sorted(list(filter(lambda i: os.path.isfile(i), glob(f"{watchdir}/**", recursive=True))))
         files.append("Cargo.toml")
+        files.append("../common/Cargo.toml")
         curr_checksums = list(map(lambda i: f"{i}: {hash(Path(i).read_text())}", files))
         if curr_checksums != prev_checksums:
             build_wasm()
@@ -36,7 +39,7 @@ def watch_files():
 
 
 if __name__ == "__main__":
-    print(f"===== WATCHING FILES IN '{watch_dir}/' =====")
+    print(f"===== WATCHING FILES =====")
     watcher = Thread(target=watch_files, daemon=True)
     watcher.start()
     Handler = partial(SimpleHTTPRequestHandler, directory=serve_dir)
