@@ -38,7 +38,13 @@ impl Frontend {
         }
 
         let messages = self.network.drain_messages();
-        console_log!("MESSAGES: {:#?}", messages);
+        if messages.len() != 0 {
+            console_log!("MESSAGES: {:#?}", messages);
+        }
+
+        // do stuff...
+
+        self.network.flush();
 
         match status {
             NetworkStatus::Connected => RunAgain::Yes,

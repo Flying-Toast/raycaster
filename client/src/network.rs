@@ -3,7 +3,7 @@ use wasm_bindgen::JsCast;
 use std::rc::Rc;
 use std::cell::RefCell;
 use common::protocol::{ServerMessage, next_message_from_server};
-use common::protocol::payload::Pieces;
+use common::protocol::payload::{Pieces, BuiltPayload};
 use web_sys::{WebSocket, BinaryType, MessageEvent};
 use js_sys::{ArrayBuffer, Uint8Array};
 
@@ -19,6 +19,7 @@ pub struct Network {
     ws: Option<WebSocket>,
     message_queue: Rc<RefCell<Vec<ServerMessage>>>,
     onmessage_cb: Rc<RefCell<Option<Closure<dyn FnMut(MessageEvent)>>>>,
+    outgoing_queue: Vec<u8>,
 }
 
 impl Network {
@@ -27,6 +28,7 @@ impl Network {
             ws: None,
             message_queue: Rc::new(RefCell::new(Vec::new())),
             onmessage_cb: Rc::new(RefCell::new(None)),
+            outgoing_queue: Vec::new(),
         }
     }
 
@@ -44,7 +46,30 @@ impl Network {
     }
 
     pub fn drain_messages(&mut self) -> Vec<ServerMessage> {
-        self.message_queue.borrow_mut().drain(..).collect()
+        let mut queue = Vec::new();
+        std::mem::swap(&mut *self.message_queue.borrow_mut(), &mut queue);
+
+        queue
+    }
+
+    /// Queues a message
+    pub fn send(&mut self, message: &BuiltPayload) {
+        self.outgoing_queue.extend_from_slice(message.encode());
+    }
+
+    /// Sends all queued messages in a single packet
+    pub fn flush(&mut self) {
+        // don't send an empty message for empty packets
+        if self.outgoing_queue.len() == 0 {
+            return;
+        }
+
+        if let NetworkStatus::Connected = self.status() {
+            self.ws.as_ref().unwrap().send_with_u8_array(&self.outgoing_queue).unwrap();
+            self.outgoing_queue.clear();
+        } else {
+            console_error!("Tried to send to a closed websocket");
+        }
     }
 
     pub fn connect(&mut self, host: &str, port: u16, use_tls: bool) {

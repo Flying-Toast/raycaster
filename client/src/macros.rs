@@ -10,6 +10,7 @@ macro_rules! console_error {
     };
 }
 
+#[allow(unused_macros)]
 macro_rules! println {
     ($($t:tt)*) => {
         compile_error!("Don't use println in wasm (use console_log)");
