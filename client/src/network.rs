@@ -8,6 +8,7 @@ use web_sys::{WebSocket, BinaryType, MessageEvent};
 use js_sys::{ArrayBuffer, Uint8Array};
 
 
+#[derive(Debug)]
 pub enum NetworkStatus {
     Connecting,
     Connected,
@@ -42,6 +43,10 @@ impl Network {
         }
     }
 
+    pub fn drain_messages(&mut self) -> Vec<ServerMessage> {
+        self.message_queue.borrow_mut().drain(..).collect()
+    }
+
     pub fn connect(&mut self, host: &str, port: u16, use_tls: bool) {
         if let Some(_) = self.ws {
             panic!("Attemted to connect Network multiple times");
@@ -73,7 +78,6 @@ impl Network {
                     Some(Ok(m)) => message = m,
                 }
 
-                console_log!("{:#?}", message);
                 queue_clone.borrow_mut().push(message);
             }
         }) as Box<dyn FnMut(MessageEvent)>));

@@ -37,7 +37,8 @@ impl Frontend {
             return RunAgain::Yes;
         }
 
-        // do stuff....
+        let messages = self.network.drain_messages();
+        console_log!("MESSAGES: {:#?}", messages);
 
         match status {
             NetworkStatus::Connected => RunAgain::Yes,
