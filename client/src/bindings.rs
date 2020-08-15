@@ -5,7 +5,4 @@ use wasm_bindgen::prelude::*;
 extern {
     #[wasm_bindgen(js_namespace = console)]
     pub fn log(s: &str);
-
-    #[wasm_bindgen(js_namespace = console)]
-    pub fn error(s: &str);
 }
