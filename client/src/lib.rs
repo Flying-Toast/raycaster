@@ -1,12 +1,13 @@
 #[macro_use]
 mod macros;
 mod bindings;
+mod frontend;
 
 use wasm_bindgen::prelude::*;
 
 
 #[wasm_bindgen(start)]
 pub fn start() {
-    console_log!("HELLO HELLO HELLO HELLO");
-    console_error!("oopsie");
+    let f = frontend::Frontend::new();
+    f.start();
 }
