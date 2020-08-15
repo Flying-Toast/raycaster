@@ -2,6 +2,7 @@
 mod macros;
 mod bindings;
 mod frontend;
+mod network;
 
 use wasm_bindgen::prelude::*;
 

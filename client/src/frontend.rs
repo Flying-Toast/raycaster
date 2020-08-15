@@ -2,18 +2,22 @@ use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use std::rc::Rc;
 use std::cell::RefCell;
+use crate::network::{Network, NetworkStatus};
+use web_sys::window;
 
 
 enum RunAgain { Yes, No }
 
 pub struct Frontend {
     last_time: f64,
+    network: Network,
 }
 
 impl Frontend {
     pub fn new() -> Self {
         Self {
             last_time: 0.0,
+            network: Network::new(),
         }
     }
 
@@ -27,12 +31,24 @@ impl Frontend {
         let dt = current_time - self.last_time;
         self.last_time = current_time;
 
+        let status = self.network.status();
+        // don't run mainloop until network is connected
+        if let NetworkStatus::Connecting = status {
+            return RunAgain::Yes;
+        }
+
         // do stuff....
 
-        RunAgain::Yes
+        match status {
+            NetworkStatus::Connected => RunAgain::Yes,
+            _ => RunAgain::No,
+        }
     }
 
     pub fn start(mut self) {
+        let hostname = window().unwrap().location().hostname().unwrap();
+        self.network.connect(&hostname, 8000, false);
+
         let closure = Rc::new(RefCell::new(None));
         let starter = closure.clone();
 
@@ -49,7 +65,7 @@ impl Frontend {
 }
 
 fn request_frame(cb: &Closure<dyn FnMut(f64)>) {
-    web_sys::window().unwrap()
+    window().unwrap()
         .request_animation_frame(cb.as_ref().unchecked_ref())
         .unwrap();
 }
