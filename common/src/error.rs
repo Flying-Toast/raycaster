@@ -1,8 +1,6 @@
 /// "Common Error" - error type
 #[derive(Debug)]
 pub enum CME {
-    // protocol errors
-
     BadClientMessageType{payload_key: u16},
     BadServerMessageType{payload_key: u16},
     /// Tried to parse a type which requires more bytes than
@@ -12,6 +10,8 @@ pub enum CME {
     NotEnoughBytes{requested: usize, available: usize},
     /// Invalid string (the bytes were not valid UTF-8)
     BadString{bytes: Vec<u8>},
+    BadMapFormat{line_num: usize},
+    BadTileType{type_string: String},
 }
 
 /// Converts `Result<T, _>` to `Result<T, E>`. Also implemented on `Option`.

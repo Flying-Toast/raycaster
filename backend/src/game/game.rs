@@ -1,11 +1,13 @@
 use std::collections::HashMap;
+use rand::{seq::IteratorRandom, thread_rng};
 use crate::net::{Responder, ClientID};
 use common::protocol::ClientMessage;
-use crate::game::map::Map;
+use common::map::{Map, TileType};
 use common::protocol::payloads::*;
 use crate::game::client::Client;
 use common::entity::{Entity, EntityID};
 use common::protocol::payload::BuiltPayload;
+use common::vector::Vector;
 
 
 pub struct Game {
@@ -17,8 +19,9 @@ pub struct Game {
 
 impl Game {
     pub fn new() -> Self {
+        let mapstring = std::fs::read_to_string("../maps/default").expect("Error reading default map");
         Self {
-            map: Map::from_file("../maps/default").expect("Error reading default map"),
+            map: Map::from_str(&mapstring).unwrap(),
             clients: HashMap::new(),
             entities: HashMap::new(),
             next_entity_id: 0,
@@ -34,7 +37,7 @@ impl Game {
     pub fn on_client_connect(&mut self, client_id: ClientID, mut responder: Responder) {
         let ent_id = self.gen_entity_id();
         responder.send(&YourIDPayload::assemble(ent_id));
-        let entity = Entity::new(ent_id, self.map.find_spawnpoint());
+        let entity = Entity::new(ent_id, self.map.choose_spawnpoint());
         self.announce_entity(&entity);
         self.entities.insert(ent_id, entity);
         let mut client = Client::new(responder, ent_id);
@@ -117,5 +120,24 @@ impl Game {
         for entity in self.entities.values() {
             client.responder.send(&NewEntityPayload::assemble(entity));
         }
+    }
+}
+
+trait MapExt {
+    fn choose_spawnpoint(&self) -> Vector;
+}
+
+impl MapExt for Map {
+    fn choose_spawnpoint(&self) -> Vector {
+        let (x, y) =
+            self.tiles()
+                .iter()
+                .flatten()
+                .filter(|tile| matches!(tile.tile_type(), TileType::SpawnPoint))
+                .map(|tile| (tile.location().x, tile.location().y))
+                .choose(&mut thread_rng())
+                .unwrap_or((0.0, 0.0));
+
+        Vector::new(x + 0.5, y + 0.5)
     }
 }

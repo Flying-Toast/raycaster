@@ -5,3 +5,5 @@ authors = ["Flying-Toast"]
 edition = "2018"
 
 [dependencies]
+strum = "0.19"
+strum_macros = "0.19"

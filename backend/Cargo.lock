@@ -8,8 +8,6 @@ dependencies = [
  "flume",
  "futures-util",
  "rand",
- "strum",
- "strum_macros",
  "tokio",
  "tokio-tungstenite",
 ]
@@ -65,6 +63,10 @@ checksum = "4785bdd1c96b2a846b2bd7cc02e86b6b3dbf14e7e53446c4f54c92a361040822"
 [[package]]
 name = "common"
 version = "0.1.0"
+dependencies = [
+ "strum",
+ "strum_macros",
+]
 
 [[package]]
 name = "cpuid-bool"

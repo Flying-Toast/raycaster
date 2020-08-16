@@ -1,11 +1,8 @@
-use std::io::{BufRead, BufReader, Lines};
-use std::fs::File;
 use std::collections::HashMap;
-use std::str::FromStr;
+use std::str::{FromStr, Lines};
 use strum_macros::EnumString;
-use rand::{seq::IteratorRandom, thread_rng};
 use crate::error::*;
-use common::vector::Vector;
+use crate::vector::Vector;
 
 
 #[derive(Debug, Clone, EnumString)]
@@ -48,21 +45,30 @@ pub struct Map {
 trait LinesExt {
     fn parse_next_line<T: FromStr>(&mut self) -> Option<T>;
 }
-impl LinesExt for Lines<BufReader<File>> {
+
+impl LinesExt for Lines<'_> {
     fn parse_next_line<T: FromStr>(&mut self) -> Option<T> {
         match self.next() {
-            Some(Ok(line)) => line.parse().ok(),
+            Some(line) => line.parse().ok(),
             _ => None,
         }
     }
 }
 
 impl Map {
-    pub fn from_file(file_path: &str) -> Result<Self, BKE> {
-        use BKE::BadMapFormat as BMF;
+    /// Returns the tile that the given vector is in.
+    pub fn get_tile(&self, v: &Vector) -> Option<&Tile> {
+        self.tiles.get(v.y as usize)?.get(v.x as usize)
+    }
 
-        let file = File::open(file_path).to(BKE::MapFileRead)?;
-        let mut lines = BufReader::new(file).lines();
+    pub fn tiles(&self) -> &Vec<Vec<Tile>> {
+        &self.tiles
+    }
+
+    pub fn from_str(string: &str) -> Result<Self, CME> {
+        use CME::BadMapFormat as BMF;
+
+        let mut lines = string.lines();
         let mut line_num = 0;
 
         line_num += 1;
@@ -75,21 +81,20 @@ impl Map {
         let mut tiletype_map = HashMap::new();
         for _ in 0..num_tiletypes {
             line_num += 1;
-            let line = lines.next().to(BMF{line_num})?.to(BMF{line_num})?;
+            let line = lines.next().to(BMF{line_num})?;
             let mut chars = line.chars();
             let key = chars.next().to(BMF{line_num})?;
             if chars.next() != Some('=') {
                 return Err(BMF{line_num});
             }
             let type_string: String = chars.collect();
-            let tiletype = TileType::from_str(&type_string).to(BKE::BadTileType{type_string})?;
+            let tiletype = TileType::from_str(&type_string).to(CME::BadTileType{type_string})?;
             tiletype_map.insert(key, tiletype);
         }
 
         let mut tiles = Vec::new();
         for (y, line) in lines.enumerate() {
             line_num += 1;
-            let line = line.to(BMF{line_num})?;
             let mut row = Vec::new();
             let chars = line.chars();
             for (x, ch) in chars.enumerate() {
@@ -114,23 +119,5 @@ impl Map {
             height,
             tiles,
         })
-    }
-
-    pub fn find_spawnpoint(&self) -> Vector {
-        let (x, y) =
-            self.tiles
-                .iter()
-                .flatten()
-                .filter(|tile| matches!(tile.tile_type(), TileType::SpawnPoint))
-                .map(|tile| (tile.location().x, tile.location().y))
-                .choose(&mut thread_rng())
-                .unwrap_or((0.0, 0.0));
-
-        Vector::new(x + 0.5, y + 0.5)
-    }
-
-    /// Returns the tile that the given vector is in.
-    pub fn get_tile(&self, v: &Vector) -> Option<&Tile> {
-        self.tiles.get(v.y as usize)?.get(v.x as usize)
     }
 }
