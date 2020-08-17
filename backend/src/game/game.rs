@@ -8,22 +8,22 @@ use crate::game::client::Client;
 use common::entity::{Entity, EntityID};
 use common::protocol::payload::BuiltPayload;
 use common::vector::Vector;
+use common::gamestate::GameState;
 
 
 pub struct Game {
-    map: Map,
+    state: GameState,
     clients: HashMap<ClientID, Client>,
-    entities: HashMap<EntityID, Entity>,
     next_entity_id: u32,
 }
 
 impl Game {
     pub fn new() -> Self {
         let mapstring = std::fs::read_to_string("../maps/default").expect("Error reading default map");
+        let map = Map::from_str(&mapstring).unwrap();
         Self {
-            map: Map::from_str(&mapstring).unwrap(),
+            state: GameState::new(map),
             clients: HashMap::new(),
-            entities: HashMap::new(),
             next_entity_id: 0,
         }
     }
@@ -37,9 +37,9 @@ impl Game {
     pub fn on_client_connect(&mut self, client_id: ClientID, mut responder: Responder) {
         let ent_id = self.gen_entity_id();
         responder.send(&YourIDPayload::assemble(ent_id));
-        let entity = Entity::new(ent_id, self.map.choose_spawnpoint());
+        let entity = Entity::new(ent_id, self.state.choose_spawnpoint());
         self.announce_entity(&entity);
-        self.entities.insert(ent_id, entity);
+        self.state.add_entity(ent_id, entity);
         let mut client = Client::new(responder, ent_id);
         self.update_new_client(&mut client);
         self.clients.insert(client_id, client);
@@ -77,7 +77,7 @@ impl Game {
     }
 
     fn remove_entity(&mut self, entity_id: EntityID) {
-        if let Some(_) = self.entities.remove(&entity_id) {
+        if let Some(_) = self.state.remove_entity(entity_id) {
             self.broadcast_message(&RemoveEntityPayload::assemble(entity_id));
         }
     }
@@ -117,20 +117,21 @@ impl Game {
 
     /// Tells the entire current game state to `client`
     fn update_new_client(&mut self, client: &mut Client) {
-        for entity in self.entities.values() {
+        for entity in self.state.entities() {
             client.responder.send(&NewEntityPayload::assemble(entity));
         }
     }
 }
 
-trait MapExt {
+trait GameStateExt {
     fn choose_spawnpoint(&self) -> Vector;
 }
 
-impl MapExt for Map {
+impl GameStateExt for GameState {
     fn choose_spawnpoint(&self) -> Vector {
         let (x, y) =
-            self.tiles()
+            self.map
+                .tiles()
                 .iter()
                 .flatten()
                 .filter(|tile| matches!(tile.tile_type(), TileType::SpawnPoint))
