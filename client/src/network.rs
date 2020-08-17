@@ -94,11 +94,11 @@ impl Network {
                     None => break,
                     Some(Err(e)) => {
                         panic!(concat!(
-                            "Error while parsing message from server: {:?}",
-                            "The (entire) packet containing the error:",
-                            "======START======",
-                            "{:#?}",
-                            "=======END=======",
+                            "Error while parsing message from server: {:?}\n",
+                            "The (entire) packet containing the error:\n",
+                            "======START======\n",
+                            "{:#?}\n",
+                            "=======END======="
                         ), e, bytes);
                     },
                     Some(Ok(m)) => message = m,
