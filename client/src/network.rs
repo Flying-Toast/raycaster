@@ -98,7 +98,7 @@ impl Network {
                         console_error!("======START======");
                         console_error!("{:#?}", bytes);
                         console_error!("=======END=======");
-                        break;
+                        panic!("");
                     },
                     Some(Ok(m)) => message = m,
                 }
