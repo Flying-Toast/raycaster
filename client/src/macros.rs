@@ -1,12 +1,12 @@
 macro_rules! console_log {
     ($($t:tt)*) => {
-        crate::bindings::log(&format_args!($($t)*).to_string())
+        web_sys::console::log_1(&wasm_bindgen::JsValue::from(&format_args!($($t)*).to_string()))
     };
 }
 
 macro_rules! console_error {
     ($($t:tt)*) => {
-        crate::bindings::error(&format_args!($($t)*).to_string())
+        web_sys::console::error_1(&wasm_bindgen::JsValue::from(&format_args!($($t)*).to_string()))
     };
 }
 

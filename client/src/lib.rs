@@ -1,6 +1,5 @@
 #[macro_use]
 mod macros;
-mod bindings;
 mod frontend;
 mod network;
 mod game;

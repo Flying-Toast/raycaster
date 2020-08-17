@@ -21,4 +21,5 @@ features = [
 	"Location",
 	"BinaryType",
 	"MessageEvent",
+	"console",
 ]
