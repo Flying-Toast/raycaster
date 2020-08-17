@@ -93,12 +93,13 @@ impl Network {
                 match next_message_from_server(&mut pieces) {
                     None => break,
                     Some(Err(e)) => {
-                        console_error!("Error while parsing message from server: {:?}", e);
-                        console_error!("The (entire) packet containing the error:");
-                        console_error!("======START======");
-                        console_error!("{:#?}", bytes);
-                        console_error!("=======END=======");
-                        panic!("");
+                        panic!(concat!(
+                            "Error while parsing message from server: {:?}",
+                            "The (entire) packet containing the error:",
+                            "======START======",
+                            "{:#?}",
+                            "=======END=======",
+                        ), e, bytes);
                     },
                     Some(Ok(m)) => message = m,
                 }

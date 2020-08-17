@@ -85,11 +85,13 @@ async fn handle_connection(stream: TcpStream, tx: flume::Sender<NetEvent>, id: u
                     match next_message_from_client(&mut pieces) {
                         None => break,
                         Some(Err(e)) => {
-                            eprintln!("Error while parsing message from client #{}: {:?}", id, e);
-                            eprintln!("The (entire) packet containing the error:");
-                            eprintln!("======START======");
-                            eprintln!("{:#?}", bytes);
-                            eprintln!("=======END=======");
+                            eprintln!(concat!(
+                                "Error while parsing message from client #{}: {:?}",
+                                "The (entire) packet containing the error:",
+                                "======START======",
+                                "{:#?}",
+                                "=======END=======",
+                            ), id, e, bytes);
                             break;
                         },
                         Some(Ok(m)) => message = m,
