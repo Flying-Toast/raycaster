@@ -65,6 +65,15 @@ impl Map {
         &self.tiles
     }
 
+    /// An empty map
+    pub fn dummy() -> Self {
+        Self {
+            width: 0,
+            height: 0,
+            tiles: Vec::new(),
+        }
+    }
+
     pub fn from_str(string: &str) -> Result<Self, CME> {
         use CME::BadMapFormat as BMF;
 

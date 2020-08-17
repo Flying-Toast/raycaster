@@ -3,6 +3,7 @@ use crate::map::Map;
 use crate::entity::{Entity, EntityID};
 
 
+#[derive(Debug)]
 pub struct GameState {
     pub map: Map,
     entities: HashMap<EntityID, Entity>,

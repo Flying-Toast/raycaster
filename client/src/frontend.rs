@@ -2,8 +2,9 @@ use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use std::rc::Rc;
 use std::cell::RefCell;
-use crate::network::{Network, NetworkStatus};
 use web_sys::window;
+use crate::network::{Network, NetworkStatus};
+use crate::game::Game;
 
 
 enum RunAgain { Yes, No }
@@ -11,6 +12,7 @@ enum RunAgain { Yes, No }
 pub struct Frontend {
     last_time: f64,
     network: Network,
+    game: Game,
 }
 
 impl Frontend {
@@ -18,6 +20,7 @@ impl Frontend {
         Self {
             last_time: 0.0,
             network: Network::new(),
+            game: Game::new(),
         }
     }
 
@@ -37,9 +40,8 @@ impl Frontend {
             return RunAgain::Yes;
         }
 
-        let messages = self.network.drain_messages();
-        if messages.len() != 0 {
-            console_log!("MESSAGES: {:#?}", messages);
+        for message in self.network.drain_messages() {
+            self.game.on_message(message);
         }
 
         // do stuff...
