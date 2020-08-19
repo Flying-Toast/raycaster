@@ -37,7 +37,7 @@ impl Game {
         let ent_id = self.gen_entity_id();
         responder.send(&YourIDPayload::assemble(ent_id));
         // TODO: actual spawpoints
-        let entity = Entity::new(ent_id, Vector::new(0.5, 0.5));
+        let entity = Entity::new(ent_id, Vector::new(2.5, 2.5));
         self.announce_entity(&entity);
         self.state.add_entity(entity);
         let mut client = Client::new(responder, ent_id);
