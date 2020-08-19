@@ -137,7 +137,7 @@ impl PayloadBuilder {
 
     /// Adds an `Entity` to the payload
     pub fn entity(&mut self, entity: &Entity) {
-        self.ent_id(entity.id);
+        self.ent_id(entity.id());
         self.vector(entity.location());
     }
 

@@ -18,7 +18,7 @@ impl GameState {
     }
 
     pub fn add_entity(&mut self, entity: Entity) {
-        self.entities.insert(entity.id, entity);
+        self.entities.insert(entity.id(), entity);
     }
 
     pub fn remove_entity(&mut self, id: EntityID) -> Option<Entity> {

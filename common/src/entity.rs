@@ -13,7 +13,7 @@ impl EntityID {
 #[derive(Debug)]
 pub struct Entity {
     location: Vector,
-    pub id: EntityID,
+    id: EntityID,
 }
 
 impl Entity {
@@ -26,5 +26,9 @@ impl Entity {
 
     pub fn location(&self) -> &Vector {
         &self.location
+    }
+
+    pub fn id(&self) -> EntityID {
+        self.id
     }
 }
