@@ -95,7 +95,7 @@ impl Game {
     fn remove_client(&mut self, client_id: ClientID) -> Option<Client> {
         if let Some(client) = self.clients.remove(&client_id) {
             // remove the client's player
-            self.remove_entity(client.player_entity);
+            self.remove_entity(client.player_entity());
 
             Some(client)
         } else {

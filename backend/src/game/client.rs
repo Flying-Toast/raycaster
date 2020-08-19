@@ -5,7 +5,7 @@ use common::entity::EntityID;
 pub struct Client {
     pub responder: Responder,
     /// The ID of the entity that this client controls (their player)
-    pub player_entity: EntityID,
+    player_entity: EntityID,
 }
 
 impl Client {
@@ -14,5 +14,9 @@ impl Client {
             responder,
             player_entity,
         }
+    }
+
+    pub fn player_entity(&self) -> EntityID {
+        self.player_entity
     }
 }
