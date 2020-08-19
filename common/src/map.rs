@@ -2,7 +2,6 @@ use std::collections::HashMap;
 use std::str::{FromStr, Lines};
 use strum_macros::EnumString;
 use crate::error::*;
-use crate::vector::Vector;
 
 
 #[derive(Debug, Clone, EnumString)]
@@ -49,11 +48,6 @@ impl LinesExt for Lines<'_> {
 }
 
 impl Map {
-    /// Returns the tile that the given vector is in.
-    pub fn get_tile(&self, v: &Vector) -> Option<&Tile> {
-        self.tiles.get(v.y as usize)?.get(v.x as usize)
-    }
-
     /// An empty map
     pub fn dummy() -> Self {
         Self {
