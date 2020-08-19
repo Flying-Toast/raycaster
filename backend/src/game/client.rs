@@ -1,10 +1,10 @@
 use crate::net::Responder;
 use common::entity::EntityID;
+use common::protocol::payload::BuiltPayload;
 
 
 pub struct Client {
-    pub responder: Responder,
-    /// The ID of the entity that this client controls (their player)
+    responder: Responder,
     player_entity: EntityID,
 }
 
@@ -16,7 +16,20 @@ impl Client {
         }
     }
 
+    /// The ID of the entity that this client controls (their player)
     pub fn player_entity(&self) -> EntityID {
         self.player_entity
+    }
+
+    pub fn send(&mut self, payload: &BuiltPayload) {
+        self.responder.send(payload);
+    }
+
+    pub fn flush_messages(&mut self) {
+        self.responder.flush();
+    }
+
+    pub fn disconnect(self) {
+        self.responder.close();
     }
 }

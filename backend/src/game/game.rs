@@ -66,7 +66,7 @@ impl Game {
     /// Flushes the outgoing message queues of all clients
     fn send_queued_messages(&mut self) {
         for client in self.clients.values_mut() {
-            client.responder.flush();
+            client.flush_messages();
         }
     }
 
@@ -85,7 +85,7 @@ impl Game {
     /// Sends `message` to all connected clients
     fn broadcast_message(&mut self, message: &BuiltPayload) {
         for client in self.clients.values_mut() {
-            client.responder.send(message);
+            client.send(message);
         }
     }
 
@@ -106,7 +106,7 @@ impl Game {
     /// The same as `remove_client()`, but also closes the client's connection.
     fn close_and_remove_client(&mut self, client_id: ClientID) {
         if let Some(client) = self.remove_client(client_id) {
-            client.responder.close();
+            client.disconnect();
         }
     }
 
@@ -118,7 +118,7 @@ impl Game {
     /// Tells the entire current game state to `client`
     fn update_new_client(&mut self, client: &mut Client) {
         for entity in self.state.entities() {
-            client.responder.send(&NewEntityPayload::assemble(entity));
+            client.send(&NewEntityPayload::assemble(entity));
         }
     }
 }
