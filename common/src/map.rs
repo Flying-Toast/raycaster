@@ -9,29 +9,22 @@ use crate::vector::Vector;
 pub enum TileType {
     Air,
     Wall,
-    SpawnPoint,
 }
 
 #[derive(Debug)]
 pub struct Tile {
     tile_type: TileType,
-    location: Vector,
 }
 
 impl Tile {
-    fn new(tile_type: TileType, location: Vector) -> Self {
+    fn new(tile_type: TileType) -> Self {
         Self {
             tile_type,
-            location,
         }
     }
 
     pub fn tile_type(&self) -> &TileType {
         &self.tile_type
-    }
-
-    pub fn location(&self) -> &Vector {
-        &self.location
     }
 }
 
@@ -59,10 +52,6 @@ impl Map {
     /// Returns the tile that the given vector is in.
     pub fn get_tile(&self, v: &Vector) -> Option<&Tile> {
         self.tiles.get(v.y as usize)?.get(v.x as usize)
-    }
-
-    pub fn tiles(&self) -> &Vec<Vec<Tile>> {
-        &self.tiles
     }
 
     /// An empty map
@@ -102,15 +91,14 @@ impl Map {
         }
 
         let mut tiles = Vec::new();
-        for (y, line) in lines.enumerate() {
+        for line in lines {
             line_num += 1;
             let mut row = Vec::new();
             let chars = line.chars();
-            for (x, ch) in chars.enumerate() {
+            for ch in chars {
                 row.push(
                     Tile::new(
-                        tiletype_map.get(&ch).to(BMF{line_num})?.clone(),
-                        Vector::new(x as f32, y as f32)
+                        tiletype_map.get(&ch).to(BMF{line_num})?.clone()
                     )
                 );
             }

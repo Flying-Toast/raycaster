@@ -1,8 +1,7 @@
 use std::collections::HashMap;
-use rand::{seq::IteratorRandom, thread_rng};
 use crate::net::{Responder, ClientID};
 use common::protocol::ClientMessage;
-use common::map::{Map, TileType};
+use common::map::Map;
 use common::protocol::payloads::*;
 use crate::game::client::Client;
 use common::entity::{Entity, EntityID};
@@ -37,7 +36,8 @@ impl Game {
     pub fn on_client_connect(&mut self, client_id: ClientID, mut responder: Responder) {
         let ent_id = self.gen_entity_id();
         responder.send(&YourIDPayload::assemble(ent_id));
-        let entity = Entity::new(ent_id, self.state.choose_spawnpoint());
+        // TODO: actual spawpoints
+        let entity = Entity::new(ent_id, Vector::new(0.5, 0.5));
         self.announce_entity(&entity);
         self.state.add_entity(entity);
         let mut client = Client::new(responder, ent_id);
@@ -120,25 +120,5 @@ impl Game {
         for entity in self.state.entities() {
             client.responder.send(&NewEntityPayload::assemble(entity));
         }
-    }
-}
-
-trait GameStateExt {
-    fn choose_spawnpoint(&self) -> Vector;
-}
-
-impl GameStateExt for GameState {
-    fn choose_spawnpoint(&self) -> Vector {
-        let (x, y) =
-            self.map
-                .tiles()
-                .iter()
-                .flatten()
-                .filter(|tile| matches!(tile.tile_type(), TileType::SpawnPoint))
-                .map(|tile| (tile.location().x, tile.location().y))
-                .choose(&mut thread_rng())
-                .unwrap_or((0.0, 0.0));
-
-        Vector::new(x + 0.5, y + 0.5)
     }
 }
