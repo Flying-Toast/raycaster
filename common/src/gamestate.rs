@@ -5,7 +5,7 @@ use crate::entity::{Entity, EntityID};
 
 #[derive(Debug)]
 pub struct GameState {
-    pub map: Map,
+    map: Map,
     entities: HashMap<EntityID, Entity>,
 }
 
