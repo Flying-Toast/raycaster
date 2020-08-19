@@ -33,14 +33,14 @@ impl Game {
         }
     }
 
-    pub fn on_client_connect(&mut self, client_id: ClientID, mut responder: Responder) {
-        let ent_id = self.gen_entity_id();
-        responder.send(&YourIDPayload::assemble(ent_id));
+    pub fn on_client_connect(&mut self, client_id: ClientID, responder: Responder) {
+        let mut client = Client::new(responder, self.gen_entity_id());
+
+        client.send(&YourIDPayload::assemble(client.player_entity()));
         // TODO: actual spawpoints
-        let entity = Entity::new(ent_id, Vector::new(2.5, 2.5));
+        let entity = Entity::new(client.player_entity(), Vector::new(2.5, 2.5));
         self.announce_entity(&entity);
         self.state.add_entity(entity);
-        let mut client = Client::new(responder, ent_id);
         self.update_new_client(&mut client);
         self.clients.insert(client_id, client);
     }
