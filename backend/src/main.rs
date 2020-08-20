@@ -2,6 +2,7 @@ mod net;
 mod server;
 mod error;
 mod game;
+mod client;
 
 
 fn main() {

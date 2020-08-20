@@ -1,9 +1,9 @@
 use std::collections::HashMap;
 use crate::net::{Responder, ClientID};
+use crate::client::Client;
 use common::protocol::ClientMessage;
 use common::map::Map;
 use common::protocol::payloads::*;
-use crate::game::client::Client;
 use common::entity::{Entity, EntityID};
 use common::protocol::payload::BuiltPayload;
 use common::vector::Vector;
