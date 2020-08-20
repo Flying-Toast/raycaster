@@ -7,7 +7,7 @@ from threading import Thread
 
 import sys
 sys.path.append("../util/filewatcher")
-from filewatcher import watch_files
+import filewatcher
 
 port = 8080
 serve_dir = "static"
@@ -24,7 +24,7 @@ def build_wasm():
         print("===== ERROR BUILDING WASM =====")
 
 def watch():
-    watch_files(
+    filewatcher.watch(
         build_wasm, 1,
         watch_dirs=["src", "../common/src"],
         watch_files=["Cargo.toml", "../common/Cargo.toml"]

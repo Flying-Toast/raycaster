@@ -3,7 +3,7 @@ import os
 from glob import glob
 from pathlib import Path
 
-def watch_files(on_change, delay_secs, watch_dirs=[], watch_files=[]):
+def watch(on_change, delay_secs, watch_dirs=[], watch_files=[]):
     prev_checksums = []
     while True:
         files = []

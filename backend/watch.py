@@ -3,7 +3,7 @@ import subprocess
 
 import sys
 sys.path.append("../util/filewatcher")
-from filewatcher import watch_files
+import filewatcher
 
 def on_change():
     if on_change.running_process is not None:
@@ -19,7 +19,7 @@ def on_change():
 on_change.running_process = None
 
 if __name__ == "__main__":
-    watch_files(
+    filewatcher.watch(
         on_change, 1,
         watch_dirs=["src", "../common/src"],
         watch_files=["Cargo.toml", "../common/Cargo.toml"]
