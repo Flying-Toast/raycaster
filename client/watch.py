@@ -15,7 +15,7 @@ serve_dir = "static"
 def build_wasm():
     print("===== BUILDING WASM =====")
     LockableRequestHandler.lock = True
-    result = subprocess.run(["wasm-pack", "build", "--dev", "--target", "web"])
+    result = subprocess.run(["wasm-pack", "build", "--dev", "--target", "web", "--no-typescript"])
     if result.returncode == 0:
         os.replace("pkg/client_bg.wasm", f"{serve_dir}/client_bg.wasm")
         os.replace("pkg/client.js", f"{serve_dir}/client.js")
