@@ -22,6 +22,16 @@ macro_rules! bitflags {
                 }
             }
 
+            pub fn as_bytes(&self) -> &[u8] {
+                &self.bytes
+            }
+
+            pub fn from_bytes(bytes: [u8; Self::num_bytes()]) -> Self {
+                Self {
+                    bytes,
+                }
+            }
+
             #[allow(dead_code)]
             pub const fn num_bytes() -> usize {
                 (Self::num_flags() / 8) + ((Self::num_flags() % 8 != 0) as usize)
@@ -58,6 +68,24 @@ macro_rules! bitflags {
                 let bit_offset = (flag as usize) % 8;
 
                 (byte_index, 1 << bit_offset)
+            }
+        }
+
+        impl crate::protocol::payload::Encodable for &$flags_struct {
+            fn encode_to(self, builder: &mut crate::protocol::payload::PayloadBuilder) {
+                builder.extend(self.as_bytes());
+            }
+        }
+
+        impl crate::protocol::payload::Decodable for $flags_struct {
+            fn decode_from(pieces: &mut crate::protocol::payload::Pieces) -> Result<Self, crate::error::CME> {
+                use std::convert::TryInto;
+
+                Ok(Self::from_bytes(
+                    pieces.bytes_from_front(Self::num_bytes())?
+                        .try_into()
+                        .unwrap()
+                ))
             }
         }
     };
