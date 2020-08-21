@@ -9,7 +9,7 @@ pub struct YourIDPayload {
 
 def_serialized_fields!(
     YourIDPayload {
-        id: EntityID, ent_id,
+        id <- EntityID,
     }
 );
 
@@ -21,7 +21,7 @@ pub struct RemoveEntityPayload {
 
 def_serialized_fields!(
     RemoveEntityPayload {
-        entity: EntityID, ent_id,
+        entity <- EntityID,
     }
 );
 
@@ -33,7 +33,7 @@ pub struct NewEntityPayload {
 
 def_serialized_fields!(
     NewEntityPayload {
-        entity: &Entity, entity,
+        entity <- &Entity,
     }
 );
 
@@ -46,7 +46,7 @@ pub struct HelloPayload {
 
 def_serialized_fields!(
     HelloPayload {
-        message: &str, string,
-        random_u32: u32, u32,
+        message <- &str,
+        random_u32 <- u32,
     }
 );

@@ -1,3 +1,7 @@
+use crate::error::*;
+use crate::protocol::payload::{Pieces, PayloadBuilder, Encodable, Decodable};
+
+
 #[derive(Debug)]
 pub struct Vector {
     pub x: f32,
@@ -10,5 +14,20 @@ impl Vector {
             x,
             y,
         }
+    }
+}
+
+impl Encodable for &Vector {
+    fn encode_to(self, builder: &mut PayloadBuilder) {
+        builder.add(self.x);
+        builder.add(self.y);
+    }
+}
+
+impl Decodable for Vector {
+    fn decode_from(pieces: &mut Pieces) -> Result<Self, CME> {
+        Ok(
+            Self::new(pieces.get()?, pieces.get()?)
+        )
     }
 }

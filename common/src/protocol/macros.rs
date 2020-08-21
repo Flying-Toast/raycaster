@@ -1,20 +1,20 @@
 macro_rules! def_serialized_fields {
-    ($payload_type:ident {$($field_name:ident: $assemble_type:ty, $function:ident),*$(,)?}) => {
+    ($payload_type:ident {$($field_name:ident <- $encode_type:ty),*$(,)?}) => {
         impl crate::protocol::payload::Payload for crate::protocol::payloads::$payload_type {
             fn parse(pieces: &mut crate::protocol::payload::Pieces) -> Result<Self, crate::error::CME> {
                 Ok(Self {
                     $(
-                        $field_name: pieces.$function()?,
+                        $field_name: pieces.get()?,
                     )*
                 })
             }
         }
 
         impl crate::protocol::payloads::$payload_type {
-            pub fn assemble($($field_name: $assemble_type),*) -> crate::protocol::payload::BuiltPayload {
+            pub fn assemble($($field_name: $encode_type),*) -> crate::protocol::payload::BuiltPayload {
                 let mut builder = builder!();
                 $(
-                    builder.$function($field_name);
+                    builder.add($field_name);
                 )*
 
                 builder.build()
@@ -57,7 +57,7 @@ macro_rules! generic_decl_payloads {
             if pieces.is_empty() {
                 return None;
             }
-            let payload_key = match pieces.u16() {
+            let payload_key: u16 = match pieces.get() {
                 Ok(s) => s,
                 Err(e) => return Some(Err(e)),
             };
