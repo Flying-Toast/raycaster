@@ -10,26 +10,31 @@ macro_rules! bitflags {
         }
 
         pub struct $flags_struct {
+            #[allow(dead_code)]
             bytes: [u8; Self::num_bytes()],
         }
 
         impl $flags_struct {
+            #[allow(dead_code)]
             pub fn new() -> Self {
                 Self {
                     bytes: [0; Self::num_bytes()],
                 }
             }
 
+            #[allow(dead_code)]
             pub const fn num_bytes() -> usize {
                 (Self::num_flags() / 8) + ((Self::num_flags() % 8 != 0) as usize)
             }
 
+            #[allow(dead_code)]
             pub fn get(&self, flag: $flag_enum) -> bool {
                 let (byte, bit) = Self::bit_position_of_flag(flag);
 
                 self.bytes[byte] & bit != 0
             }
 
+            #[allow(dead_code)]
             pub fn set(&mut self, flag: $flag_enum, value: bool) {
                 let (byte, bit) = Self::bit_position_of_flag(flag);
 
@@ -40,10 +45,12 @@ macro_rules! bitflags {
                 }
             }
 
+            #[allow(dead_code)]
             const fn num_flags() -> usize {
                 $flag_enum::_MaxFlag as usize
             }
 
+            #[allow(dead_code)]
             fn bit_position_of_flag(flag: $flag_enum) -> (usize, u8) {
                 assert!(!matches!(flag, $flag_enum::_MaxFlag), "_MaxFlag is not a valid flag");
 
