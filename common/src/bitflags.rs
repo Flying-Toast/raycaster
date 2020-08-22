@@ -1,12 +1,11 @@
 macro_rules! bitflags {
     ($flags_struct:ident, $flag_enum:ident { $($flag:ident),*$(,)? }) => {
         #[repr(usize)]
-        #[derive(Copy, Clone)]
+        #[derive(Copy, Clone, strum_macros::EnumCount)]
         pub enum $flag_enum {
             $(
                 $flag,
             )*
-            _MaxFlag,
         }
 
         pub struct $flags_struct {
@@ -57,7 +56,9 @@ macro_rules! bitflags {
 
             #[allow(dead_code)]
             const fn num_flags() -> usize {
-                $flag_enum::_MaxFlag as usize
+                use strum::EnumCount;
+
+                $flag_enum::COUNT
             }
 
             #[allow(dead_code)]
