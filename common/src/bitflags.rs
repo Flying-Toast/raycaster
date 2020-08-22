@@ -62,8 +62,6 @@ macro_rules! bitflags {
 
             #[allow(dead_code)]
             fn bit_position_of_flag(flag: $flag_enum) -> (usize, u8) {
-                assert!(!matches!(flag, $flag_enum::_MaxFlag), "_MaxFlag is not a valid flag");
-
                 let byte_index = (flag as usize) / 8;
                 let bit_offset = (flag as usize) % 8;
 
