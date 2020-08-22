@@ -19,7 +19,7 @@ pub struct Game {
 impl Game {
     pub fn new() -> Self {
         let mapstring = std::fs::read_to_string("../maps/default").expect("Error reading default map");
-        let map = Map::from_str(&mapstring).unwrap();
+        let map = Map::from_string(mapstring).unwrap();
         Self {
             state: GameState::new(map),
             clients: HashMap::new(),

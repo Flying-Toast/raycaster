@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::str::{FromStr, Lines};
 use strum_macros::EnumString;
 use crate::error::*;
+use crate::protocol::payload::{Pieces, PayloadBuilder, Encodable, Decodable};
 
 
 #[derive(Debug, Clone, EnumString)]
@@ -32,6 +33,7 @@ pub struct Map {
     width: usize,
     height: usize,
     tiles: Vec<Vec<Tile>>,
+    string: String,
 }
 
 trait LinesExt {
@@ -51,13 +53,18 @@ impl Map {
     /// An empty map
     pub fn dummy() -> Self {
         Self {
+            string: String::new(),
             width: 0,
             height: 0,
             tiles: Vec::new(),
         }
     }
 
-    pub fn from_str(string: &str) -> Result<Self, CME> {
+    pub fn as_str(&self) -> &str {
+        &self.string
+    }
+
+    pub fn from_string(string: String) -> Result<Self, CME> {
         use CME::BadMapFormat as BMF;
 
         let mut lines = string.lines();
@@ -109,6 +116,19 @@ impl Map {
             width,
             height,
             tiles,
+            string,
         })
+    }
+}
+
+impl Encodable for &Map {
+    fn encode_to(self, builder: &mut PayloadBuilder) {
+        builder.add(self.as_str());
+    }
+}
+
+impl Decodable for Map {
+    fn decode_from(pieces: &mut Pieces) -> Result<Self, CME> {
+        Map::from_string(pieces.get()?)
     }
 }
