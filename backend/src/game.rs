@@ -120,5 +120,6 @@ impl Game {
         for entity in self.state.entities() {
             client.send(&NewEntityPayload::assemble(entity));
         }
+        client.send(&SetMapPayload::assemble(self.state.map()));
     }
 }

@@ -1,4 +1,5 @@
 use crate::entity::{EntityID, Entity};
+use crate::map::Map;
 
 
 /// Tells a client what their player entity's id is
@@ -34,6 +35,18 @@ pub struct NewEntityPayload {
 def_serialized_fields!(
     NewEntityPayload {
         entity <- &Entity,
+    }
+);
+
+/// Instructs a client to change their map
+#[derive(Debug)]
+pub struct SetMapPayload {
+    pub map: Map,
+}
+
+def_serialized_fields!(
+    SetMapPayload {
+        map <- &Map,
     }
 );
 

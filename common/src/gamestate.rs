@@ -17,6 +17,14 @@ impl GameState {
         }
     }
 
+    pub fn set_map(&mut self, map: Map) {
+        self.map = map;
+    }
+
+    pub fn map(&self) -> &Map {
+        &self.map
+    }
+
     pub fn add_entity(&mut self, entity: Entity) {
         self.entities.insert(entity.id(), entity);
     }

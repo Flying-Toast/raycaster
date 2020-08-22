@@ -30,6 +30,9 @@ impl Game {
             ServerMessage::RemoveEntity(payload) => {
                 self.state.remove_entity(payload.entity);
             },
+            ServerMessage::SetMap(payload) => {
+                self.state.set_map(payload.map);
+            },
         }
     }
 }

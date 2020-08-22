@@ -16,4 +16,5 @@ s2c_payloads!(
     YourID,                         YourIDPayload,
     RemoveEntity,                   RemoveEntityPayload,
     NewEntity,                      NewEntityPayload,
+    SetMap,                         SetMapPayload,
 );
