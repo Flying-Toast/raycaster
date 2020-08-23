@@ -21,21 +21,6 @@ macro_rules! bitflags {
                 }
             }
 
-            pub fn as_bytes(&self) -> &[u8] {
-                &self.bytes
-            }
-
-            pub fn from_bytes(bytes: [u8; Self::num_bytes()]) -> Self {
-                Self {
-                    bytes,
-                }
-            }
-
-            #[allow(dead_code)]
-            pub const fn num_bytes() -> usize {
-                (Self::num_flags() / 8) + ((Self::num_flags() % 8 != 0) as usize)
-            }
-
             #[allow(dead_code)]
             pub fn get(&self, flag: $flag_enum) -> bool {
                 let (byte, bit) = Self::bit_position_of_flag(flag);
@@ -52,6 +37,21 @@ macro_rules! bitflags {
                 } else {
                     self.bytes[byte] &= !bit;
                 }
+            }
+
+            fn as_bytes(&self) -> &[u8] {
+                &self.bytes
+            }
+
+            fn from_bytes(bytes: [u8; Self::num_bytes()]) -> Self {
+                Self {
+                    bytes,
+                }
+            }
+
+            #[allow(dead_code)]
+            const fn num_bytes() -> usize {
+                (Self::num_flags() / 8) + ((Self::num_flags() % 8 != 0) as usize)
             }
 
             #[allow(dead_code)]
