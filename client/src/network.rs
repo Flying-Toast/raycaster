@@ -18,7 +18,7 @@ pub enum NetworkStatus {
 pub struct Network {
     ws: Option<WebSocket>,
     message_queue: Rc<RefCell<Vec<ServerMessage>>>,
-    onmessage_cb: Rc<RefCell<Option<Closure<dyn FnMut(MessageEvent)>>>>,
+    onmessage_cb: Option<Closure<dyn FnMut(MessageEvent)>>,
     outgoing_queue: Vec<u8>,
 }
 
@@ -27,7 +27,7 @@ impl Network {
         Self {
             ws: None,
             message_queue: Rc::new(RefCell::new(Vec::new())),
-            onmessage_cb: Rc::new(RefCell::new(None)),
+            onmessage_cb: None,
             outgoing_queue: Vec::new(),
         }
     }
@@ -83,7 +83,7 @@ impl Network {
 
         let queue_clone = self.message_queue.clone();
 
-        *self.onmessage_cb.borrow_mut() = Some(Closure::wrap(Box::new(move |msg: MessageEvent| {
+        self.onmessage_cb = Some(Closure::wrap(Box::new(move |msg: MessageEvent| {
             let message = msg.data().dyn_into::<ArrayBuffer>().unwrap();
             let bytes = Uint8Array::new(&message).to_vec();
             let mut pieces = Pieces::new(&bytes);
@@ -108,7 +108,7 @@ impl Network {
             }
         }) as Box<dyn FnMut(MessageEvent)>));
 
-        ws.set_onmessage(Some(self.onmessage_cb.borrow().as_ref().unwrap().as_ref().unchecked_ref()));
+        ws.set_onmessage(Some(self.onmessage_cb.as_ref().unwrap().as_ref().unchecked_ref()));
 
         self.ws = Some(ws);
     }
