@@ -71,10 +71,6 @@ impl PayloadBuilder {
     }
 }
 
-pub trait Payload {
-    fn parse(pieces: &mut Pieces) -> Result<Self, CME> where Self: Sized;
-}
-
 /// Something that can be put in a `PayloadBuilder`
 pub trait Encodable {
     fn encode_to(self, builder: &mut PayloadBuilder);

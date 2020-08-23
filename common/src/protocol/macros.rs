@@ -1,7 +1,7 @@
 macro_rules! def_serialized_fields {
     ($payload_type:ident {$($field_name:ident <- $encode_type:ty),*$(,)?}) => {
-        impl crate::protocol::payload::Payload for crate::protocol::payloads::$payload_type {
-            fn parse(pieces: &mut crate::protocol::payload::Pieces) -> Result<Self, crate::error::CME> {
+        impl crate::protocol::payload::Decodable for crate::protocol::payloads::$payload_type {
+            fn decode_from(pieces: &mut crate::protocol::payload::Pieces) -> Result<Self, crate::error::CME> {
                 Ok(Self {
                     $(
                         $field_name: pieces.get()?,
@@ -53,7 +53,7 @@ macro_rules! generic_decl_payloads {
         pub fn $next_message(pieces: &mut crate::protocol::payload::Pieces)
             -> Option<Result<$enum_name, crate::error::CME>>
         {
-            use crate::protocol::payload::Payload;
+            use crate::protocol::payload::Decodable;
             if pieces.is_empty() {
                 return None;
             }
@@ -64,7 +64,7 @@ macro_rules! generic_decl_payloads {
             Some(match payload_key {
                 $(
                     key if key == crate::protocol::payloads::$payload_ident::payload_key() => {
-                        let payload = crate::protocol::payloads::$payload_ident::parse(pieces);
+                        let payload = crate::protocol::payloads::$payload_ident::decode_from(pieces);
                         match payload {
                             Err(e) => Err(e),
                             Ok(p) => Ok($enum_name::$enum_variant(p)),
