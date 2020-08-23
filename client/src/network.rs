@@ -113,3 +113,13 @@ impl Network {
         self.ws = Some(ws);
     }
 }
+
+impl Drop for Network {
+    fn drop(&mut self) {
+        if let Some(ref ws) = self.ws {
+            if !matches!(self.status(), NetworkStatus::Disconnected) {
+                let _ = ws.close();
+            }
+        }
+    }
+}
