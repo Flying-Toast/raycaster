@@ -4,7 +4,7 @@ use crate::protocol::payload::{Pieces, PayloadBuilder, Encodable, Decodable};
 
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
-pub struct EntityID(pub u32);
+pub struct EntityID(u32);
 
 impl EntityID {
     pub fn new(value: u32) -> Self {
