@@ -6,3 +6,4 @@ pub mod map;
 pub mod gamestate;
 #[macro_use]
 pub mod bitflags;
+pub mod input;

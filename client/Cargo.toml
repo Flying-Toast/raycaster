@@ -27,4 +27,5 @@ features = [
 	"BinaryType",
 	"MessageEvent",
 	"console",
+	"KeyboardEvent",
 ]

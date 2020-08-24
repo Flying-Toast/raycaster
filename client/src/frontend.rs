@@ -5,6 +5,7 @@ use std::cell::RefCell;
 use web_sys::window;
 use crate::network::{Network, NetworkStatus};
 use crate::game::Game;
+use crate::controls::Controls;
 
 
 enum RunAgain { Yes, No }
@@ -13,6 +14,7 @@ pub struct Frontend {
     last_time: f64,
     network: Network,
     game: Game,
+    controls: Controls,
 }
 
 impl Frontend {
@@ -21,6 +23,7 @@ impl Frontend {
             last_time: 0.0,
             network: Network::new(),
             game: Game::new(),
+            controls: Controls::new(),
         }
     }
 

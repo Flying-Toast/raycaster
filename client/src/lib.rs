@@ -3,6 +3,7 @@ mod macros;
 mod frontend;
 mod network;
 mod game;
+mod controls;
 
 use wasm_bindgen::prelude::*;
 
