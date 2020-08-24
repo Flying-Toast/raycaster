@@ -3,6 +3,8 @@ use crate::map::Map;
 use crate::input::Input;
 
 
+// SERVER-TO-CLIENT PAYLOADS:
+
 /// Tells a client what their player entity's id is
 #[derive(Debug)]
 pub struct YourIDPayload {
@@ -50,6 +52,20 @@ def_serialized_fields!(
         map <- &Map,
     }
 );
+
+#[derive(Debug)]
+pub struct LastProcessedInputPayload {
+    pub id: u32,
+}
+
+def_serialized_fields!(
+    LastProcessedInputPayload {
+        id <- u32,
+    }
+);
+
+
+// CLIENT-TO-SERVER PAYLOADS:
 
 #[derive(Debug)]
 pub struct InputPayload {

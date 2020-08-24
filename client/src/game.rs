@@ -33,6 +33,9 @@ impl Game {
             ServerMessage::SetMap(payload) => {
                 self.state.set_map(payload.map);
             },
+            ServerMessage::LastProcessedInput(payload) => {
+                //TODO
+            },
         }
     }
 }

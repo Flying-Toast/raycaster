@@ -17,4 +17,5 @@ s2c_payloads!(
     RemoveEntity,                   RemoveEntityPayload,
     NewEntity,                      NewEntityPayload,
     SetMap,                         SetMapPayload,
+    LastProcessedInput,             LastProcessedInputPayload,
 );
