@@ -1,13 +1,14 @@
 macro_rules! bitflags {
     ($struct_vis:vis $flags_struct:ident; $enum_vis:vis $flag_enum:ident { $($flag:ident),*$(,)? }) => {
         #[repr(usize)]
-        #[derive(Copy, Clone, strum_macros::EnumCount)]
+        #[derive(Copy, Clone, strum_macros::EnumCount, Debug)]
         $enum_vis enum $flag_enum {
             $(
                 $flag,
             )*
         }
 
+        #[derive(Debug)]
         $struct_vis struct $flags_struct {
             #[allow(dead_code)]
             bytes: [u8; Self::num_bytes()],
