@@ -2,12 +2,15 @@ use common::gamestate::GameState;
 use common::map::Map;
 use common::entity::EntityID;
 use common::protocol::ServerMessage;
+use common::input::Input;
 
 
 #[derive(Debug)]
 pub struct Game {
     state: GameState,
     my_id: EntityID,
+    /// For client-side prediction
+    unprocessed_inputs: Vec<Input>,
 }
 
 impl Game {
@@ -16,7 +19,13 @@ impl Game {
             state: GameState::new(Map::dummy()),
             // dummy value, overwritten when "YourID" message is received
             my_id: EntityID::new(12345),
+            unprocessed_inputs: Vec::new(),
         }
+    }
+
+    /// Pushes an input to the unprocessed inputs queue
+    pub fn push_input(&mut self, input: Input) {
+        self.unprocessed_inputs.push(input);
     }
 
     pub fn on_message(&mut self, message: ServerMessage) {
@@ -34,7 +43,12 @@ impl Game {
                 self.state.set_map(payload.map);
             },
             ServerMessage::LastProcessedInput(payload) => {
-                //TODO
+                let mut tmp = Vec::new();
+                std::mem::swap(&mut tmp, &mut self.unprocessed_inputs);
+                self.unprocessed_inputs = tmp
+                    .into_iter()
+                    .skip_while(|i| i.seq_id() <= payload.id)
+                    .collect();
             },
         }
     }

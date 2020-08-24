@@ -49,8 +49,8 @@ impl Frontend {
         }
 
         let input_sample = self.controls.get_input();
-        //TODO: queue input_sample and apply locally
         self.network.send(&InputPayload::assemble(&input_sample));
+        self.game.push_input(input_sample);
 
         self.network.flush();
 
@@ -61,6 +61,8 @@ impl Frontend {
     }
 
     pub fn start(mut self) {
+        console_log!("Starting frontend instance");
+
         let hostname = window().unwrap().location().hostname().unwrap();
         self.network.connect(&hostname, 8000, false);
 
