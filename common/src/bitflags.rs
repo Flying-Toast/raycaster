@@ -1,14 +1,14 @@
 macro_rules! bitflags {
     ($struct_vis:vis $flags_struct:ident; $enum_vis:vis $flag_enum:ident { $($flag:ident),*$(,)? }) => {
         #[repr(usize)]
-        #[derive(Copy, Clone, strum_macros::EnumCount, Debug)]
+        #[derive(Copy, Clone, strum_macros::EnumCount, Debug, strum_macros::EnumIter, strum_macros::AsRefStr)]
         $enum_vis enum $flag_enum {
             $(
                 $flag,
             )*
         }
 
-        #[derive(Debug, Clone)]
+        #[derive(Clone)]
         $struct_vis struct $flags_struct {
             #[allow(dead_code)]
             bytes: [u8; Self::num_bytes()],
@@ -68,6 +68,19 @@ macro_rules! bitflags {
                 let bit_offset = (flag as usize) % 8;
 
                 (byte_index, 1 << bit_offset)
+            }
+        }
+
+        impl std::fmt::Debug for $flags_struct {
+            fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                use strum::IntoEnumIterator;
+
+                let mut debug = fmt.debug_struct(stringify!($flags_struct));
+                for flag in $flag_enum::iter() {
+                    debug.field(flag.as_ref(), &self.get(flag));
+                }
+
+                debug.finish()
             }
         }
 
