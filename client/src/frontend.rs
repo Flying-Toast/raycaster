@@ -48,7 +48,7 @@ impl Frontend {
             self.game.on_message(message);
         }
 
-        let input_sample = self.controls.get_input();
+        let input_sample = self.controls.get_input(dt as u8);
         self.network.send(&InputPayload::assemble(&input_sample));
         self.game.push_input(input_sample);
 

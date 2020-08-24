@@ -28,5 +28,4 @@ features = [
 	"MessageEvent",
 	"console",
 	"KeyboardEvent",
-	"Performance",
 ]

@@ -43,7 +43,6 @@ pub struct Controls {
     state: Rc<RefCell<InputState>>,
     bindings: Rc<Keybindings>,
     next_input_id: u32,
-    last_input_time: f64,
     #[allow(dead_code)]
     keydown_cb: Closure<dyn FnMut(KeyboardEvent)>,
     #[allow(dead_code)]
@@ -51,16 +50,7 @@ pub struct Controls {
 }
 
 impl Controls {
-    pub fn get_input(&mut self) -> Input {
-        let now = window().unwrap().performance().unwrap().now();
-
-        let dt = if self.last_input_time == 0.0 {
-            0 // use a delta of 0 for the first input
-        } else {
-            (now - self.last_input_time) as u8
-        };
-        self.last_input_time = now;
-
+    pub fn get_input(&mut self, dt: u8) -> Input {
         Input::new(self.get_state(), self.next_id(), dt)
     }
 
@@ -93,7 +83,6 @@ impl Controls {
             state,
             bindings,
             next_input_id: 1,
-            last_input_time: 0.0,
             keydown_cb,
             keyup_cb,
         }
