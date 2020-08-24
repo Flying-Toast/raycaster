@@ -8,7 +8,7 @@ macro_rules! bitflags {
             )*
         }
 
-        #[derive(Debug)]
+        #[derive(Debug, Clone)]
         $struct_vis struct $flags_struct {
             #[allow(dead_code)]
             bytes: [u8; Self::num_bytes()],
