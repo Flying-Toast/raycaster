@@ -12,6 +12,8 @@ pub struct Game {
     predicted_state: GameState,
     /// Our prediction becomes invalid whenever we receive an authoritative state change
     prediction_invalid: bool,
+    /// ID of the most recent input applied to predicted_state
+    last_predicted_input: u32,
     my_id: EntityID,
     ready: bool,
     /// For client-side prediction
@@ -25,6 +27,7 @@ impl Game {
             authoritative_state: dummy_state.clone(),
             predicted_state: dummy_state,
             prediction_invalid: false,
+            last_predicted_input: 0,
             // dummy value, overwritten when "YourID" message is received
             my_id: EntityID::new(12345),
             ready: false,
@@ -44,9 +47,20 @@ impl Game {
     pub fn predict_state(&mut self) -> &GameState {
         if self.prediction_invalid {
             self.predicted_state = self.authoritative_state.clone();
+            self.last_predicted_input = 0;
             self.prediction_invalid = false;
         }
-        todo!();
+
+        let last_predicted_input = self.last_predicted_input;
+        for input in self.unprocessed_inputs
+            .iter()
+            .skip_while(|input| input.seq_id() <= last_predicted_input)
+        {
+            self.predicted_state.apply_input(self.my_id, input);
+            self.last_predicted_input = input.seq_id();
+        }
+
+        &self.predicted_state
     }
 
     pub fn on_message(&mut self, message: ServerMessage) {
