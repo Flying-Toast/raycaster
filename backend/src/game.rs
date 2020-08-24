@@ -36,7 +36,6 @@ impl Game {
     pub fn on_client_connect(&mut self, client_id: ClientID, responder: Responder) {
         let mut client = Client::new(responder, self.gen_entity_id());
 
-        client.send(&YourIDPayload::assemble(&client.player_entity()));
         // TODO: actual spawpoints
         let entity = Entity::new(client.player_entity(), Vector::new(2.5, 2.5));
         self.announce_entity(&entity);
@@ -125,6 +124,7 @@ impl Game {
 
     /// Tells the entire current game state to `client`
     fn update_new_client(&mut self, client: &mut Client) {
+        client.send(&YourIDPayload::assemble(&client.player_entity()));
         for entity in self.state.entities() {
             client.send(&NewEntityPayload::assemble(entity));
         }
