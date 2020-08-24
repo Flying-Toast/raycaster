@@ -2,7 +2,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
-use common::input::{InputState, BistateInput};
+use common::input::{InputState, BistateInput, Input};
 use web_sys::{KeyboardEvent, window};
 
 
@@ -42,6 +42,8 @@ impl Keybindings {
 pub struct Controls {
     state: Rc<RefCell<InputState>>,
     bindings: Rc<Keybindings>,
+    next_input_id: u32,
+    last_input_time: f64,
     #[allow(dead_code)]
     keydown_cb: Closure<dyn FnMut(KeyboardEvent)>,
     #[allow(dead_code)]
@@ -49,8 +51,17 @@ pub struct Controls {
 }
 
 impl Controls {
-    pub fn get_state(&mut self) -> InputState {
-        self.state.borrow().clone()
+    pub fn get_input(&mut self) -> Input {
+        let now = window().unwrap().performance().unwrap().now();
+
+        let dt = if self.last_input_time == 0.0 {
+                     0 // use a delta of 0 for the first input
+                 } else {
+                     now - self.last_input_time
+                 }
+        self.last_input_time = now;
+
+        Input::new(self.get_state(), self.next_id(), dt as u8)
     }
 
     pub fn new() -> Self {
@@ -81,9 +92,21 @@ impl Controls {
         Self {
             state,
             bindings,
+            next_input_id: 0,
+            last_input_time: 0.0,
             keydown_cb,
             keyup_cb,
         }
+    }
+
+    fn get_state(&self) -> InputState {
+        self.state.borrow().clone()
+    }
+
+    fn next_id(&mut self) -> u32 {
+        self.next_input_id = self.next_input_id.wrapping_add(1);
+
+        self.next_input_id.wrapping_sub(1)
     }
 }
 
