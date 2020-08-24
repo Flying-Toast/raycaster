@@ -25,10 +25,6 @@ impl Entity {
         }
     }
 
-    pub fn location(&self) -> &Vector {
-        &self.location
-    }
-
     pub fn id(&self) -> EntityID {
         self.id
     }

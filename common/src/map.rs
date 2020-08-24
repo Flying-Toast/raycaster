@@ -22,10 +22,6 @@ impl Tile {
             tile_type,
         }
     }
-
-    pub fn tile_type(&self) -> &TileType {
-        &self.tile_type
-    }
 }
 
 #[derive(Debug)]

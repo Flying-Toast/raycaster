@@ -47,12 +47,4 @@ impl Input {
     pub fn seq_id(&self) -> u32 {
         self.seq_id
     }
-
-    pub fn state(&self) -> &InputState {
-        &self.state
-    }
-
-    pub fn dt(&self) -> u8 {
-        self.dt
-    }
 }
