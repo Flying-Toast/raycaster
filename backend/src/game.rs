@@ -13,7 +13,7 @@ use common::gamestate::GameState;
 pub struct Game {
     state: GameState,
     clients: HashMap<ClientID, Client>,
-    next_entity_id: u32,
+    next_entity_id: u16,
 }
 
 impl Game {
