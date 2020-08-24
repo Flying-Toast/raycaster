@@ -7,7 +7,8 @@ use common::input::Input;
 
 #[derive(Debug)]
 pub struct Game {
-    state: GameState,
+    authoritative_state: GameState,
+    predicted_state: GameState,
     my_id: EntityID,
     ready: bool,
     /// For client-side prediction
@@ -16,8 +17,10 @@ pub struct Game {
 
 impl Game {
     pub fn new() -> Self {
+        let dummy_state = GameState::new(Map::dummy());
         Self {
-            state: GameState::new(Map::dummy()),
+            authoritative_state: dummy_state.clone(),
+            predicted_state: dummy_state,
             // dummy value, overwritten when "YourID" message is received
             my_id: EntityID::new(12345),
             ready: false,
@@ -43,13 +46,13 @@ impl Game {
                 self.my_id = payload.id;
             },
             ServerMessage::NewEntity(payload) => {
-                self.state.add_entity(payload.entity);
+                self.authoritative_state.add_entity(payload.entity);
             },
             ServerMessage::RemoveEntity(payload) => {
-                self.state.remove_entity(payload.entity);
+                self.authoritative_state.remove_entity(payload.entity);
             },
             ServerMessage::SetMap(payload) => {
-                self.state.set_map(payload.map);
+                self.authoritative_state.set_map(payload.map);
             },
             ServerMessage::LastProcessedInput(payload) => {
                 let mut tmp = Vec::new();
