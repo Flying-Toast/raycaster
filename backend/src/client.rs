@@ -7,6 +7,7 @@ pub struct Client {
     responder: Responder,
     player_entity: EntityID,
     pub last_processed_input: u32,
+    pub last_acknowledged_input: u32,
 }
 
 impl Client {
@@ -15,6 +16,7 @@ impl Client {
             responder,
             player_entity,
             last_processed_input: 0,
+            last_acknowledged_input: 0,
         }
     }
 
