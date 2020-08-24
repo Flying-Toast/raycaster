@@ -92,7 +92,7 @@ impl Controls {
         Self {
             state,
             bindings,
-            next_input_id: 0,
+            next_input_id: 1,
             last_input_time: 0.0,
             keydown_cb,
             keyup_cb,
