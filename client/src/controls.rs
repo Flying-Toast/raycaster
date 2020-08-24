@@ -58,7 +58,7 @@ impl Controls {
                      0 // use a delta of 0 for the first input
                  } else {
                      now - self.last_input_time
-                 }
+                 };
         self.last_input_time = now;
 
         Input::new(self.get_state(), self.next_id(), dt as u8)
