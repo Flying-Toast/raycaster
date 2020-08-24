@@ -1,11 +1,39 @@
 macro_rules! bitflags {
     ($struct_vis:vis $flags_struct:ident; $enum_vis:vis $flag_enum:ident { $($flag:ident),*$(,)? }) => {
         #[repr(usize)]
-        #[derive(Copy, Clone, strum_macros::EnumCount, Debug, strum_macros::EnumIter, strum_macros::AsRefStr)]
+        #[derive(Copy, Clone, Debug)]
         $enum_vis enum $flag_enum {
             $(
                 $flag,
             )*
+        }
+
+        impl $flag_enum {
+            const fn count() -> usize {
+                macro_rules! noop {
+                    ($_:ident) => {};
+                }
+
+                let mut cnt = 0;
+                $(
+                    noop!($flag);
+                    cnt += 1;
+                )*
+
+                cnt
+            }
+
+            fn values() -> &'static [Self] {
+                &[$(Self::$flag,)*]
+            }
+
+            fn as_str(self) -> &'static str {
+                match self {
+                    $(
+                        Self::$flag => stringify!($flag),
+                    )*
+                }
+            }
         }
 
         #[derive(Clone)]
@@ -52,14 +80,7 @@ macro_rules! bitflags {
 
             #[allow(dead_code)]
             const fn num_bytes() -> usize {
-                (Self::num_flags() / 8) + ((Self::num_flags() % 8 != 0) as usize)
-            }
-
-            #[allow(dead_code)]
-            const fn num_flags() -> usize {
-                use strum::EnumCount;
-
-                $flag_enum::COUNT
+                ($flag_enum::count() / 8) + (($flag_enum::count() % 8 != 0) as usize)
             }
 
             #[allow(dead_code)]
@@ -73,11 +94,9 @@ macro_rules! bitflags {
 
         impl std::fmt::Debug for $flags_struct {
             fn fmt(&self, fmt: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                use strum::IntoEnumIterator;
-
                 let mut debug = fmt.debug_struct(stringify!($flags_struct));
-                for flag in $flag_enum::iter() {
-                    debug.field(flag.as_ref(), &self.get(flag));
+                for flag in $flag_enum::values() {
+                    debug.field(flag.as_str(), &self.get(*flag));
                 }
 
                 debug.finish()
