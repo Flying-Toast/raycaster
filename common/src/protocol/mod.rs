@@ -19,4 +19,5 @@ s2c_payloads!(
     SetMap,                         SetMapPayload,
     LastProcessedInput,             LastProcessedInputPayload,
     Ready,                          ReadyPayload,
+    ForeignInput,                   ForeignInputPayload,
 );

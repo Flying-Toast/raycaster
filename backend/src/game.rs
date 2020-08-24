@@ -46,15 +46,24 @@ impl Game {
 
     pub fn on_client_message(&mut self, client_id: ClientID, message: ClientMessage) {
         // ignore the message if we don't know a client with this id
-        if let Some(client) = self.clients.get_mut(&client_id) {
-            match message {
-                ClientMessage::Input(payload) => {
-                    self.state.apply_input(client.player_entity(), &payload.input);
-                    client.last_processed_input = payload.input.seq_id();
-                },
-            }
-        } else {
+        if !self.clients.contains_key(&client_id) {
             eprintln!("Ignoring a message from client #{:?} because they are not in the game", client_id);
+            return;
+        }
+
+        match message {
+            ClientMessage::Input(payload) => {
+                let client = self.clients.get_mut(&client_id).unwrap();
+                let player_entity = client.player_entity();
+
+                self.state.apply_input(player_entity, &payload.input);
+                client.last_processed_input = payload.input.seq_id();
+
+                self.broadcast_message_except_to(
+                    &ForeignInputPayload::assemble(&player_entity, &payload.input),
+                    client_id
+                );
+            },
         }
     }
 
@@ -93,6 +102,15 @@ impl Game {
     fn broadcast_message(&mut self, message: &BuiltPayload) {
         for client in self.clients.values_mut() {
             client.send(message);
+        }
+    }
+
+    /// Sends `message` to all connected clients except `excluded_client`
+    fn broadcast_message_except_to(&mut self, message: &BuiltPayload, excluded_client: ClientID) {
+        for (id, client) in self.clients.iter_mut() {
+            if *id != excluded_client {
+                client.send(message);
+            }
         }
     }
 

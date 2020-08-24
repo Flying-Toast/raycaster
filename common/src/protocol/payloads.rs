@@ -72,6 +72,20 @@ def_serialized_fields!(
     ReadyPayload {}
 );
 
+/// Someone else's input
+#[derive(Debug)]
+pub struct ForeignInputPayload {
+    pub puppeteer: EntityID,
+    pub input: Input,
+}
+
+def_serialized_fields!(
+    ForeignInputPayload {
+        puppeteer <- EntityID,
+        input <- Input,
+    }
+);
+
 
 // CLIENT-TO-SERVER PAYLOADS:
 
