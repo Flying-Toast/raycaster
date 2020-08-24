@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use crate::map::Map;
 use crate::entity::{Entity, EntityID};
+use crate::input::Input;
 
 
 #[derive(Debug)]
@@ -15,6 +16,9 @@ impl GameState {
             map,
             entities: HashMap::new(),
         }
+    }
+
+    pub fn apply_input(&mut self, puppeteer: EntityID, input: &Input) {
     }
 
     pub fn set_map(&mut self, map: Map) {

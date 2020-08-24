@@ -6,6 +6,7 @@ use common::protocol::payload::BuiltPayload;
 pub struct Client {
     responder: Responder,
     player_entity: EntityID,
+    pub last_processed_input: u32,
 }
 
 impl Client {
@@ -13,6 +14,7 @@ impl Client {
         Self {
             responder,
             player_entity,
+            last_processed_input: 0,
         }
     }
 
