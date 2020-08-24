@@ -9,6 +9,7 @@ use common::input::Input;
 pub struct Game {
     state: GameState,
     my_id: EntityID,
+    ready: bool,
     /// For client-side prediction
     unprocessed_inputs: Vec<Input>,
 }
@@ -19,8 +20,13 @@ impl Game {
             state: GameState::new(Map::dummy()),
             // dummy value, overwritten when "YourID" message is received
             my_id: EntityID::new(12345),
+            ready: false,
             unprocessed_inputs: Vec::new(),
         }
+    }
+
+    pub fn ready(&self) -> bool {
+        self.ready
     }
 
     /// Pushes an input to the unprocessed inputs queue
@@ -30,6 +36,9 @@ impl Game {
 
     pub fn on_message(&mut self, message: ServerMessage) {
         match message {
+            ServerMessage::Ready(_) => {
+                self.ready = true;
+            },
             ServerMessage::YourID(payload) => {
                 self.my_id = payload.id;
             },

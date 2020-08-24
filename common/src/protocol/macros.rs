@@ -1,5 +1,6 @@
 macro_rules! def_serialized_fields {
     ($payload_type:ident {$($field_name:ident <- $encode_type:ty),*$(,)?}) => {
+        #[allow(unused_variables)]
         impl crate::protocol::payload::Decodable for crate::protocol::payloads::$payload_type {
             fn decode_from(pieces: &mut crate::protocol::payload::Pieces) -> Result<Self, crate::error::CME> {
                 Ok(Self {
@@ -10,6 +11,7 @@ macro_rules! def_serialized_fields {
             }
         }
 
+        #[allow(unused_mut)]
         impl crate::protocol::payloads::$payload_type {
             pub fn assemble($($field_name: &$encode_type),*) -> crate::protocol::payload::BuiltPayload {
                 let mut builder = builder!();

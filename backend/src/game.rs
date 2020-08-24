@@ -129,5 +129,7 @@ impl Game {
             client.send(&NewEntityPayload::assemble(entity));
         }
         client.send(&SetMapPayload::assemble(self.state.map()));
+
+        client.send(&ReadyPayload::assemble());
     }
 }

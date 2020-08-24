@@ -18,4 +18,5 @@ s2c_payloads!(
     NewEntity,                      NewEntityPayload,
     SetMap,                         SetMapPayload,
     LastProcessedInput,             LastProcessedInputPayload,
+    Ready,                          ReadyPayload,
 );

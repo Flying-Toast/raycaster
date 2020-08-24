@@ -64,6 +64,14 @@ def_serialized_fields!(
     }
 );
 
+/// Sent to a new client after they have been sent the initial state
+#[derive(Debug)]
+pub struct ReadyPayload;
+
+def_serialized_fields!(
+    ReadyPayload {}
+);
+
 
 // CLIENT-TO-SERVER PAYLOADS:
 
