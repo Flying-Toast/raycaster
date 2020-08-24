@@ -103,7 +103,7 @@ macro_rules! codable_primatives {
     };
 }
 
-codable_primatives!(u16, u32, f32);
+codable_primatives!(u8, u16, u32, f32);
 
 impl Encodable for &str {
     fn encode_to(self, builder: &mut PayloadBuilder) {
