@@ -55,10 +55,10 @@ impl Controls {
         let now = window().unwrap().performance().unwrap().now();
 
         let dt = if self.last_input_time == 0.0 {
-                     0 // use a delta of 0 for the first input
-                 } else {
-                     (now - self.last_input_time) as u8
-                 };
+            0 // use a delta of 0 for the first input
+        } else {
+            (now - self.last_input_time) as u8
+        };
         self.last_input_time = now;
 
         Input::new(self.get_state(), self.next_id(), dt)

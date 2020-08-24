@@ -33,12 +33,12 @@ pub fn start(server_tx: flume::Sender<NetEvent>, port: u16) -> Result<(), BKE> {
 
 async fn handle_connection(stream: TcpStream, tx: flume::Sender<NetEvent>, id: u32) {
     let ws_stream = match accept_async(stream).await {
-                        Ok(s) => s,
-                        Err(e) => {
-                            eprintln!("Error with websocket handshake (client #{}): {}", id, e);
-                            return;
-                        },
-                    };
+        Ok(s) => s,
+        Err(e) => {
+            eprintln!("Error with websocket handshake (client #{}): {}", id, e);
+            return;
+        },
+    };
 
     let (mut outgoing, mut incoming) = ws_stream.split();
 
