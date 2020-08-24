@@ -1,9 +1,8 @@
 use crate::vector::Vector;
-use crate::error::*;
-use crate::protocol::payload::{Pieces, PayloadBuilder, Encodable, Decodable};
+use proc::Codable;
 
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, Codable)]
 pub struct EntityID(u16);
 
 impl EntityID {
@@ -12,21 +11,7 @@ impl EntityID {
     }
 }
 
-impl Encodable for EntityID {
-    fn encode_to(self, builder: &mut PayloadBuilder) {
-        builder.add(self.0);
-    }
-}
-
-impl Decodable for EntityID {
-    fn decode_from(pieces: &mut Pieces) -> Result<Self, CME> {
-        Ok(
-            EntityID::new(pieces.get()?)
-        )
-    }
-}
-
-#[derive(Debug)]
+#[derive(Debug, Codable)]
 pub struct Entity {
     location: Vector,
     id: EntityID,
@@ -46,23 +31,5 @@ impl Entity {
 
     pub fn id(&self) -> EntityID {
         self.id
-    }
-}
-
-impl Encodable for &Entity {
-    fn encode_to(self, builder: &mut PayloadBuilder) {
-        builder.add(self.id());
-        builder.add(self.location());
-    }
-}
-
-impl Decodable for Entity {
-    fn decode_from(pieces: &mut Pieces) -> Result<Self, CME> {
-        let id: EntityID = pieces.get()?;
-        let location: Vector = pieces.get()?;
-
-        Ok(
-            Entity::new(id, location)
-        )
     }
 }

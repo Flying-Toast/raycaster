@@ -84,7 +84,7 @@ pub trait Decodable {
 macro_rules! codable_primatives {
     ($($primative:ty),*$(,)?) => {
         $(
-            impl Encodable for $primative {
+            impl Encodable for &$primative {
                 fn encode_to(self, builder: &mut PayloadBuilder) {
                     builder.extend(&self.to_be_bytes());
                 }
@@ -108,7 +108,7 @@ codable_primatives!(u8, u16, u32, f32);
 impl Encodable for &str {
     fn encode_to(self, builder: &mut PayloadBuilder) {
         let length = self.len() as u32;
-        builder.add(length);
+        builder.add(&length);
         builder.extend(self.as_bytes());
     }
 }

@@ -36,7 +36,7 @@ impl Game {
     pub fn on_client_connect(&mut self, client_id: ClientID, responder: Responder) {
         let mut client = Client::new(responder, self.gen_entity_id());
 
-        client.send(&YourIDPayload::assemble(client.player_entity()));
+        client.send(&YourIDPayload::assemble(&client.player_entity()));
         // TODO: actual spawpoints
         let entity = Entity::new(client.player_entity(), Vector::new(2.5, 2.5));
         self.announce_entity(&entity);
@@ -64,7 +64,7 @@ impl Game {
             if client.last_processed_input == client.last_acknowledged_input {
                 continue;
             }
-            client.send(&LastProcessedInputPayload::assemble(client.last_processed_input));
+            client.send(&LastProcessedInputPayload::assemble(&client.last_processed_input));
             client.last_acknowledged_input = client.last_processed_input;
         }
 
@@ -86,7 +86,7 @@ impl Game {
 
     fn remove_entity(&mut self, entity_id: EntityID) {
         if let Some(_) = self.state.remove_entity(entity_id) {
-            self.broadcast_message(&RemoveEntityPayload::assemble(entity_id));
+            self.broadcast_message(&RemoveEntityPayload::assemble(&entity_id));
         }
     }
 

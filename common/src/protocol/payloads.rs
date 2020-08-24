@@ -37,7 +37,7 @@ pub struct NewEntityPayload {
 
 def_serialized_fields!(
     NewEntityPayload {
-        entity <- &Entity,
+        entity <- Entity,
     }
 );
 
@@ -49,7 +49,7 @@ pub struct SetMapPayload {
 
 def_serialized_fields!(
     SetMapPayload {
-        map <- &Map,
+        map <- Map,
     }
 );
 
@@ -74,6 +74,6 @@ pub struct InputPayload {
 
 def_serialized_fields!(
     InputPayload {
-        input <- &Input,
+        input <- Input,
     }
 );

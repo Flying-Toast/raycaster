@@ -1,5 +1,4 @@
-use crate::error::*;
-use crate::protocol::payload::{Pieces, PayloadBuilder, Encodable, Decodable};
+use proc::Codable;
 
 
 bitflags!(
@@ -12,7 +11,7 @@ bitflags!(
     }
 );
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Codable)]
 pub struct InputState {
     bistate_flags: BistateInputs,
 }
@@ -29,21 +28,7 @@ impl InputState {
     }
 }
 
-impl Encodable for &InputState {
-    fn encode_to(self, builder: &mut PayloadBuilder) {
-        builder.add(&self.bistate_flags);
-    }
-}
-
-impl Decodable for InputState {
-    fn decode_from(pieces: &mut Pieces) -> Result<Self, CME> {
-        Ok(Self {
-            bistate_flags: pieces.get()?,
-        })
-    }
-}
-
-#[derive(Debug)]
+#[derive(Debug, Codable)]
 pub struct Input {
     state: InputState,
     seq_id: u32,
@@ -69,21 +54,5 @@ impl Input {
 
     pub fn dt(&self) -> u8 {
         self.dt
-    }
-}
-
-impl Encodable for &Input {
-    fn encode_to(self, builder: &mut PayloadBuilder) {
-        builder.add(&self.state);
-        builder.add(self.seq_id);
-        builder.add(self.dt);
-    }
-}
-
-impl Decodable for Input {
-    fn decode_from(pieces: &mut Pieces) -> Result<Self, CME> {
-        Ok(
-            Self::new(pieces.get()?, pieces.get()?, pieces.get()?)
-        )
     }
 }

@@ -11,7 +11,7 @@ macro_rules! def_serialized_fields {
         }
 
         impl crate::protocol::payloads::$payload_type {
-            pub fn assemble($($field_name: $encode_type),*) -> crate::protocol::payload::BuiltPayload {
+            pub fn assemble($($field_name: &$encode_type),*) -> crate::protocol::payload::BuiltPayload {
                 let mut builder = builder!();
                 $(
                     builder.add($field_name);
