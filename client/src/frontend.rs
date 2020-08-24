@@ -6,6 +6,7 @@ use web_sys::window;
 use crate::network::{Network, NetworkStatus};
 use crate::game::Game;
 use crate::controls::Controls;
+use common::protocol::payloads::InputPayload;
 
 
 enum RunAgain { Yes, No }
@@ -47,7 +48,9 @@ impl Frontend {
             self.game.on_message(message);
         }
 
-        // do stuff...
+        let input_sample = self.controls.get_input();
+        todo!("queue input_sample and apply locally");
+        self.network.send(&InputPayload::assemble(&input_sample));
 
         self.network.flush();
 

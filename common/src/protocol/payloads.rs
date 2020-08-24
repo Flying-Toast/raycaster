@@ -1,5 +1,6 @@
 use crate::entity::{EntityID, Entity};
 use crate::map::Map;
+use crate::input::Input;
 
 
 /// Tells a client what their player entity's id is
@@ -50,16 +51,13 @@ def_serialized_fields!(
     }
 );
 
-//TEMP
 #[derive(Debug)]
-pub struct HelloPayload {
-    pub message: String,
-    pub random_u32: u32,
+pub struct InputPayload {
+    pub input: Input,
 }
 
 def_serialized_fields!(
-    HelloPayload {
-        message <- &str,
-        random_u32 <- u32,
+    InputPayload {
+        input <- &Input,
     }
 );

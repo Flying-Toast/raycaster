@@ -53,8 +53,8 @@ impl Game {
         }
 
         match message {
-            ClientMessage::Hello(payload) => {
-                println!("Got ClientHelloPayload: {:?}", payload);
+            ClientMessage::Input(payload) => {
+                todo!();
             },
         }
     }
