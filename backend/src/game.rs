@@ -61,7 +61,7 @@ impl Game {
 
     pub fn tick(&mut self, dt: u128) {
         for client in self.clients.values_mut() {
-            if client.last_processed_input == client.last_acknowledged_input {
+            if client.last_processed_input == client.last_acknowledged_input || client.last_processed_input == 0 {
                 continue;
             }
             client.send(&LastProcessedInputPayload::assemble(&client.last_processed_input));
