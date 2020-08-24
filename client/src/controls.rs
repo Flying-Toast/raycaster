@@ -50,7 +50,7 @@ pub struct Controls {
 
 impl Controls {
     pub fn get_state(&mut self) -> InputState {
-        (*self.state.borrow()).clone()
+        self.state.borrow().clone()
     }
 
     pub fn new() -> Self {
