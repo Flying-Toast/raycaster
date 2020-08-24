@@ -49,7 +49,7 @@ impl Frontend {
         }
 
         let input_sample = self.controls.get_input();
-        todo!("queue input_sample and apply locally");
+        //TODO: queue input_sample and apply locally
         self.network.send(&InputPayload::assemble(&input_sample));
 
         self.network.flush();

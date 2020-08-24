@@ -54,7 +54,7 @@ impl Game {
 
         match message {
             ClientMessage::Input(payload) => {
-                todo!();
+                //TODO
             },
         }
     }
