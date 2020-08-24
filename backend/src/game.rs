@@ -47,15 +47,14 @@ impl Game {
 
     pub fn on_client_message(&mut self, client_id: ClientID, message: ClientMessage) {
         // ignore the message if we don't know a client with this id
-        if !self.clients.contains_key(&client_id) {
+        if let Some(client) = self.clients.get(&client_id) {
+            match message {
+                ClientMessage::Input(payload) => {
+                    self.state.apply_input(client.player_entity(), &payload.input);
+                },
+            }
+        } else {
             eprintln!("Ignoring a message from client #{:?} because they are not in the game", client_id);
-            return;
-        }
-
-        match message {
-            ClientMessage::Input(payload) => {
-                //TODO
-            },
         }
     }
 
