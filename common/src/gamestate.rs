@@ -4,7 +4,7 @@ use crate::entity::{Entity, EntityID};
 use crate::input::Input;
 
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct GameState {
     map: Map,
     entities: HashMap<EntityID, Entity>,

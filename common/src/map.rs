@@ -11,7 +11,7 @@ pub enum TileType {
     Wall,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Tile {
     tile_type: TileType,
 }
@@ -24,7 +24,7 @@ impl Tile {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Map {
     width: usize,
     height: usize,

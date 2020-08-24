@@ -8,7 +8,10 @@ use common::input::Input;
 #[derive(Debug)]
 pub struct Game {
     authoritative_state: GameState,
+    /// A clone of the most recent authoritative_state with our unprocessed_inputs applied on top
     predicted_state: GameState,
+    /// Our prediction becomes invalid whenever we receive an authoritative state change
+    prediction_invalid: bool,
     my_id: EntityID,
     ready: bool,
     /// For client-side prediction
@@ -21,6 +24,7 @@ impl Game {
         Self {
             authoritative_state: dummy_state.clone(),
             predicted_state: dummy_state,
+            prediction_invalid: false,
             // dummy value, overwritten when "YourID" message is received
             my_id: EntityID::new(12345),
             ready: false,
@@ -37,6 +41,14 @@ impl Game {
         self.unprocessed_inputs.push(input);
     }
 
+    pub fn predict_state(&mut self) -> &GameState {
+        if self.prediction_invalid {
+            self.predicted_state = self.authoritative_state.clone();
+            self.prediction_invalid = false;
+        }
+        todo!();
+    }
+
     pub fn on_message(&mut self, message: ServerMessage) {
         match message {
             ServerMessage::Ready(_) => {
@@ -47,12 +59,15 @@ impl Game {
             },
             ServerMessage::NewEntity(payload) => {
                 self.authoritative_state.add_entity(payload.entity);
+                self.prediction_invalid = true;
             },
             ServerMessage::RemoveEntity(payload) => {
                 self.authoritative_state.remove_entity(payload.entity);
+                self.prediction_invalid = true;
             },
             ServerMessage::SetMap(payload) => {
                 self.authoritative_state.set_map(payload.map);
+                self.prediction_invalid = true;
             },
             ServerMessage::LastProcessedInput(payload) => {
                 let mut tmp = Vec::new();

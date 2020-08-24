@@ -11,7 +11,7 @@ impl EntityID {
     }
 }
 
-#[derive(Debug, Codable)]
+#[derive(Debug, Codable, Clone)]
 pub struct Entity {
     location: Vector,
     id: EntityID,
