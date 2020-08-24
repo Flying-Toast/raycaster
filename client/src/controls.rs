@@ -57,11 +57,11 @@ impl Controls {
         let dt = if self.last_input_time == 0.0 {
                      0 // use a delta of 0 for the first input
                  } else {
-                     now - self.last_input_time
+                     (now - self.last_input_time) as u8
                  };
         self.last_input_time = now;
 
-        Input::new(self.get_state(), self.next_id(), dt as u8)
+        Input::new(self.get_state(), self.next_id(), dt)
     }
 
     pub fn new() -> Self {
