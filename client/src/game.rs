@@ -83,10 +83,6 @@ impl Game {
                 self.authoritative_state.set_map(payload.map);
                 self.prediction_invalid = true;
             },
-            ServerMessage::ForeignInput(payload) => {
-                self.authoritative_state.apply_input(payload.puppeteer, &payload.input);
-                self.prediction_invalid = true;
-            },
             ServerMessage::LastProcessedInput(payload) => {
                 let mut tmp = Vec::new();
                 std::mem::swap(&mut tmp, &mut self.unprocessed_inputs);
