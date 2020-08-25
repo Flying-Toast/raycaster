@@ -29,22 +29,39 @@ impl InputState {
 }
 
 #[derive(Debug, Codable)]
-pub struct Input {
+pub struct ForeignInput {
     state: InputState,
-    seq_id: u32,
     dt: u8,
 }
 
-impl Input {
-    pub fn new(state: InputState, seq_id: u32, dt: u8) -> Self {
+impl ForeignInput {
+    pub fn new(state: InputState, dt: u8) -> Self {
         Self {
             state,
-            seq_id,
             dt,
+        }
+    }
+}
+
+#[derive(Debug, Codable)]
+pub struct Input {
+    input: ForeignInput,
+    seq_id: u32,
+}
+
+impl Input {
+    pub fn new(input: ForeignInput, seq_id: u32) -> Self {
+        Self {
+            input,
+            seq_id,
         }
     }
 
     pub fn seq_id(&self) -> u32 {
         self.seq_id
+    }
+
+    pub fn as_foreign(&self) -> &ForeignInput {
+        &self.input
     }
 }

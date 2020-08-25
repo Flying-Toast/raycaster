@@ -56,7 +56,7 @@ impl Game {
             .iter()
             .skip_while(|input| input.seq_id() <= last_predicted_input)
         {
-            self.predicted_state.apply_input(self.my_id, input);
+            self.predicted_state.apply_input(self.my_id, input.as_foreign());
             self.last_predicted_input = input.seq_id();
         }
 

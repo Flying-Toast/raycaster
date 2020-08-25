@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use crate::map::Map;
 use crate::entity::{Entity, EntityID};
-use crate::input::Input;
+use crate::input::ForeignInput;
 
 
 #[derive(Debug, Clone)]
@@ -18,7 +18,7 @@ impl GameState {
         }
     }
 
-    pub fn apply_input(&mut self, puppeteer: EntityID, input: &Input) {
+    pub fn apply_input(&mut self, puppeteer: EntityID, input: &ForeignInput) {
         //TODO
     }
 

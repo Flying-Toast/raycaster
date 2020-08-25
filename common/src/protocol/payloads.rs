@@ -1,6 +1,6 @@
 use crate::entity::{EntityID, Entity};
 use crate::map::Map;
-use crate::input::Input;
+use crate::input::{ForeignInput, Input};
 
 
 // SERVER-TO-CLIENT PAYLOADS:

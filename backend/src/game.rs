@@ -54,7 +54,7 @@ impl Game {
         match message {
             ClientMessage::Input(payload) => {
                 let client = self.clients.get_mut(&client_id).unwrap();
-                self.state.apply_input(client.player_entity(), &payload.input);
+                self.state.apply_input(client.player_entity(), payload.input.as_foreign());
                 client.last_processed_input = payload.input.seq_id();
             },
         }

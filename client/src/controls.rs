@@ -2,7 +2,7 @@ use std::rc::Rc;
 use std::cell::RefCell;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
-use common::input::{InputState, BistateInput, Input};
+use common::input::{InputState, BistateInput, Input, ForeignInput};
 use web_sys::{KeyboardEvent, window};
 
 
@@ -51,7 +51,9 @@ pub struct Controls {
 
 impl Controls {
     pub fn get_input(&mut self, dt: u8) -> Input {
-        Input::new(self.get_state(), self.next_id(), dt)
+        let foreign = ForeignInput::new(self.get_state(), dt);
+
+        Input::new(foreign, self.next_id())
     }
 
     pub fn new() -> Self {
