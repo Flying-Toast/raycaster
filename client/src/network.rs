@@ -65,7 +65,8 @@ impl Network {
         }
 
         if let NetworkStatus::Connected = self.status() {
-            self.ws.as_ref().unwrap().send_with_u8_array(&self.outgoing_queue).unwrap();
+            let bytes = lz4_compress::compress(&self.outgoing_queue);
+            self.ws.as_ref().unwrap().send_with_u8_array(&bytes).unwrap();
             self.outgoing_queue.clear();
         } else {
             console_error!("Tried to send to a closed websocket");
@@ -86,6 +87,10 @@ impl Network {
         self.onmessage_cb = Some(Closure::wrap(Box::new(move |msg: MessageEvent| {
             let message = msg.data().dyn_into::<ArrayBuffer>().unwrap();
             let bytes = Uint8Array::new(&message).to_vec();
+            let bytes = match lz4_compress::decompress(&bytes) {
+                Ok(b) => b,
+                Err(_) => panic!("Error decompressing packet"),
+            };
             let mut pieces = Pieces::new(&bytes);
 
             loop {

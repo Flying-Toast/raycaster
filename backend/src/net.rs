@@ -53,6 +53,7 @@ async fn handle_connection(stream: TcpStream, tx: flume::Sender<NetEvent>, id: u
         while let Ok(event) = resp_rx.recv_async().await {
             match event {
                 ServerEvent::Message(bytes) => {
+                    let bytes = lz4_compress::compress(&bytes);
                     if let Err(e) = outgoing.send(Message::Binary(bytes)).await {
                         eprintln!("Error sending to client #{}: {} - disconnecting", id, e);
                         let _ = outgoing.close().await;
@@ -78,6 +79,13 @@ async fn handle_connection(stream: TcpStream, tx: flume::Sender<NetEvent>, id: u
     let net_events = async move {
         while let Some(message) = incoming.next().await {
             if let Ok(Message::Binary(bytes)) = message {
+                let bytes = match lz4_compress::decompress(&bytes) {
+                    Ok(b) => b,
+                    Err(_) => {
+                        eprintln!("Error decompressing packet from client #{}", id);
+                        break;
+                    },
+                };
                 let mut pieces = Pieces::new(&bytes);
 
                 loop {
