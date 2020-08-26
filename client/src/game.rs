@@ -83,8 +83,10 @@ impl Game {
                 self.authoritative_state.set_map(payload.map);
                 self.prediction_invalid = true;
             },
-            ServerMessage::ForeignInput(payload) => {
-                self.authoritative_state.apply_input(payload.puppeteer, &payload.input);
+            ServerMessage::ForeignInputs(payload) => {
+                for input in payload.inputs {
+                    self.authoritative_state.apply_input(payload.puppeteer, &input);
+                }
                 self.prediction_invalid = true;
             },
             ServerMessage::LastProcessedInput(payload) => {

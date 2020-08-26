@@ -74,15 +74,15 @@ def_serialized_fields!(
 
 /// Someone else's input
 #[derive(Debug)]
-pub struct ForeignInputPayload {
+pub struct ForeignInputsPayload {
     pub puppeteer: EntityID,
-    pub input: ForeignInput,
+    pub inputs: Vec<ForeignInput>,
 }
 
 def_serialized_fields!(
-    ForeignInputPayload {
+    ForeignInputsPayload {
         puppeteer <- EntityID,
-        input <- ForeignInput,
+        inputs <- [ForeignInput],
     }
 );
 

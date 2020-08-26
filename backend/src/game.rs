@@ -58,21 +58,28 @@ impl Game {
                 self.state.apply_input(player_entity, payload.input.as_foreign());
                 client.last_processed_input = payload.input.seq_id();
 
-                self.broadcast_message_except_to(
-                    &ForeignInputPayload::assemble(&player_entity, payload.input.as_foreign()),
-                    client_id
-                );
+                client.unbroadcast_inputs.push(payload.input.into_foreign());
             },
         }
     }
 
     pub fn tick(&mut self, dt: u128) {
-        for client in self.clients.values_mut() {
-            if client.last_processed_input == client.last_acknowledged_input || client.last_processed_input == 0 {
-                continue;
+        let mut foreign_inputs: Vec<(ClientID, BuiltPayload)> = Vec::new();
+        for (id, client) in self.clients.iter_mut() {
+            foreign_inputs.push((
+                *id,
+                ForeignInputsPayload::assemble(&client.player_entity(), &client.unbroadcast_inputs)
+            ));
+            client.unbroadcast_inputs.clear();
+
+            if client.last_processed_input != client.last_acknowledged_input && client.last_processed_input != 0 {
+                client.send(&LastProcessedInputPayload::assemble(&client.last_processed_input));
+                client.last_acknowledged_input = client.last_processed_input;
             }
-            client.send(&LastProcessedInputPayload::assemble(&client.last_processed_input));
-            client.last_acknowledged_input = client.last_processed_input;
+        }
+
+        for (id, payload) in foreign_inputs {
+            self.broadcast_message_except_to(&payload, id);
         }
 
         self.send_queued_messages();

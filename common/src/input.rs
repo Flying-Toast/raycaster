@@ -64,4 +64,8 @@ impl Input {
     pub fn as_foreign(&self) -> &ForeignInput {
         &self.input
     }
+
+    pub fn into_foreign(self) -> ForeignInput {
+        self.input
+    }
 }
