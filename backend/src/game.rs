@@ -66,11 +66,13 @@ impl Game {
     pub fn tick(&mut self, dt: u128) {
         let mut foreign_inputs: Vec<(ClientID, BuiltPayload)> = Vec::new();
         for (id, client) in self.clients.iter_mut() {
-            foreign_inputs.push((
-                *id,
-                ForeignInputsPayload::assemble(&client.player_entity(), &client.unbroadcast_inputs)
-            ));
-            client.unbroadcast_inputs.clear();
+            if client.unbroadcast_inputs.len() != 0 {
+                foreign_inputs.push((
+                    *id,
+                    ForeignInputsPayload::assemble(&client.player_entity(), &client.unbroadcast_inputs)
+                ));
+                client.unbroadcast_inputs.clear();
+            }
 
             if client.last_processed_input != client.last_acknowledged_input && client.last_processed_input != 0 {
                 client.send(&LastProcessedInputPayload::assemble(&client.last_processed_input));
