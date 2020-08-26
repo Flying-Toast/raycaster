@@ -123,3 +123,25 @@ impl Decodable for String {
         Ok(string)
     }
 }
+
+impl<'a, T> Encodable for &'a [T] where &'a T: Encodable {
+    fn encode_to(self, builder: &mut PayloadBuilder) {
+        let length = self.len() as u32;
+        builder.add(&length);
+        for i in self {
+            builder.add(i);
+        }
+    }
+}
+
+impl<T: Decodable> Decodable for Vec<T> {
+    fn decode_from(pieces: &mut Pieces) -> Result<Self, CME> {
+        let length: u32 = pieces.get()?;
+        let mut v = Vec::with_capacity(length as usize);
+        for _ in 0..length {
+            v.push(pieces.get()?);
+        }
+
+        Ok(v)
+    }
+}
