@@ -4,6 +4,9 @@ version = "0.1.0"
 authors = ["Flying-Toast"]
 edition = "2018"
 
+[profile.release]
+lto = true
+
 [dependencies]
 common = { path = "../common" }
 tokio-tungstenite = "0.11"
