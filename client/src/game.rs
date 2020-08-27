@@ -39,6 +39,10 @@ impl Game {
         self.ready
     }
 
+    pub fn my_id(&self) -> EntityID {
+        self.my_id
+    }
+
     /// Pushes an input to the unprocessed inputs queue
     pub fn push_input(&mut self, input: Input) {
         self.unprocessed_inputs.push(input);

@@ -6,6 +6,7 @@ use web_sys::window;
 use crate::network::{Network, NetworkStatus};
 use crate::game::Game;
 use crate::controls::Controls;
+use crate::renderer::Renderer;
 use common::protocol::payloads::InputPayload;
 
 
@@ -16,6 +17,7 @@ pub struct Frontend {
     network: Network,
     game: Game,
     controls: Controls,
+    renderer: Renderer,
 }
 
 impl Frontend {
@@ -25,6 +27,7 @@ impl Frontend {
             network: Network::new(),
             game: Game::new(),
             controls: Controls::new(),
+            renderer: Renderer::new(),
         }
     }
 
@@ -57,6 +60,9 @@ impl Frontend {
         self.game.push_input(input_sample);
 
         self.network.flush();
+
+        let my_id = self.game.my_id();
+        self.renderer.render(self.game.predict_state(), my_id);
 
         match status {
             NetworkStatus::Connected => RunAgain::Yes,

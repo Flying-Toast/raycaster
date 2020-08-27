@@ -4,6 +4,7 @@ mod frontend;
 mod network;
 mod game;
 mod controls;
+mod renderer;
 
 use wasm_bindgen::prelude::*;
 
