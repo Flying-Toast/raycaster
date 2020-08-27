@@ -9,5 +9,3 @@ lto = true
 
 [dependencies]
 proc = { path = "./proc" }
-strum = "0.19"
-strum_macros = "0.19"

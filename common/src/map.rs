@@ -1,11 +1,11 @@
 use std::collections::HashMap;
 use std::str::{FromStr, Lines};
-use strum_macros::EnumString;
 use crate::error::*;
 use crate::protocol::payload::{Pieces, PayloadBuilder, Encodable, Decodable};
+use proc::EnumFromStr;
 
 
-#[derive(Debug, Clone, EnumString)]
+#[derive(Debug, Clone, EnumFromStr)]
 pub enum TileType {
     Air,
     Wall,

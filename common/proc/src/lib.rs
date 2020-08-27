@@ -3,6 +3,36 @@ use quote::quote;
 use syn::{Data, parse, Fields, Index};
 
 
+#[proc_macro_derive(EnumFromStr)]
+pub fn enum_fromstr_derive(ts: TokenStream) -> TokenStream {
+    let input: syn::DeriveInput = parse(ts).expect("Can't parse DeriveInput");
+    let data = match input.data {
+        Data::Enum(data) => data,
+        _ => panic!("Not an enum"),
+    };
+    let ident = input.ident;
+    let match_arms = data.variants
+        .iter()
+        .map(|v| {
+            let variant = &v.ident;
+            quote!{
+                stringify!(#variant) => Ok(Self::#variant),
+            }
+        });
+
+    (quote!{
+        impl std::str::FromStr for #ident {
+            type Err = ();
+            fn from_str(s: &str) -> Result<Self, Self::Err> {
+                match s {
+                    #(#match_arms)*
+                    _ => Err(()),
+                }
+            }
+        }
+    }).into()
+}
+
 #[proc_macro_derive(Codable)]
 pub fn codable_derive(ts: TokenStream) -> TokenStream {
     let input: syn::DeriveInput = parse(ts).expect("Can't parse DeriveInput");
