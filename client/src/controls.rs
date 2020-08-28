@@ -43,9 +43,7 @@ pub struct Controls {
     state: Rc<RefCell<InputState>>,
     bindings: Rc<Keybindings>,
     next_input_id: u32,
-    #[allow(dead_code)]
     keydown_cb: Closure<dyn FnMut(KeyboardEvent)>,
-    #[allow(dead_code)]
     keyup_cb: Closure<dyn FnMut(KeyboardEvent)>,
 }
 
@@ -70,7 +68,7 @@ impl Controls {
                 state_clone1.borrow_mut().bistates().set(input, true);
             }
         }) as Box<dyn FnMut(KeyboardEvent)>);
-        window.set_onkeydown(Some(keydown_cb.as_ref().unchecked_ref()));
+        window.add_event_listener_with_callback("keydown", keydown_cb.as_ref().unchecked_ref()).unwrap();
 
         let state_clone2 = state.clone();
         let bindings_clone2 = bindings.clone();
@@ -79,7 +77,7 @@ impl Controls {
                 state_clone2.borrow_mut().bistates().set(input, false);
             }
         }) as Box<dyn FnMut(KeyboardEvent)>);
-        window.set_onkeyup(Some(keyup_cb.as_ref().unchecked_ref()));
+        window.add_event_listener_with_callback("keyup", keyup_cb.as_ref().unchecked_ref()).unwrap();
 
         Self {
             state,
@@ -104,7 +102,7 @@ impl Controls {
 impl Drop for Controls {
     fn drop(&mut self) {
         let window = window().unwrap();
-        window.set_onkeydown(None);
-        window.set_onkeyup(None);
+        window.remove_event_listener_with_callback("keydown", self.keydown_cb.as_ref().unchecked_ref()).unwrap();
+        window.remove_event_listener_with_callback("keyup", self.keyup_cb.as_ref().unchecked_ref()).unwrap();
     }
 }
