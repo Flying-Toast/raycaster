@@ -1,5 +1,11 @@
 import init from "./client.js";
 
-(async function() {
-	await init();
-})();
+addEventListener("load", function() {
+	main();
+});
+
+function main() {
+	(async function() {
+		await init();
+	})();
+}
