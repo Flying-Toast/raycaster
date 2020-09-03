@@ -41,6 +41,10 @@ impl Server {
                 NetEvent::Message(id, message) => self.game.on_client_message(id, message),
             }
         }
+
+        if self.rx.is_disconnected() {
+            panic!("Net thread disconnected");
+        }
     }
 
     /// Starts the main loop.
