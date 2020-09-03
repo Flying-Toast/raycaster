@@ -3,7 +3,11 @@ import subprocess
 
 import sys
 sys.path.append("../util/filewatcher")
-import filewatcher
+try:
+    import filewatcher
+except:
+    print(f"Error: you need to run the script from within '{sys.path[0]}/'.")
+    exit(1)
 
 def on_change():
     if on_change.running_process is not None:
