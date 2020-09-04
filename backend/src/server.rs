@@ -5,15 +5,11 @@ use crate::net::NetEvent;
 use crate::game::Game;
 
 
-/// Runs a `Server` in a new thread.
-/// `rx` is the receiver from the networking thread.
-pub fn run(rx: Receiver<NetEvent>) {
-    thread::Builder::new()
-        .name("server".to_string())
-        .spawn(move || {
-            let mut server = Server::new(rx);
-            server.run();
-        }).unwrap();
+/// Runs a `Server` in this thread.
+/// `rx` is the receiver from the network thread.
+pub fn run(rx: Receiver<NetEvent>) -> ! {
+    let mut server = Server::new(rx);
+    server.run();
 }
 
 struct Server {

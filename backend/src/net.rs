@@ -1,4 +1,5 @@
 use std::fmt;
+use std::thread;
 use tokio::runtime::Runtime;
 use tokio::net::{TcpListener, TcpStream};
 use tokio_tungstenite::accept_async;
@@ -9,9 +10,17 @@ use common::protocol::{ClientMessage, next_message_from_client};
 use common::protocol::payload::{BuiltPayload, Pieces};
 
 
-/// Runs the network server in this thread.
+/// Starts the network in a new thread.
 /// `server_tx` is the transmitting end of a channel for sending `NetEvent`s to the server thread.
-pub fn start(server_tx: flume::Sender<NetEvent>, port: u16) -> Result<(), BKE> {
+pub fn start(server_tx: flume::Sender<NetEvent>, port: u16) {
+    thread::Builder::new()
+        .name("network".to_string())
+        .spawn(move || {
+            run(server_tx, port).unwrap();
+        }).unwrap();
+}
+
+fn run(server_tx: flume::Sender<NetEvent>, port: u16) -> Result<(), BKE> {
     Runtime::new().to(BKE::NetworkFailedToStart)?.block_on(async {
         let address = format!("0.0.0.0:{}", port);
         let mut listener = TcpListener::bind(&address).await
@@ -43,7 +52,7 @@ async fn handle_connection(stream: TcpStream, tx: flume::Sender<NetEvent>, id: u
     let (mut outgoing, mut incoming) = ws_stream.split();
 
     // channel for the `Responder` to send things to this websocket
-    let (resp_tx, mut resp_rx) = flume::unbounded();
+    let (resp_tx, resp_rx) = flume::unbounded();
 
     tx.send(NetEvent::Connect(ClientID(id), Responder::new(resp_tx)))
         .expect("Server channel disconnected");
