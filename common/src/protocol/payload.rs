@@ -2,7 +2,6 @@ use std::mem;
 use std::convert::TryInto;
 use crate::error::*;
 
-
 /// Parses incoming payloads
 #[derive(Debug)]
 pub struct Pieces<'a> {

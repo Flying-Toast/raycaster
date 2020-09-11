@@ -2,7 +2,6 @@ use crate::entity::{EntityID, Entity};
 use crate::map::Map;
 use crate::input::{ForeignInput, Input};
 
-
 // SERVER-TO-CLIENT PAYLOADS:
 
 /// Tells a client what their player entity's id is

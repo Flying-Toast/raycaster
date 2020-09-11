@@ -8,7 +8,6 @@ mod renderer;
 
 use wasm_bindgen::prelude::*;
 
-
 #[wasm_bindgen(start)]
 pub fn start() {
     std::panic::set_hook(Box::new(|info| {

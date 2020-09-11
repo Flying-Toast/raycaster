@@ -9,7 +9,6 @@ use common::protocol::payload::BuiltPayload;
 use common::vector::Vector;
 use common::gamestate::GameState;
 
-
 pub struct Game {
     state: GameState,
     clients: HashMap<ClientID, Client>,

@@ -1,7 +1,6 @@
 use common::entity::EntityID;
 use common::gamestate::GameState;
 
-
 pub struct Renderer {
 }
 

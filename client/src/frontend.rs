@@ -9,7 +9,6 @@ use crate::controls::Controls;
 use crate::renderer::Renderer;
 use common::protocol::payloads::InputPayload;
 
-
 enum RunAgain { Yes, No }
 
 pub struct Frontend {

@@ -3,7 +3,6 @@ use common::entity::EntityID;
 use common::protocol::payload::BuiltPayload;
 use common::input::ForeignInput;
 
-
 pub struct Client {
     responder: Responder,
     player_entity: EntityID,

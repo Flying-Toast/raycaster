@@ -3,7 +3,6 @@ use crate::map::Map;
 use crate::entity::{Entity, EntityID};
 use crate::input::ForeignInput;
 
-
 #[derive(Debug, Clone)]
 pub struct GameState {
     map: Map,

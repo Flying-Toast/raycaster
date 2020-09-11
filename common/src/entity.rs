@@ -1,7 +1,6 @@
 use crate::vector::Vector;
 use proc::Codable;
 
-
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, Codable)]
 pub struct EntityID(u16);
 

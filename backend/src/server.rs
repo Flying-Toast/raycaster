@@ -4,7 +4,6 @@ use std::thread;
 use crate::net::NetEvent;
 use crate::game::Game;
 
-
 /// Runs a `Server` in this thread.
 /// `rx` is the receiver from the network thread.
 pub fn run(rx: Receiver<NetEvent>) -> ! {

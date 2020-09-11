@@ -4,7 +4,6 @@ use common::entity::EntityID;
 use common::protocol::ServerMessage;
 use common::input::Input;
 
-
 #[derive(Debug)]
 pub struct Game {
     authoritative_state: GameState,

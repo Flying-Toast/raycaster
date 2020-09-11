@@ -9,7 +9,6 @@ use crate::error::*;
 use common::protocol::{ClientMessage, next_message_from_client};
 use common::protocol::payload::{BuiltPayload, Pieces};
 
-
 /// Starts the network in a new thread.
 /// `server_tx` is the transmitting end of a channel for sending `NetEvent`s to the server thread.
 pub fn start(server_tx: flume::Sender<NetEvent>, port: u16) {

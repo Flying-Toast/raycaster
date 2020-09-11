@@ -1,6 +1,5 @@
 use proc::Codable;
 
-
 #[derive(Debug, Codable, Clone)]
 pub struct Vector {
     pub x: f32,

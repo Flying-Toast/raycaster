@@ -5,7 +5,6 @@ use wasm_bindgen::JsCast;
 use common::input::{InputState, BistateInput, Input, ForeignInput};
 use web_sys::{KeyboardEvent, window};
 
-
 #[derive(Debug)]
 struct Keybindings {
     forwards: String,

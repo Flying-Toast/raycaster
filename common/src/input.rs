@@ -1,6 +1,5 @@
 use proc::Codable;
 
-
 bitflags!(
     pub BistateInputs;
     pub BistateInput {

@@ -7,7 +7,6 @@ use common::protocol::payload::{Pieces, BuiltPayload};
 use web_sys::{WebSocket, BinaryType, MessageEvent};
 use js_sys::{ArrayBuffer, Uint8Array};
 
-
 #[derive(Debug)]
 pub enum NetworkStatus {
     Connecting,

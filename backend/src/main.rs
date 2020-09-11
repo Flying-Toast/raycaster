@@ -4,7 +4,6 @@ mod error;
 mod game;
 mod client;
 
-
 fn main() {
     let (tx, rx) = flume::unbounded();
 

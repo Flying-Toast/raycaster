@@ -4,7 +4,6 @@ use crate::error::*;
 use crate::protocol::payload::{Pieces, PayloadBuilder, Encodable, Decodable};
 use proc::EnumFromStr;
 
-
 #[derive(Debug, Clone, EnumFromStr)]
 pub enum TileType {
     Air,
