@@ -1,8 +1,8 @@
 /// "Common Error" - error type
 #[derive(Debug)]
 pub enum CME {
-    BadClientMessageType{payload_key: u16},
-    BadServerMessageType{payload_key: u16},
+    BadClientMessageType{payload_key: u8},
+    BadServerMessageType{payload_key: u8},
     /// Tried to parse a type which requires more bytes than
     /// there are left in the packet.
     /// `requested` is how many bytes the read operation requested,

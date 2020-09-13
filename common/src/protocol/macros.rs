@@ -36,7 +36,7 @@ macro_rules! generic_decl_payloads {
             )*
         }
 
-        #[repr(u16)]
+        #[repr(u8)]
         enum $keys_enum {
             $(
                 $enum_variant,
@@ -45,8 +45,8 @@ macro_rules! generic_decl_payloads {
 
         $(
             impl crate::protocol::payloads::$payload_ident {
-                pub const fn payload_key() -> u16 {
-                    $keys_enum::$enum_variant as u16
+                pub const fn payload_key() -> u8 {
+                    $keys_enum::$enum_variant as u8
                 }
             }
         )*
@@ -59,7 +59,7 @@ macro_rules! generic_decl_payloads {
             if pieces.is_empty() {
                 return None;
             }
-            let payload_key: u16 = match pieces.get() {
+            let payload_key: u8 = match pieces.get() {
                 Ok(s) => s,
                 Err(e) => return Some(Err(e)),
             };

@@ -51,9 +51,9 @@ pub struct PayloadBuilder {
 }
 
 impl PayloadBuilder {
-    pub fn new(payload_key: u16) -> Self {
+    pub fn new(payload_key: u8) -> Self {
         Self {
-            bytes: Vec::from(payload_key.to_be_bytes()),
+            bytes: vec![payload_key],
         }
     }
 
