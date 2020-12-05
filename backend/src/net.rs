@@ -1,4 +1,3 @@
-use std::fmt;
 use std::thread;
 use tokio::runtime::Runtime;
 use tokio::net::{TcpListener, TcpStream};
@@ -164,6 +163,7 @@ enum ServerEvent {
     Close,
 }
 
+#[derive(Debug)]
 pub struct Responder {
     net_tx: flume::Sender<ServerEvent>,
     queue: Vec<u8>,
@@ -199,13 +199,5 @@ impl Responder {
         // Send any queued messages before closing
         self.flush();
         let _ = self.net_tx.send(ServerEvent::Close);
-    }
-}
-
-impl fmt::Debug for Responder {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("Responder")
-         .field("net_tx", &"flume::Sender<ServerEvent>")
-         .finish()
     }
 }
