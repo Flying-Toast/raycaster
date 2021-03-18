@@ -70,6 +70,9 @@ impl Map {
         line_num += 1;
         let height: usize = lines.parse_next_line().to(BMF{line_num})?;
         line_num += 1;
+        if width < 3 || height < 3 {
+            return Err(CME::MapTooSmall);
+        }
         let num_tiletypes: u32 = lines.parse_next_line().to(BMF{line_num})?;
 
         let mut tiletype_map = HashMap::new();
@@ -101,10 +104,21 @@ impl Map {
             if row.len() != width {
                 return Err(BMF{line_num});
             }
+            if !matches!(row[0].tile_type, TileType::Wall) || !matches!(row.last().unwrap().tile_type, TileType::Wall) {
+                return Err(CME::NonClosedMap);
+            }
             tiles.push(row);
         }
         if tiles.len() != height {
             return Err(BMF{line_num});
+        }
+
+        for tile in tiles[0].iter()
+            .chain(tiles[tiles.len() - 1].iter())
+        {
+            if !matches!(tile.tile_type, TileType::Wall) {
+                return Err(CME::NonClosedMap);
+            }
         }
 
         Ok(Map {

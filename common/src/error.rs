@@ -12,6 +12,10 @@ pub enum CME {
     BadString{bytes: Vec<u8>},
     BadMapFormat{line_num: usize},
     BadTileType{type_string: String},
+    /// The parsed `Map` does not have walls all around the edges
+    NonClosedMap,
+    /// All maps need to be at least 3x3
+    MapTooSmall,
 }
 
 /// Converts `Result<T, _>` to `Result<T, E>`. Also implemented on `Option`.
