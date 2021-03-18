@@ -30,4 +30,7 @@ features = [
 	"MessageEvent",
 	"console",
 	"KeyboardEvent",
+	"CanvasRenderingContext2d",
+	"HtmlCanvasElement",
+	"Document",
 ]
