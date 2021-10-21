@@ -13,5 +13,5 @@ tokio-tungstenite = "0.15"
 tokio = { version = "1.12", features = ["rt", "rt-multi-thread"] }
 futures-util = "0.3"
 flume = "0.10"
-rand = "0.7"
+rand = "0.8"
 lz4-compress = "0.1"
