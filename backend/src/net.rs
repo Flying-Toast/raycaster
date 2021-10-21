@@ -21,7 +21,7 @@ pub fn start(server_tx: flume::Sender<NetEvent>, port: u16) {
 fn run(server_tx: flume::Sender<NetEvent>, port: u16) -> Result<(), BKE> {
     Runtime::new().to(BKE::NetworkFailedToStart)?.block_on(async {
         let address = format!("0.0.0.0:{}", port);
-        let mut listener = TcpListener::bind(&address).await
+        let listener = TcpListener::bind(&address).await
             .to(BKE::NetworkFailedToStart)?;
         println!("Listening on {}", address);
 
